@@ -42,6 +42,10 @@ async def on_slash_command_completion(inter: disnake.AppCmdInter):
     og_embed.description = f"Command finished. Response (if applicable) is attached."
     og_embed.colour = disnake.Color.green()
     embeds = [og_embed]
-    response = await inter.original_response()
+    try:
+        response = await inter.original_response()
+    except disnake.NotFound:
+        # this means the slash command timed out (usually an internet issue or hypixel api rate limiting)
+        return
     embeds.extend(response.embeds)
     await msg.edit(embeds=embeds)
