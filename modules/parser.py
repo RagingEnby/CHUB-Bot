@@ -57,8 +57,8 @@ async def ensure_all_decoded(data: dict) -> dict:
         elif isinstance(v, bytearray):
             # TODO: Fix this (this does not work)
             decoded_v = await decode_bytes(gzipped_data=v)
-            if 'i' in decoded_v and len(decoded_v) == 1:
-                decoded_v = decoded_v['i']
+            if len(decoded_v) == 1 and 'i' in decoded_v[0]:
+                decoded_v = decoded_v[0]['i']
             data[k] = decoded_v
     return data
 
