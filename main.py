@@ -202,7 +202,7 @@ async def moderation_ban_command(inter: disnake.AppCmdInter, member: disnake.Mem
     if not reason.replace(' ', ''):
         return await inter.send(embed=misc.make_error(
             "no ban reason",
-            "you must provide a ban reason"
+            "You must provide a ban reason."
         ))
 
     reason = reason + f" | Banned by {inter.author.name} ({inter.author.id})"
