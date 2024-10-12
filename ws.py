@@ -1,3 +1,8 @@
+# if you're just a random person you can ignore this file
+# the point of this is i keep a mongodb database with requests
+# made by any of my bots/services. this is just to communicate
+# with the central program that controls this.
+
 import asyncio
 import websockets
 from websockets import ConnectionClosedError, InvalidStatusCode
