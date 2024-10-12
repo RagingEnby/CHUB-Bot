@@ -72,7 +72,7 @@ async def on_member_ban(guild: disnake.Guild, user: disnake.User):
         return
     ban = await guild.fetch_ban(user)
     await usermanager.log_ban(user.id, reason=ban.reason if ban else None)
-    if not ban.reason:
+    if not ban.reason.strip():
         channel = bot.get_channel(config.STAFF_CHANNEL)
         await channel.send(f"**{disnake.utils.escape_markdown(ban.user.name)}** ({ban.user.mention}) was banned without reason. Please remember to provide a reason when banning users!!!!")
 
