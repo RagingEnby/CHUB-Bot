@@ -1,0 +1,11 @@
+.replit
+poetry.lock
+pyproject.toml
+scrts.py
+__pycache__/*
+*.pyc
+.idea/*
+parsed.json
+data.json
+/storage/sbdata
+/storage/inv

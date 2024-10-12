@@ -1,0 +1,34 @@
+import asyncio
+import websockets
+from websockets import ConnectionClosedError, InvalidStatusCode
+from asyncio import CancelledError, TimeoutError
+import json
+
+
+queue = []
+
+
+async def websocket_connector():
+    global queue
+    try:
+        async with websockets.connect("ws://localhost:42069/hypixeltracking/ws") as websocket:
+            print('ws connected')
+            await websocket.send(json.dumps({"method": "login", "content": "ChubBot"}))
+            while True:
+                local_queue = queue.copy()
+                queue = []
+                for msg in local_queue:
+                    await websocket.send(json.dumps(msg))
+                await asyncio.sleep(0.2)
+    except (ConnectionClosedError, InvalidStatusCode, CancelledError, TimeoutError) as e:
+        print('ws disconnected:', e)
+        await asyncio.sleep(3)
+        await websocket_connector()
+
+    except Exception as e:
+        print('unknown ws error:', e)
+        await asyncio.sleep(3)
+        await websocket_connector()
+
+async def start():
+    asyncio.create_task(websocket_connector())
