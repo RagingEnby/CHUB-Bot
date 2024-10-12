@@ -73,15 +73,15 @@ async def on_member_ban(guild: disnake.Guild, user: disnake.User):
     ban = await guild.fetch_ban(user)
     await usermanager.log_ban(user.id, reason=ban.reason if ban else None)
 
-    # im SURE there's a nicer looking way to do this, but according to the disnake support
-    # server, the only way to get the moderator responsible is through audit logs
-    moderator: Optional[disnake.Member] = None
-    async for audit_ban in guild.audit_logs(limit=5, action=disnake.AuditLogAction.ban)
-        if audit_ban.target.id == user.id:
-            # IDE's don't like this since AuditLogEntry.user isn't always Member, but in this instance it is:
-            moderator = audit_ban.user
-            break
     if not ban.reason.strip():
+        # im SURE there's a nicer looking way to do this, but according to the disnake support
+        # server, the only way to get the moderator responsible is through audit logs
+        moderator: Optional[disnake.Member] = None
+        async for audit_ban in guild.audit_logs(limit=5, action=disnake.AuditLogAction.ban)
+            if audit_ban.target.id == user.id:
+                # IDE's don't like this since AuditLogEntry.user isn't always Member, but in this instance it is:
+                moderator = audit_ban.user
+                break
         channel = bot.get_channel(config.STAFF_CHANNEL)
         await channel.send(f"{(moderator.mention + ' ') if moderator else ''}**{disnake.utils.escape_markdown(ban.user.name)}** ({ban.user.mention}) was banned without reason. Please remember to provide a reason when banning users!!!!")
 
