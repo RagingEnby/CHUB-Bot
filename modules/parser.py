@@ -63,11 +63,13 @@ async def ensure_all_decoded(data: dict) -> dict:
     return data
 
 
-async def decode_item(item_bytes: str) -> list[dict]:
+async def decode_item(item_bytes: str) -> dict:
     # TODO: Fix this (this does not work for the same reason)
     dict_data = await decode_bytes(item_bytes)
-    data = await ensure_all_decoded(dict_data)
-    return data
+    if len(dict_data) == 1 and 'i' in dict_data[0]:
+        data = await ensure_all_decoded(dict_data[0]['i'])
+        return data
+    raise ValueError("unexpected item data format: " + str(dict_data))
 
 
 async def get_inventories(sb_data: dict) -> list[dict]:
@@ -78,9 +80,10 @@ async def get_inventories(sb_data: dict) -> list[dict]:
                 inv_name: inv_data['data'] for inv_name, inv_data in member_data.get('inventory', {}).items()
                 if isinstance(inv_data, dict) and 'data' in inv_data
             }
+            rift_inventory = member_data.get('rift', {}).get('inventory', {})
             inventories.update(
                 {
-                    "rift_" + inv_name: inv_data['data'] for inv_name, inv_data in member_data.get('rift', {}).get('inventory', {}).items()
+                    "rift_" + inv_name: inv_data['data'] for inv_name, inv_data in rift_inventory.items()
                     if isinstance(inv_data, dict) and 'data' in inv_data
                 }
             )
