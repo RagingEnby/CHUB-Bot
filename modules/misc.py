@@ -65,9 +65,7 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
             continue
         for container_name, container_items in inventory['parsed'].items():
             for item in container_items:
-                if 'ExtraAttributes' not in item:
-                    continue
-                if 'uuid' not in item['ExtraAttributes']:
+                if not item.get('ExtraAttributes', {}).get('uuid'):
                     continue
                 items[item['ExtraAttributes']['uuid']] = item
     async with aiofiles.open(f'storage/inv/{uuid}.json', 'w') as file:
