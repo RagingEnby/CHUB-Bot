@@ -66,8 +66,8 @@ async def ensure_all_decoded(data: dict) -> dict:
 
 async def decode_item(item_bytes: str) -> dict:
     dict_data = await decode_bytes(item_bytes)
-    if len(dict_data) == 1 and 'i' in dict_data[0]:
-        data = await ensure_all_decoded(dict_data[0]['i'])
+    if len(dict_data) == 1:
+        data = await ensure_all_decoded(dict_data[0])
         return data
     raise ValueError("unexpected item data format: " + str(dict_data))
 
