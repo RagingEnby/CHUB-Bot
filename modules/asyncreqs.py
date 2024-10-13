@@ -11,6 +11,6 @@ async def get(*args, **kwargs) -> aiohttp.ClientResponse:
         await response.text()  # wait for response to go through (async can be buggy so this is somewhat needed)
         if response.status == 429 and 'api.hypixel.net' in args[0]:
             print('RATE LIMITED!!!')
-            print(json.dumps(response.headers, indent=2))
+            print(json.dumps(dict(response.headers), indent=2))
         return response
         
