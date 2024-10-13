@@ -53,8 +53,6 @@ async def ban_member(bot: BOT_CLASS, user_id: int, reason: Optional[str] = None)
 async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] = None) -> dict[str, dict]:
     uuid = uuid.replace('-', '')
     data = await hypixelapi.ensure_data('/skyblock/profiles', {"uuid": uuid}, session=session)
-    async with aiofiles.open(f'storage/sbdata/{uuid}.json', 'w') as file:
-        await file.write(json.dumps(data, indent=2))
     if not data.get('profiles'):
         return {}
     if not data:
