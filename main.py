@@ -145,9 +145,9 @@ async def info_command(inter: disnake.AppCmdInter):
     await inter.response.defer()
     await inter.send(f"""This bot was made by {config.BOT_DEVELOPER_MENTION} for the Collector's Hub Discord server.
     
-The bot is made to give out item roles automatically as well as some other nice features that make managing this server easier.
+The bot was made to give out item roles automatically, but is now much more.
 
-The bot will eventually be open source, but this will only be after it is fully finished.
+The bot is open source: <https://github.com/RagingEnby/CHUB-Bot>
 
 If you have any other questions, feel free to reach out to {config.BOT_DEVELOPER_ID}.""")
 
