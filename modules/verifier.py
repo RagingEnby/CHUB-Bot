@@ -24,8 +24,7 @@ async def log_verification(inter: disnake.AppCmdInter, player: datatypes.Minecra
         description = [
             f"**Linked To:** {member.mention}",
             f"**First Login:** <t:{round(data['firstLogin']) // 1000}> (<t:{round(data['firstLogin']) // 1000}:R>)",
-            f"**Possible Alts:** `{', '.join([disnake.utils.escape_markdown(player['name']) for player in 
-                                              data['possibleAlts']]) if data['possibleAlts'] else 'None'}`"
+            f"**Possible Alts:** `{', '.join([disnake.utils.escape_markdown(player['name']) for player in data['possibleAlts']]) if data['possibleAlts'] else 'None'}`"
         ]
         embed = disnake.Embed(
             description='\n'.join(description)
