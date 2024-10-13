@@ -50,7 +50,7 @@ async def ban_member(bot: BOT_CLASS, user_id: int, reason: Optional[str] = None)
     await guild.ban(disnake.Object(user_id), reason=reason)
 
 
-async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession]=None) -> dict[str, dict]:
+async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] = None) -> dict[str, dict]:
     uuid = uuid.replace('-', '')
     data = await hypixelapi.ensure_data('/skyblock/profiles', {"uuid": uuid}, session=session)
     async with aiofiles.open(f'storage/sbdata/{uuid}.json', 'w') as file:
@@ -87,7 +87,7 @@ async def randomize_dict_order(input_dict: dict) -> dict:
     return {key: input_dict[key] for key in keys}
 
 
-async def get_guild_members(session: Optional[aiohttp.ClientSession]=None) -> list[str]:
+async def get_guild_members(session: Optional[aiohttp.ClientSession] = None) -> list[str]:
     data = await hypixelapi.ensure_data("/guild", {"id": config.HYPIXEL_GUILD_ID}, session=session)
     return [member['uuid'] for member in data['guild']['members']]
 
@@ -139,7 +139,7 @@ def make_success(title: str, description: Optional[list[str] | str | dict] = Non
     return embed
 
 
-async def validate_mod_cmd(inter: disnake.AppCmdInter, role: Optional[disnake.Role]=None) -> bool:
+async def validate_mod_cmd(inter: disnake.AppCmdInter, role: Optional[disnake.Role] = None) -> bool:
     await inter.response.defer()
     if not inter.guild or (inter.guild and inter.guild.id != config.GUILD_ID):
         await inter.send(embed=NOT_GUILD_ERROR)
@@ -153,12 +153,13 @@ async def validate_mod_cmd(inter: disnake.AppCmdInter, role: Optional[disnake.Ro
     if role and inter.author.top_role <= role:
         await inter.send(embed=make_error(
             "not allowed",
-            f"You are not allowed to give away this role as it is above your top role ({inter.author.top_role.mention()})"
+            f"You are not allowed to give away this role as it is above your top role "
+            f"({inter.author.top_role.mention()})"
         ))
     return True
 
 
-def numerize(num: int|float) -> str:
+def numerize(num: int | float) -> str:
     num = float('{:.3g}'.format(num))
     magnitude = 0
     while abs(num) >= 1000:

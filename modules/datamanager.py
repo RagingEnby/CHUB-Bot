@@ -1,6 +1,6 @@
-import aiofiles
 import json
-import asyncio
+
+import aiofiles
 
 
 class DictManager:

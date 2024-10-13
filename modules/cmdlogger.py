@@ -1,9 +1,7 @@
-import time
 import disnake
 
-from modules import misc
-
 import config
+from modules import misc
 
 log_msgs: dict[int, disnake.Message] = {}
 
@@ -36,7 +34,7 @@ async def on_slash_command(inter: disnake.AppCmdInter):
 async def on_slash_command_completion(inter: disnake.AppCmdInter):
     if inter.id not in log_msgs:
         return
-    #ping = round(inter.created_at.timestamp() - time.time())
+    # ping = round(inter.created_at.timestamp() - time.time())
     msg = log_msgs[inter.id]
     og_embed = msg.embeds[0]
     og_embed.description = f"Command finished. Response (if applicable) is attached."
