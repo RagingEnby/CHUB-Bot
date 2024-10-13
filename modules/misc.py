@@ -77,8 +77,8 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
             if not item.get('ExtraAttributes', {}).get('uuid'):
                 continue
             items[item['ExtraAttributes']['uuid']] = item
-    async with aiofiles.open(f'storage/inv/{uuid}.json', 'w') as file:
-        await file.write(json.dumps(items, indent=2))
+    #async with aiofiles.open(f'storage/inv/{uuid}.json', 'w') as file:
+    #    await file.write(json.dumps(items, indent=2))
     return items
 
 
