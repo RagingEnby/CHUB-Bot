@@ -72,6 +72,13 @@ async def decode_item(item_bytes: str) -> dict:
     raise ValueError("unexpected item data format: " + str(dict_data))
 
 
+async def decode_items(item_bytes: str) -> list[dict]:
+    data: list[dict] = await decode_bytes(item_bytes)
+    for item in data:
+        item = await ensure_all_decoded(item)
+    return data
+
+
 async def get_museum_inventories(profiles: Optional[list[dict]]=None, profile: Optional[dict]=None) -> list[dict]:
     if profiles is None and profile is None:
         raise ValueError('Must provide either profiles or profile')
@@ -104,9 +111,17 @@ async def get_museum_inventories(profiles: Optional[list[dict]]=None, profile: O
                     continue
                 formatted_member_data['bytes'].append(item_bytes)
             formatted_member_data['parsed'] = await asyncio.gather(*[
-                decode_item(item_bytes)
+                decode_items(item_bytes)
                 for item_bytes in formatted_member_data['bytes']
             ])
+            remove = []
+            for i, item_data in enumerate(formatted_member_data['parsed']):
+                if isinstance(item_data, list):
+                    remove.append(i)
+                    for item in item_data:
+                        formatted_member_data['parsed'].append(item)
+            for i in reversed(remove):
+                del formatted_member_data['parsed'][i]
             del formatted_member_data['bytes']
             members_data.append(formatted_member_data)
     return members_data
