@@ -5,6 +5,7 @@ import json
 import aiohttp
 import disnake
 from disnake.ext import commands
+import asyncio
 
 from modules import hypixelapi
 from modules import parser
