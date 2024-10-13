@@ -1,4 +1,7 @@
+import json
+import time
 import requests
+
 from scrts import BOT_TOKEN, HYPIXEL_API_KEY
 
 HYPIXEL_GUILD_ID: str = "639d0c668ea8c9185c70caf9"
@@ -46,4 +49,7 @@ response = None
 while response is None or response.status_code != 200:
     print('getting guild data...')
     response = requests.get(f'https://api.hypixel.net/v2/guild?key={HYPIXEL_API_KEY}&id={HYPIXEL_GUILD_ID}')
+    if response.status_code != 200:
+        print(response.status_code, json.dumps(response.json(), indent=2))
+        time.sleep(2)
 guild_members: list[str] = [member['uuid'] for member in response.json()['guild']['members']]
