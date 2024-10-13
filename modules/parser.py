@@ -88,7 +88,7 @@ async def get_museum_inventories(profiles: Optional[list[dict]]=None, profile: O
         if 'profile' in profile:
             profile = profile['profile']
             
-        for member_uuid, member_data in profile['member'].items():
+        for member_uuid, member_data in profile['members'].items():
             formatted_member_data = {
                 "playerId": member_uuid,
                 "bytes": []
