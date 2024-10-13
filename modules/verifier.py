@@ -135,9 +135,9 @@ async def update_member(member: disnake.Member, player: Optional[datatypes.Minec
         if member.display_name != player.name:
             with suppress(Forbidden):
                 await member.edit(nick=player.name)
-        elif config.GUILD_MEMBER_ROLE in [role.id for role in member.roles]:
+        if player.name in config.guild_members and config.GUILD_MEMBER_ROLE in [role.id for role in member.roles]:
             await member.remove_roles(disnake.Object(config.GUILD_MEMBER_ROLE), reason="Not Guild Member")
-        await give_item_roles(member, player, session=session)
+        
 
 
 async def remove_verification(member: disnake.Member):
