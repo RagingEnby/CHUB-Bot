@@ -1,3 +1,4 @@
+from contextlib import suppress
 import json
 import time
 from typing import Optional
@@ -6,6 +7,7 @@ import aiofiles
 import aiohttp
 import disnake
 from disnake.errors import Forbidden
+from requests.sessions import SessionRedirectMixin
 
 import config
 import datatypes
@@ -55,9 +57,13 @@ async def log_verification(inter: disnake.AppCmdInter, player: datatypes.Minecra
     await channel.send(embed=embed)
 
 
-async def get_linked_discord(player: datatypes.MinecraftPlayer, session: Optional[aiohttp.ClientSession] = None) -> \
+async def get_player_data(uuid: str, session: Optional[aiohttp.ClientSession] = None):
+    return await hypixelapi.ensure_data("/player", {"uuid": uuid}, session=session)
+
+
+async def get_linked_discord(player: datatypes.MinecraftPlayer, session: Optional[aiohttp.ClientSession] = None, player_data: Optional[dict]=None) -> \
         Optional[str]:
-    data = await hypixelapi.ensure_data("/player", {"uuid": player.uuid}, session=session)
+    data = await get_player_data(uuid=player.uuid, session=session) or player_data
     return data.get('player', {}).get('socialMedia', {}).get('links', {}).get('DISCORD', None)
 
 
@@ -87,11 +93,22 @@ async def give_item_roles(member: disnake.Member, player: Optional[datatypes.Min
         player = await usermanager.get_linked_player(member)
     if not player:
         return
-    deserved_roles = await get_item_roles(player, debug=False, session=session)
+    deserved_roles = await get_item_roles(player, debug=False, session=session))
+    
     try:
         await member.add_roles(*[disnake.Object(role) for role in deserved_roles], reason="Auto Item Roles")
     except disnake.errors.NotFound:
         pass
+
+
+async def get_misc_roles(player: datatypes.MinecraftPlayer, player_data: dict) -> list[int]:
+    roles = []
+    if player.uuid in config.guild_members:
+        roles.append(config.GUILD_MEMBER_ROLE)
+    rank = player_data.get('player', {}).get('rank')
+    if rank in config.RANK_ROLES:
+        roles.append(config.RANK_ROLES[rank])
+    return roles
 
 
 async def update_member(member: disnake.Member, player: Optional[datatypes.MinecraftPlayer] = None,
@@ -103,26 +120,24 @@ async def update_member(member: disnake.Member, player: Optional[datatypes.Minec
     if player is None:
         print(member.name, 'might have an invalid account linked')
         return
-    discord = await get_linked_discord(player, session=session)
+    player_data = await get_player_data(player.uuid, session=session)
+    discord = await get_linked_discord(player, player_data=player_data)
     if discord is None or str(discord).lower() != member.name.lower():
         await remove_verification(member)
         await usermanager.log_unlink(player)
         return
-    if config.VERIFIED_ROLE not in [role.id for role in member.roles]:
-        await member.add_roles(disnake.Object(config.VERIFIED_ROLE), reason="Missing Role but Verified")
-    try:
+    roles = [config.VERIFIED_ROLE]
+
+    roles.extend(await get_item_roles(player, session=session))
+    roles.extend(await get_misc_roles(player, player_data=player_data))
+        
+    with suppress(disnake.NotFound):
         if member.display_name != player.name:
-            try:
+            with suppress(Forbidden):
                 await member.edit(nick=player.name)
-            except Forbidden:
-                pass
-        if player.uuid in config.guild_members:
-            await member.add_roles(disnake.Object(config.GUILD_MEMBER_ROLE), reason="Guild Member Detected")
         elif config.GUILD_MEMBER_ROLE in [role.id for role in member.roles]:
             await member.remove_roles(disnake.Object(config.GUILD_MEMBER_ROLE), reason="Not Guild Member")
         await give_item_roles(member, player, session=session)
-    except disnake.NotFound:
-        return
 
 
 async def remove_verification(member: disnake.Member):
