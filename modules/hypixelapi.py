@@ -37,7 +37,7 @@ async def ensure_data(endpoint: str,
                       params: Optional[dict] = None,
                       session: Optional[aiohttp.ClientSession] = None) -> dict:
     global LAST_RESPONSE
-    id_ = params.get('uuid', params.get('player', params.get('id'))) if params else None
+    id_ = params.get('uuid', params.get('player', params.get('id', params.get('profile')))) if params else None
     response = await get_data(endpoint, params, session=session)
     if response.status == 200 or response.status == 204:
         data = await response.json()
