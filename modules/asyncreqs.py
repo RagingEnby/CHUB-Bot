@@ -13,5 +13,6 @@ async def get(*args, **kwargs) -> aiohttp.ClientResponse:
             important_headers = {k: v for k, v in dict(response.headers).items() if k.startswith('ratelimit-')}
             print('RATE LIMITED!!!')
             print(json.dumps(important_headers, indent=2))
+            print(json.dumps(await response.json(), indent=2))
         return response
         
