@@ -126,17 +126,20 @@ async def update_member(member: disnake.Member, player: Optional[datatypes.Minec
         await remove_verification(member)
         await usermanager.log_unlink(player)
         return
-    roles = [config.VERIFIED_ROLE]
-
-    roles.extend(await get_item_roles(player, session=session))
-    roles.extend(await get_misc_roles(player, player_data=player_data))
         
     with suppress(disnake.NotFound):
+        roles = [config.VERIFIED_ROLE]
+
+        roles.extend(await get_item_roles(player, session=session))
+        roles.extend(await get_misc_roles(player, player_data=player_data))
+
         if member.display_name != player.name:
             with suppress(Forbidden):
                 await member.edit(nick=player.name)
         if player.name in config.guild_members and config.GUILD_MEMBER_ROLE in [role.id for role in member.roles]:
             await member.remove_roles(disnake.Object(config.GUILD_MEMBER_ROLE), reason="Not Guild Member")
+
+        await member.add_roles(*[disnake.Object(role) for role in roles], reason="Auto Roles")
         
 
 
