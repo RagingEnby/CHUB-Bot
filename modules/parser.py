@@ -100,12 +100,12 @@ async def get_museum_inventories(profiles: Optional[list[dict]]=None, profile: O
                 "playerId": member_uuid,
                 "bytes": []
             }
-            for item_data in member_data['items'].values():
+            for item_data in member_data.get('items', {}).values():
                 item_bytes = item_data.get('items', {}).get('data')
                 if item_bytes is None:
                     continue
                 formatted_member_data['bytes'].append(item_bytes)
-            for item_data in member_data['special']:
+            for item_data in member_data.get('special', []):
                 item_bytes = item_data.get('items', {}).get('data')
                 if item_bytes is None:
                     continue
@@ -125,9 +125,6 @@ async def get_museum_inventories(profiles: Optional[list[dict]]=None, profile: O
             del formatted_member_data['bytes']
             members_data.append(formatted_member_data)
     return members_data
-
-    
-    
 
 
 async def get_inventories(sb_data: dict) -> list[dict]:

@@ -71,7 +71,7 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
                 if not item.get('ExtraAttributes', {}).get('uuid'):
                     continue
                 items[item['ExtraAttributes']['uuid']] = item
-    print(json.dumps(museum_inventories, indent=2))
+    #print(json.dumps(museum_inventories, indent=2))
     for museum_inventory in museum_inventories:
         for item in museum_inventory['parsed']:
             if not item.get('ExtraAttributes', {}).get('uuid'):
