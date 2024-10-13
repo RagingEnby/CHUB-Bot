@@ -57,18 +57,24 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
         return {}
     if not profiles_data:
         return {}
+    museum_datas = await asyncio.gather(*[
+        hypixelapi.ensure_data('/skyblock/museum', {"profile": profile['profile_id']}, session=session)
+        for profile in profiles_data['profiles']
+    ])
     inventories = await parser.get_inventories(profiles_data)
+    museum_inventories = await parser.get_museum_inventories(profiles=museum_datas)
     items = {}
     for inventory in inventories:
-        # this is commented out because i used to not allow coop's inventories to count,
-        # but i think it makes more sense to allow them since theyre co-owned items
-        # if inventory['playerId'] != uuid:
-        #     continue
         for container_items in inventory['parsed'].values():
             for item in container_items:
                 if not item.get('ExtraAttributes', {}).get('uuid'):
                     continue
                 items[item['ExtraAttributes']['uuid']] = item
+    for museum_inventory in museum_inventories:
+        for item in museum_inventory['parsed']:
+            if not item.get('ExtraAttributes', {}).get('uuid'):
+                continue
+            items[item['ExtraAttributes']['uuid']] = item
     return items
 
 

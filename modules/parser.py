@@ -72,36 +72,47 @@ async def decode_item(item_bytes: str) -> dict:
     raise ValueError("unexpected item data format: " + str(dict_data))
 
 
-async def get_museum_inventories(profiles: Optional[list[dict]]=None, profile: Optional[dict]=None):
+async def get_museum_inventories(profiles: Optional[list[dict]]=None, profile: Optional[dict]=None) -> list[dict]:
     if profiles is None and profile is None:
         raise ValueError('Must provide either profiles or profile')
     if profiles is not None and profile is not None:
         raise ValueError('Must provide only profiles or profile')
     # before i hear 'just use `profiles = profiles or [profile]`', i would love to,
     # however if profiles is [] and profile is None, then profiles becomes [None] and that is bad
-    profiles = profiles if profiles is not None else [profile]
-    raw_items = []
-    for profile in profiles, member_uuid, member_data in profile['member'].items():
-        for item_id, item_data in member_data['items'].items():
-            item_bytes = item_data.get('items', {}).get('data')
-            if item_bytes is None:
-                continue
-            raw_items.append(item_bytes)
-        for item_data in member_data['special']:
-            item_bytes = item_data.get('items', {}).get('data')
-            if item_bytes is None:
-                continue
-            raw_items.append({
+    if profiles is None:
+        profiles = [profile]
+        
+    members_data = []
+    for profile in profiles:
+        # allow for passing just the data, or the entire response:
+        if 'profile' in profile:
+            profile = profile['profile']
+            
+        for member_uuid, member_data in profile['member'].items():
+            formatted_member_data = {
                 "playerId": member_uuid,
-                "bytes": item_bytes
-            })
-    parsed = await asyncio.gather(*[decode_item(item_bytes) for item_bytes in raw_items])
-    return [
-        {
-            "playerId", raw_items[i]['playerId'],
-            "parsed": item
-        } for i, item in enumerate(parsed)
-    ]
+                "bytes": []
+            }
+            for item_data in member_data['items'].values():
+                item_bytes = item_data.get('items', {}).get('data')
+                if item_bytes is None:
+                    continue
+                formatted_member_data['bytes'].append(item_bytes)
+            for item_data in member_data['special']:
+                item_bytes = item_data.get('items', {}).get('data')
+                if item_bytes is None:
+                    continue
+                formatted_member_data['bytes'].append(item_bytes)
+            formatted_member_data['parsed'] = await asyncio.gather(*[
+                decode_item(item_bytes)
+                for item_bytes in formatted_member_data['bytes']
+            ])
+            del formatted_member_data['bytes']
+            members_data.append(formatted_member_data)
+    return members_data
+
+    
+    
 
 
 async def get_inventories(sb_data: dict) -> list[dict]:
