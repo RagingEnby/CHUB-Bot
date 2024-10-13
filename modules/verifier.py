@@ -1,7 +1,6 @@
 import json
 import time
 from typing import Optional
-import asyncio
 
 import aiofiles
 import aiohttp
@@ -17,14 +16,16 @@ from modules import roles
 from modules import usermanager
 
 
-async def log_verification(inter: disnake.AppCmdInter, player: datatypes.MinecraftPlayer, member: disnake.Member, session: aiohttp.ClientSession):
+async def log_verification(inter: disnake.AppCmdInter, player: datatypes.MinecraftPlayer,
+                           member: disnake.Member, session: aiohttp.ClientSession):
     params = {"key": config.HYPIXEL_API_KEY, "keyType": "HYPIXEL"}
     async with session.get(f'https://api.ragingenby.dev/backgroundcheck/{player.uuid}', params=params) as response:
         data = await response.json()
         description = [
             f"**Linked To:** {member.mention}",
-            f"**First Login:** <t:{round(data['firstLogin'])//1000}> (<t:{round(data['firstLogin'])//1000}:R>)",
-            f"**Possible Alts:** `{', '.join([disnake.utils.escape_markdown(player['name']) for player in data['possibleAlts']]) if data['possibleAlts'] else 'None'}`"
+            f"**First Login:** <t:{round(data['firstLogin']) // 1000}> (<t:{round(data['firstLogin']) // 1000}:R>)",
+            f"**Possible Alts:** `{', '.join([disnake.utils.escape_markdown(player['name']) for player in 
+                                              data['possibleAlts']]) if data['possibleAlts'] else 'None'}`"
         ]
         embed = disnake.Embed(
             description='\n'.join(description)
@@ -55,12 +56,14 @@ async def log_verification(inter: disnake.AppCmdInter, player: datatypes.Minecra
     await channel.send(embed=embed)
 
 
-async def get_linked_discord(player: datatypes.MinecraftPlayer, session: Optional[aiohttp.ClientSession]=None) -> Optional[str]:
+async def get_linked_discord(player: datatypes.MinecraftPlayer, session: Optional[aiohttp.ClientSession] = None) -> \
+        Optional[str]:
     data = await hypixelapi.ensure_data("/player", {"uuid": player.uuid}, session=session)
     return data.get('player', {}).get('socialMedia', {}).get('links', {}).get('DISCORD', None)
 
 
-async def get_item_roles(player: datatypes.MinecraftPlayer, debug: bool = False, session: Optional[aiohttp.ClientSession]=None) -> list[int]:
+async def get_item_roles(player: datatypes.MinecraftPlayer, debug: bool = False,
+                         session: Optional[aiohttp.ClientSession] = None) -> list[int]:
     item_roles = []
     items = await misc.get_player_items(player.uuid, session=session)
     item_ids = list(set([item['ExtraAttributes']['id'] for item in items.values()]))
@@ -79,7 +82,8 @@ async def get_item_roles(player: datatypes.MinecraftPlayer, debug: bool = False,
     return item_roles
 
 
-async def give_item_roles(member: disnake.Member, player: Optional[datatypes.MinecraftPlayer] = None, session: Optional[aiohttp.ClientSession]=None):
+async def give_item_roles(member: disnake.Member, player: Optional[datatypes.MinecraftPlayer] = None,
+                          session: Optional[aiohttp.ClientSession] = None):
     if not player:
         player = await usermanager.get_linked_player(member)
     if not player:
@@ -89,9 +93,10 @@ async def give_item_roles(member: disnake.Member, player: Optional[datatypes.Min
         await member.add_roles(*[disnake.Object(role) for role in deserved_roles], reason="Auto Item Roles")
     except disnake.errors.NotFound:
         pass
-        
 
-async def update_member(member: disnake.Member, player: Optional[datatypes.MinecraftPlayer]=None, session: Optional[aiohttp.ClientSession]=None):
+
+async def update_member(member: disnake.Member, player: Optional[datatypes.MinecraftPlayer] = None,
+                        session: Optional[aiohttp.ClientSession] = None):
     if member is None:
         return
     if player is None:
@@ -122,7 +127,8 @@ async def update_member(member: disnake.Member, player: Optional[datatypes.Minec
 
 
 async def remove_verification(member: disnake.Member):
-    to_remove = [disnake.Object(role) for role in config.REQUIRES_VERIFICATION if role in [role.id for role in member.roles]]
+    to_remove = [disnake.Object(role) for role in config.REQUIRES_VERIFICATION if
+                 role in [role.id for role in member.roles]]
     await member.remove_roles(*to_remove, reason="Unverified")
     try:
         await member.edit(nick=None)
@@ -130,7 +136,7 @@ async def remove_verification(member: disnake.Member):
         pass
 
 
-async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[disnake.Member]=None, session: Optional[aiohttp.ClientSession]=None):
+async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[disnake.Member] = None):
     if member is None:
         member = inter.user
     async with aiohttp.ClientSession() as session:
@@ -144,7 +150,9 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
         if player is None:
             return await inter.send(embed=misc.make_error(
                 title="invalid IGN",
-                description=f"The IGN [{disnake.utils.escape_markdown(ign)}](<https://namemc.com/profile/{disnake.utils.escape_markdown(ign)}>) does not belong to any Minecraft player!."
+                description=f"The IGN [{disnake.utils.escape_markdown(ign)}]"
+                            f"(<https://namemc.com/profile/{disnake.utils.escape_markdown(ign)}>) "
+                            f"does not belong to any Minecraft player!."
             ))
 
         discord = await get_linked_discord(player, session=session)
@@ -178,9 +186,9 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
             await member.add_roles(disnake.Object(config.VERIFIED_ROLE), reason=f'Verified to {player.name}')
         except Forbidden:
             print('do not have permission to add roles')
-            
+
         await usermanager.log_link(member, player)
-        
+
         await update_member(member, session=session)
 
         try:
@@ -188,16 +196,15 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
         except disnake.NotFound:
             # this just means the interaction timed out (likely due to hypixel rate limits)
             pass
-            
+
         await log_verification(inter, player, member, session=session)
 
 
-async def unverify_command(inter: disnake.AppCmdInter, member: Optional[disnake.Member]=None):
+async def unverify_command(inter: disnake.AppCmdInter, member: Optional[disnake.Member] = None):
     if member is None:
         member = inter.user
     if not await usermanager.is_linked(member.id):
         return await inter.send('You are not linked.')
-    player = await usermanager.get_linked_player(member)
     player = await usermanager.get_linked_player(member)
     if player is None:
         return await inter.send(embed=misc.make_error(
@@ -210,7 +217,7 @@ async def unverify_command(inter: disnake.AppCmdInter, member: Optional[disnake.
     await inter.send('Successfully unlinked')
 
 
-async def update_command(inter: disnake.AppCmdInter, member: Optional[disnake.Member]=None):
+async def update_command(inter: disnake.AppCmdInter, member: Optional[disnake.Member] = None):
     before = time.time()
     if member is None:
         member = inter.user
