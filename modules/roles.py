@@ -4,7 +4,7 @@ import config
 async def dctr_space_helm(item: dict) -> list[int]:
     roles = [config.SPACE_HELM_ROLE]
     extra_attributes = item['ExtraAttributes']
-    if 'dctr' in extra_attributes.get('sender_name', '').lower():
+    if extra_attributes.get('sender_name', '').lower():
         roles.append(config.DCTR_SPACE_HELM_ROLE)
     if 'raffle_year' in extra_attributes:
         roles.append(config.RAFFLE_SPACE_HELM_ROLE)
