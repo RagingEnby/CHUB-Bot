@@ -52,13 +52,12 @@ async def ban_member(bot: BOT_CLASS, user_id: int, reason: Optional[str] = None)
 
 async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] = None) -> dict[str, dict]:
     uuid = uuid.replace('-', '')
-    data = await hypixelapi.ensure_data('/skyblock/profiles', {"uuid": uuid}, session=session)
-    if not data.get('profiles'):
+    profiles_data = await hypixelapi.ensure_data('/skyblock/profiles', {"uuid": uuid}, session=session)
+    if not profiles_data.get('profiles'):
         return {}
-    if not data:
-        print(f'get_player_items(): data is {data} for {uuid}')
+    if not profiles_data:
         return {}
-    inventories = await parser.get_inventories(data)
+    inventories = await parser.get_inventories(profiles_data)
     items = {}
     for inventory in inventories:
         if inventory['playerId'] != uuid:

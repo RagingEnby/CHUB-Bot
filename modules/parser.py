@@ -1,3 +1,4 @@
+from typing import Optional
 import json
 import base64
 from nbt import nbt
@@ -5,7 +6,7 @@ import io
 import asyncio
 
 
-async def nbt_to_dict(nbt_data):
+async def nbt_to_dict(nbt_data) -> dict:
     if isinstance(nbt_data, nbt.NBTFile) or isinstance(nbt_data, nbt.TAG_Compound):
         return {tag.name: await nbt_to_dict(tag) for tag in nbt_data.tags}
     elif isinstance(nbt_data, nbt.TAG_List):
@@ -64,12 +65,43 @@ async def ensure_all_decoded(data: dict) -> dict:
 
 
 async def decode_item(item_bytes: str) -> dict:
-    # TODO: Fix this (this does not work for the same reason)
     dict_data = await decode_bytes(item_bytes)
     if len(dict_data) == 1 and 'i' in dict_data[0]:
         data = await ensure_all_decoded(dict_data[0]['i'])
         return data
     raise ValueError("unexpected item data format: " + str(dict_data))
+
+
+async def get_museum_inventories(profiles: Optional[list[dict]]=None, profile: Optional[dict]=None):
+    if profiles is None and profile is None:
+        raise ValueError('Must provide either profiles or profile')
+    if profiles is not None and profile is not None:
+        raise ValueError('Must provide only profiles or profile')
+    # before i hear 'just use `profiles = profiles or [profile]`', i would love to,
+    # however if profiles is [] and profile is None, then profiles becomes [None] and that is bad
+    profiles = profiles if profiles is not None else [profile]
+    raw_items = []
+    for profile in profiles, member_uuid, member_data in profile['member'].items():
+        for item_id, item_data in member_data['items'].items():
+            item_bytes = item_data.get('items', {}).get('data')
+            if item_bytes is None:
+                continue
+            raw_items.append(item_bytes)
+        for item_data in member_data['special']:
+            item_bytes = item_data.get('items', {}).get('data')
+            if item_bytes is None:
+                continue
+            raw_items.append({
+                "playerId": member_uuid,
+                "bytes": item_bytes
+            })
+    parsed = await asyncio.gather(*[decode_item(item_bytes) for item_bytes in raw_items])
+    return [
+        {
+            "playerId", raw_items[i]['playerId'],
+            "parsed": item
+        } for i, item in enumerate(parsed)
+    ]
 
 
 async def get_inventories(sb_data: dict) -> list[dict]:
