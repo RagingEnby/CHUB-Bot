@@ -77,7 +77,7 @@ async def on_member_ban(guild: disnake.Guild, user: disnake.User):
         # im SURE there's a nicer looking way to do this, but according to the disnake support
         # server, the only way to get the moderator responsible is through audit logs
         moderator: Optional[disnake.Member] = None
-        async for audit_ban in guild.audit_logs(limit=5, action=disnake.AuditLogAction.ban)
+        async for audit_ban in guild.audit_logs(limit=5, action=disnake.AuditLogAction.ban):
             if audit_ban.target.id == user.id:
                 # IDE's don't like this since AuditLogEntry.user isn't always Member, but in this instance it is:
                 moderator = audit_ban.user
