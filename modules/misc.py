@@ -63,7 +63,7 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
     for inventory in inventories:
         if inventory['playerId'] != uuid:
             continue
-        for container_name, container_items in inventory['parsed'].items():
+        for container_items in inventory['parsed'].values():
             for item in container_items:
                 if not item.get('ExtraAttributes', {}).get('uuid'):
                     continue
