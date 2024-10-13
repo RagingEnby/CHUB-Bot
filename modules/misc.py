@@ -60,8 +60,10 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
     inventories = await parser.get_inventories(profiles_data)
     items = {}
     for inventory in inventories:
-        if inventory['playerId'] != uuid:
-            continue
+        # this is commented out because i used to not allow coop's inventories to count,
+        # but i think it makes more sense to allow them since theyre co-owned items
+        # if inventory['playerId'] != uuid:
+        #     continue
         for container_items in inventory['parsed'].values():
             for item in container_items:
                 if not item.get('ExtraAttributes', {}).get('uuid'):
@@ -71,6 +73,8 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
 
 
 def add_embed_footer(embed: disnake.Embed) -> disnake.Embed:
+    # this exists as a useless function because i will likely in the future add some sort of footer to all embeds,
+    # and this function allows me to do that quickly if needed
     return embed
 
 
