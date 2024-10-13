@@ -93,7 +93,7 @@ async def give_item_roles(member: disnake.Member, player: Optional[datatypes.Min
         player = await usermanager.get_linked_player(member)
     if not player:
         return
-    deserved_roles = await get_item_roles(player, debug=False, session=session))
+    deserved_roles = await get_item_roles(player, debug=False, session=session)
     
     try:
         await member.add_roles(*[disnake.Object(role) for role in deserved_roles], reason="Auto Item Roles")
