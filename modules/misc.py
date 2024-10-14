@@ -81,12 +81,12 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
     for profile in profiles_data['profiles']:
         for member in profile['members'].values():
             for pet in member.get('pets_data', {}).get('pets', []):
-                uuid = pet.get('uniqueId', pet.get('uuid', pet_id))
+                id_ = pet.get('uniqueId', pet.get('uuid', pet['type']))
                 item = {
                     "ExtraAttributes": {
                         "petInfo": json.dumps(pet),
                         "id": "PET",
-                        "uuid": uuid
+                        "uuid": id_
                     }
                 }
                 items[uuid] = item
