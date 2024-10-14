@@ -22,7 +22,7 @@ async def check_item(item: dict) -> list[int]:
 async def get_checker_roles(items: list[dict]) -> list[int]:
     roles = []
     for item in items:
-        if not isintance(item, dict):
+        if not isinstance(item, dict):
             continue
         roles.extend(await check_item(item))
     return list(set(roles))  # remove duplicates and then return
