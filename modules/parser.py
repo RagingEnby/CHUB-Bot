@@ -127,18 +127,28 @@ async def get_museum_inventories(profiles: Optional[list[dict]]=None, profile: O
     return members_data
 
 
+async def process_inventory(inv_data: dict[str, int|str|dict]):
+    if 'data' not in inv_data:
+        return {k: await process_inventory(v) for k, v in inv_data.items()}
+    
+
 async def get_inventories(sb_data: dict) -> list[dict]:
     items = []
     for profile in sb_data['profiles']:
         for uuid, member_data in profile['members'].items():
-            inventories = {
-                inv_name: inv_data['data'] for inv_name, inv_data in member_data.get('inventory', {}).items()
-                if isinstance(inv_data, dict) and 'data' in inv_data
-            }
-            rift_inventory = member_data.get('rift', {}).get('inventory', {})
+            inventories = {}
+            for inv_name, inv_data in member_data.get('inventory', {}).items():
+                if 'data' in inv_data:
+                    inventories[inv_name] = inv_data['data']
+                    continue
+                for sub_inv_name, sub_inv_data in inv_data.items():
+                    if not isinstance(sub_inv_data, dict) and 'data' not in sub_inv_data:
+                        continue
+                    inventories[f"{inv_name}_{sub_inv_data}"] = sub_inv_data['data']
+                    
             inventories.update(
                 {
-                    "rift_" + inv_name: inv_data['data'] for inv_name, inv_data in rift_inventory.items()
+                    "rift_" + inv_name: inv_data['data'] for inv_name, inv_data in member_data.get('rift', {}).get('inventory', {}).items()
                     if isinstance(inv_data, dict) and 'data' in inv_data
                 }
             )
