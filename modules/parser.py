@@ -127,31 +127,30 @@ async def get_museum_inventories(profiles: Optional[list[dict]]=None, profile: O
     return members_data
 
 
-async def process_inventory(inv_data: dict[str, int|str|dict]):
-    if 'data' not in inv_data:
-        return {k: await process_inventory(v) for k, v in inv_data.items()}
+async def process_inventory(inv_data: dict[str, int|str|dict], parent: Optional[str]=None) -> dict[str, dict]:
+    parent = parent + '_' if parent else ''
+    inventories = {}
+    for inv_name, inv_data in inv_data.items():
+        if not isinstance(inv_data, dict):
+            continue
+        if 'data' in inv_data:
+            inventories[parent + inv_name] = inv_data['data']
+            continue
+        for sub_inv_name, sub_inv_data in inv_data.items():
+            if isinstance(sub_inv_data, dict) and 'data' in sub_inv_data:
+                inventories[parent + f"{inv_name}_{sub_inv_name}"] = sub_inv_data['data']
+    return inventories
     
 
 async def get_inventories(sb_data: dict) -> list[dict]:
     items = []
     for profile in sb_data['profiles']:
         for uuid, member_data in profile['members'].items():
-            inventories = {}
-            for inv_name, inv_data in member_data.get('inventory', {}).items():
-                if 'data' in inv_data:
-                    inventories[inv_name] = inv_data['data']
-                    continue
-                for sub_inv_name, sub_inv_data in inv_data.items():
-                    if not isinstance(sub_inv_data, dict) and 'data' not in sub_inv_data:
-                        continue
-                    inventories[f"{inv_name}_{sub_inv_data}"] = sub_inv_data['data']
-                    
-            inventories.update(
-                {
-                    "rift_" + inv_name: inv_data['data'] for inv_name, inv_data in member_data.get('rift', {}).get('inventory', {}).items()
-                    if isinstance(inv_data, dict) and 'data' in inv_data
-                }
-            )
+            inventory = await process_inventory(member_data.get('inventory', {}))
+            inventory.update(await process_inventory(member_data.get('rift', {}).get('inventory', {})))
+            inventory.update(await process_inventory(member_data.get('shared_inventory', {})))
+            # combine all the inventory dicts:
+            
             parsed = {inv_name: await decode_bytes(inv_contents) for inv_name, inv_contents in inventories.items()}
             items.append({
                 "playerId": uuid,
