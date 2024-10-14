@@ -86,8 +86,7 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
                 if not skin:
                     continue
                 skin_item_id = f"PET_SKIN_{skin}"
-                if 'uniqueId' not in pet:
-                    print(json.dumps(pet, indent=2))
+                uuid = pet.get('uniqueId', pet.get('uuid', pet_id))
                 items[pet['uniqueId']] = skin_item_id
     async with aiofiles.open(f'storage/inv/{uuid}.json', 'w') as file:
         await file.write(json.dumps(items, indent=2))
