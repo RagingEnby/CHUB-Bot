@@ -75,7 +75,7 @@ async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[ai
     for item in items.values():
         if isinstance(item, str):
             print("item, str", json.dumps(item, indent=2))
-        elif isinstance(item.get('ExtraAttributes'), str)):
+        elif isinstance(item.get('ExtraAttributes'), str):
             print("ExtraAttributes, str", json.dumps(item, indent=2))
         elif isinstance(item.get('ExtraAttributes', {}).get('id'), str):
             print("id, str", json.dumps(item, indent=2))
