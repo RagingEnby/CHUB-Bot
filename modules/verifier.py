@@ -67,23 +67,21 @@ async def get_linked_discord(player: datatypes.MinecraftPlayer, session: Optiona
     return data.get('player', {}).get('socialMedia', {}).get('links', {}).get('DISCORD', None)
 
 
-async def get_item_roles(player: datatypes.MinecraftPlayer, debug: bool = False,
-                         session: Optional[aiohttp.ClientSession] = None) -> list[int]:
+async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[aiohttp.ClientSession] = None) -> list[int]:
     item_roles = []
     items = await misc.get_player_items(player.uuid, session=session)
-    item_ids = list(set([item['ExtraAttributes']['id'] for item in items.values()]))
-    if debug:
-        print(f'{player.name} item_ids:', json.dumps(item_ids, indent=2))
-        async with aiofiles.open(f'storage/{player.name}-item_ids.json', 'w') as file:
-            await file.write(json.dumps(item_ids, indent=2))
-    for item_id in item_ids:
+    item_ids = list(set([item['ExtraAttributes']['id'] for item in items.values()]))        
+    for item_id, role_id in item_ids.items():
         if item_id in config.ITEM_ID_ROLES:
-            item_roles.append(config.ITEM_ID_ROLES[item_id])
+            item_roles.append(role_id)
+            
+    for req_item_ids, role_id in config.ITEM_ID_ROLES.items():
+        if isinstance(req_item_ids, list) and all(req_item_id in item_ids for req_item_id in req_item_ids):
+            item_roles.append(role_id)
 
+            
     item_roles.extend(await roles.get_checker_roles(list(items.values())))
     item_roles = list(set(item_roles))  # remove duplicates
-    if debug:
-        print(f'{player.name} item_roles:', json.dumps(item_roles, indent=2))
     return item_roles
 
 
@@ -93,7 +91,7 @@ async def give_item_roles(member: disnake.Member, player: Optional[datatypes.Min
         player = await usermanager.get_linked_player(member)
     if not player:
         return
-    deserved_roles = await get_item_roles(player, debug=False, session=session)
+    deserved_roles = await get_item_roles(player, session=session)
     
     try:
         await member.add_roles(*[disnake.Object(role) for role in deserved_roles], reason="Auto Item Roles")
