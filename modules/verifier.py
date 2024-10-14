@@ -72,9 +72,13 @@ async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[ai
     items = await misc.get_player_items(player.uuid, session=session)
     item_ids = [item['ExtraAttributes']['id'] for item in items.values()]
     # really shittily made debug statement, ignore it:
-    for item in items:
+    for item in items.values():
         if isinstance(item, str):
-            print(json.dumps(item, indent=2))
+            print("item, str", json.dumps(item, indent=2))
+        elif isinstance(item.get('ExtraAttributes'), str)):
+            print("ExtraAttributes, str", json.dumps(item, indent=2))
+        elif isinstance(item.get('ExtraAttributes', {}).get('id'), str):
+            print("id, str", json.dumps(item, indent=2))
     pets = [json.loads(item['ExtraAttributes']['petInfo']) for item in items if item.get('ExtraAttributes', {}).get('id') == 'PET']
     pet_skins = list(set(['PET_SKIN_' + pet['skin'] for pet in pets if pet['skin']]))
     item_ids.extend(pet_skins)
