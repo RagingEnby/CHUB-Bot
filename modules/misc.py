@@ -81,13 +81,15 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
     for profile in profiles_data['profiles']:
         for member in profile['members'].values():
             for pet in member.get('pets_data', {}).get('pets', []):
-                pet_id = f"PET_{pet['type']}"
-                skin = pet.get('skin')
-                if not skin:
-                    continue
-                skin_item_id = f"PET_SKIN_{skin}"
                 uuid = pet.get('uniqueId', pet.get('uuid', pet_id))
-                items[pet['uniqueId']] = skin_item_id
+                item = {
+                    "ExtraAttributes": {
+                        "petInfo": json.dumps(pet),
+                        "id": "PET",
+                        "uuid": uuid
+                    }
+                }
+                items[uuid] = item
     async with aiofiles.open(f'storage/inv/{uuid}.json', 'w') as file:
         await file.write(json.dumps(items, indent=2))
     return items

@@ -70,7 +70,11 @@ async def get_linked_discord(player: datatypes.MinecraftPlayer, session: Optiona
 async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[aiohttp.ClientSession] = None) -> list[int]:
     item_roles = []
     items = await misc.get_player_items(player.uuid, session=session)
-    item_ids = list(set([item['ExtraAttributes']['id'] if isinstance(item, dict) else item for item in items.values()]))        
+    item_ids = [item['ExtraAttributes']['id'] for item in items.values()]
+    pets = [json.loads(item['ExtraAttributes']['petInfo']) for item in items if item['ExtraAttributes']['id'] == 'PET']
+    pet_skins = list(set(['PET_SKIN_' + pet['skin'] for pet in pets if pet['skin']]))
+    item_ids.extend(pet_skins)
+    item_ids = list(set(item_ids))
     for item_id in item_ids:
         if item_id in config.ITEM_ID_ROLES:
             item_roles.append(config.ITEM_ID_ROLES[item_id])
