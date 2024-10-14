@@ -72,7 +72,7 @@ async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[ai
     items = await misc.get_player_items(player.uuid, session=session)
     item_ids = [item['ExtraAttributes']['id'] for item in items.values()]
     pets = [json.loads(item['ExtraAttributes']['petInfo']) for item in items.values() if item.get('ExtraAttributes', {}).get('id') == 'PET']
-    pet_skins = list(set(['PET_SKIN_' + pet['skin'] for pet in pets if pet['skin']]))
+    pet_skins = list(set(['PET_SKIN_' + pet['skin'] for pet in pets if pet.get('skin')]))
     item_ids.extend(pet_skins)
     item_ids = list(set(item_ids)) # remove duplicates
     for item_id in item_ids:
