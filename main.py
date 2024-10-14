@@ -154,7 +154,7 @@ The bot was made to give out item roles automatically, but is now much more.
 
 The bot is open source: <https://github.com/RagingEnby/CHUB-Bot>
 
-If you have any other questions, feel free to reach out to {config.BOT_DEVELOPER_ID}.""")
+If you have any other questions, feel free to reach out to {config.BOT_DEVELOPER_MENTION}.""")
 
 
 @bot.slash_command(
