@@ -77,8 +77,6 @@ async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[ai
             print("item, str", json.dumps(item, indent=2))
         elif isinstance(item.get('ExtraAttributes'), str):
             print("ExtraAttributes, str", json.dumps(item, indent=2))
-        elif isinstance(item.get('ExtraAttributes', {}).get('id'), str):
-            print("id, str", json.dumps(item, indent=2))
     pets = [json.loads(item['ExtraAttributes']['petInfo']) for item in items if item.get('ExtraAttributes', {}).get('id') == 'PET']
     pet_skins = list(set(['PET_SKIN_' + pet['skin'] for pet in pets if pet['skin']]))
     item_ids.extend(pet_skins)
