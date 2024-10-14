@@ -146,9 +146,9 @@ async def get_inventories(sb_data: dict) -> list[dict]:
     items = []
     for profile in sb_data['profiles']:
         for uuid, member_data in profile['members'].items():
-            inventory = await process_inventory(member_data.get('inventory', {}))
-            inventory.update(await process_inventory(member_data.get('rift', {}).get('inventory', {})))
-            inventory.update(await process_inventory(member_data.get('shared_inventory', {})))
+            inventories = await process_inventory(member_data.get('inventory', {}))
+            inventories.update(await process_inventory(member_data.get('rift', {}).get('inventory', {})))
+            inventories.update(await process_inventory(member_data.get('shared_inventory', {})))
             # combine all the inventory dicts:
             
             parsed = {inv_name: await decode_bytes(inv_contents) for inv_name, inv_contents in inventories.items()}
