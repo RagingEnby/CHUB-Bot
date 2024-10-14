@@ -73,7 +73,7 @@ async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[ai
     item_ids = [item['ExtraAttributes']['id'] for item in items.values()]
     # really shittily made debug statement, ignore it:
     for item in items:
-        if isinstance(item.get('ExtraAttributes', str):
+        if isinstance(item.get('ExtraAttributes'), str):
             print(json.dumps(item, indent=2))
     pets = [json.loads(item['ExtraAttributes']['petInfo']) for item in items if item.get('ExtraAttributes', {}).get('id') == 'PET']
     pet_skins = list(set(['PET_SKIN_' + pet['skin'] for pet in pets if pet['skin']]))
