@@ -71,9 +71,9 @@ async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[ai
     item_roles = []
     items = await misc.get_player_items(player.uuid, session=session)
     item_ids = list(set([item['ExtraAttributes']['id'] for item in items.values()]))        
-    for item_id, role_id in item_ids.items():
+    for item_id in item_ids:
         if item_id in config.ITEM_ID_ROLES:
-            item_roles.append(role_id)
+            item_roles.append(config.ITEM_ID_ROLES[item_id])
             
     for req_item_ids, role_id in config.ITEM_ID_ROLES.items():
         if ',' not in req_item_ids:
