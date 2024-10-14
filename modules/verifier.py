@@ -76,7 +76,10 @@ async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[ai
             item_roles.append(role_id)
             
     for req_item_ids, role_id in config.ITEM_ID_ROLES.items():
-        if isinstance(req_item_ids, list) and all(req_item_id in item_ids for req_item_id in req_item_ids):
+        if ',' not in req_item_ids:
+            continue
+        req_item_ids = req_item_ids.split(',')
+        if all(req_item_id in item_ids for req_item_id in req_item_ids):
             item_roles.append(role_id)
 
             
