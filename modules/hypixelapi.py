@@ -39,8 +39,6 @@ async def get_data(
 async def ensure_data(endpoint: str,
                       params: Optional[dict] = None,
                       session: Optional[aiohttp.ClientSession] = None) -> dict:
-    if 'guild' in endpoint:
-        print('ensure_data()')
     global LAST_RESPONSE
     id_ = params.get('uuid', params.get('player', params.get('id', params.get('profile')))) if params else None
     response = await get_data(endpoint, params, session=session)

@@ -110,7 +110,6 @@ async def randomize_dict_order(input_dict: dict) -> dict:
 
 
 async def get_guild_members(session: Optional[aiohttp.ClientSession] = None) -> list[str]:
-    print('get_guild_members()')
     data = await hypixelapi.ensure_data("/guild", {"id": config.HYPIXEL_GUILD_ID}, session=session)
     return [member['uuid'] for member in data['guild']['members']]
 

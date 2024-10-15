@@ -7,8 +7,7 @@ async def get(*args, **kwargs) -> aiohttp.ClientResponse:
     if session is None:
         # this api request has to be done with no session because of how disnake
         # autocomplete works
-        if not args[0].startswith('https://api.ragingenby.dev/stem')\
-        and '/guild' not in args[0]:
+        if not args[0].startswith('https://api.ragingenby.dev/stem'):
             print('WARNING: Request to', args[0], 'is being made with no session,'
                   'this will slow the bot down. Ensure this is intentional.')
         async with aiohttp.ClientSession() as session:
