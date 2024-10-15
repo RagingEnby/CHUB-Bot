@@ -1,7 +1,7 @@
 import asyncio
 import json
 import random
-from typing import Optional
+from typing import Optional, Any
 
 import aiofiles
 import aiohttp
