@@ -209,7 +209,9 @@ async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[
         )
         if response.status != 200:
             return []
-        AUTOCOMPLETE_IGN_CACHE[user_input] = [player['name'] for player in data]
+        AUTOCOMPLETE_IGN_CACHE[user_input] = [
+            player['name'] for player in await response.json()
+        ]
         return AUTOCOMPLETE_IGN_CACHE[user_input]
     except asyncio.TimeoutError:
         print('Timeout error for stem', user_input)
