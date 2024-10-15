@@ -1,28 +1,38 @@
 from typing import Optional, Literal
+from enum import Enum
 import aiohttp
 import datatypes
 import aiohttp.client_exceptions
 
 from modules import asyncreqs
 
-Api = Literal['mojang', 'ragingenby']
+class Api(Enum):
+    RAGING = 1
+    MOJANG = 2
 
 
-async def get_uuid(name: str, session: Optional[aiohttp.ClientSession] = None,
-                   api: Api = 'mojang') -> Optional[datatypes.MinecraftPlayer]:
-    url = ('https://api.mojang.com/users/profiles/minecraft/'
-           if api == 'mojang' else 'https://api.ragingenby.dev/player/') + name
+def make_url(identifier: str, api: Api) -> str:
+    if api == Api.MOJANG and len(identifier) >= 32:
+        # identifier is a UUID, use mojang's UUID -> Name API
+        url = 'https://sessionserver.mojang.com/session/minecraft/profile/'
+    elif api == Api.MOJANG and len(identifier) < 32:
+        # identifier is a Name, use mojang's Name -> UUID API
+        url = 'https://api.mojang.com/users/profiles/minecraft/'
+    else:
+        # identifier is a Name or UUID, use ragingenby's Name <-> UUID API
+        url = 'https://api.ragingenby.dev/player/'
+    return url + identifier
+
+
+async def get(identifier: str, session: Optional[aiohttp.ClientSession] = None,
+                   api: Api = Api.MOJANG) -> Optional[datatypes.MinecraftPlayer]:
+    url = make_url(identifier, api)
     response = await asyncreqs.get(url, session=session)
-    if response.status == 429 and api == 'mojang':
-        return await get_uuid(name, session=session, api='ragingenby')
-    return datatypes.MinecraftPlayer.from_dict(await response.json())
-
-
-async def get_name(uuid: str, session: Optional[aiohttp.ClientSession] = None,
-                   api: Api = 'mojang') -> Optional[datatypes.MinecraftPlayer]:
-    url = ('https://sessionserver.mojang.com/session/minecraft/profile/'
-           if api == 'mojang' else 'https://api.ragingenby.dev/player/') + uuid
-    response = await asyncreqs.get(url, session=session)
-    if response.status == 429 and api == 'mojang':
-        return await get_uuid(uuid, session=session, api='ragingenby')
-    return datatypes.MinecraftPlayer.from_dict(await response.json())
+    try:
+        if response.status == 429:
+            raise Exception('Rate limited')
+        return datatypes.MinecraftPlayer.from_dict(await response.json())
+    except Exception as e:
+        if api == Api.MOJANG:
+            print(f'mojang.get({identifier}, api=Api.MOJANG) raised:', e)
+        raise # raise the error if this is from api.ragingenby.dev

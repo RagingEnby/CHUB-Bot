@@ -168,7 +168,7 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
                 description="Your discord account is already linked. Use /unverify first."
             ))
 
-        player = await mojang.get_uuid(ign, session=session)
+        player = await mojang.get(ign, session=session)
         if player is None:
             return await inter.send(embed=misc.make_error(
                 title="invalid IGN",

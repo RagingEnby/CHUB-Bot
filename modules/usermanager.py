@@ -39,7 +39,7 @@ async def get_linked_player(
         member = member.id
     for uuid, discord_id in LinkedUsers.items():
         if discord_id == member:
-            return await mojang.get_name(uuid, session=session)
+            return await mojang.get(uuid, session=session)
     return None
 
 

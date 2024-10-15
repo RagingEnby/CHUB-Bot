@@ -255,7 +255,7 @@ async def moderation_unban_command(inter: disnake.AppCmdInter, player: str = com
     if not await misc.validate_mod_cmd(inter):
         return
     player = player.replace('-', '')
-    player_obj = await mojang.get_name(player)
+    player_obj = await mojang.get(player)
 
     if player_obj is None:
         return await inter.send(embed=misc.make_error(
@@ -289,7 +289,7 @@ async def moderation_blacklist_command(inter: disnake.AppCmdInter, player: str =
     if not await misc.validate_mod_cmd(inter):
         return
     player = player.replace('-', '')
-    player_obj = await mojang.get_name(player)
+    player_obj = await mojang.get(player)
 
     if player_obj is None:
         return await inter.send(embed=misc.make_error(
@@ -365,7 +365,7 @@ async def on_slash_command_completion(inter: disnake.AppCmdInter):
 
 async def update_players_task_single(uuid: str, member: disnake.Member,
                                      session: Optional[aiohttp.ClientSession] = None):
-    player = await mojang.get_name(uuid, session=session)
+    player = await mojang.get(uuid, session=session)
     await verifier.update_member(member, player=player, session=session)
 
 
