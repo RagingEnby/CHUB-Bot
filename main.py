@@ -400,6 +400,7 @@ TSKS.append(ensure_all_verified_task)
 
 @tasks.loop(minutes=6)
 async def update_guild_members_task():
+    print('update_guild_members_task()')
     config.guild_members = await misc.get_guild_members()
 
 
