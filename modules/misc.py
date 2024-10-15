@@ -202,13 +202,18 @@ async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[
             "Bibby"
         ]
     print(f'IGN Autocomplete > [{inter.user.name}]  {user_input}')
-    response = await asyncreqs.get('https://api.ragingenby.dev/stem/' + user_input,)
-    data = await response.json()
-    if response.status != 200:
-        print('ERROR RESPONSE FOR STEM', user_input, json.dumps(data))
+    try:
+        response = await asyncio.wait_for(
+            asyncreqs.get('https://api.ragingenby.dev/stem/' + user_input),
+            timeout=5
+        )
+        if response.status != 200:
+            return []
+        AUTOCOMPLETE_IGN_CACHE[user_input] = [player['name'] for player in data]
+        return AUTOCOMPLETE_IGN_CACHE[user_input]
+    except asyncio.TimeoutError:
+        print('Timeout error for stem', user_input)
         return []
-    AUTOCOMPLETE_IGN_CACHE[user_input] = [player['name'] for player in data]
-    return AUTOCOMPLETE_IGN_CACHE[user_input]
 
 
 def ign_param(description: Optional[str]=None) -> commands.Param:  # type: ignore
