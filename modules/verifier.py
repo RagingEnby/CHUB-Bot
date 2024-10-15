@@ -128,8 +128,8 @@ async def update_member(member: disnake.Member, player: Optional[datatypes.Minec
     player_data = await get_player_data(player.uuid, session=session)
     discord = await get_linked_discord(player, player_data=player_data)
     if discord is None or str(discord).lower() != member.name.lower():
-        await remove_verification(member)
         await usermanager.log_unlink(player)
+        await remove_verification(member)
         return
         
     with suppress(disnake.NotFound):
@@ -234,9 +234,9 @@ async def unverify_command(inter: disnake.AppCmdInter, member: Optional[disnake.
             'You are linked to a nonexistent player.\n'
             f'Please message <@{config.BOT_DEVELOPER_ID}> (@ragingenby) for assistance.'
         ))
-    await remove_verification(member)
     await usermanager.log_unlink(player)
-    await inter.send('Successfully unlinked')
+    await remove_verification(member)
+    await inter.send(embed=misc.make_success('successfully unlinked!'))
 
 
 async def update_command(inter: disnake.AppCmdInter, member: Optional[disnake.Member] = None):
