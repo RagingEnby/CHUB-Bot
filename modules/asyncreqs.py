@@ -21,7 +21,8 @@ async def get(*args, **kwargs) -> aiohttp.ClientResponse:
         print(args[0].split('.net')[-1] + ' - ' +
             params.get('uuid',
                 params.get('player',
-                    params.get('profile', json.dumps(params)))))
+                    params.get('profile', 
+                        params.get('id', json.dumps(params))))))
     async with session.get(*args, **kwargs) as response:
         return response
         
