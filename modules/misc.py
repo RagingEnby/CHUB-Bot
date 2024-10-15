@@ -1,17 +1,15 @@
-import aiofiles
+import asyncio
+import json
 import random
 from typing import Optional
-import json
+
+import aiofiles
 import aiohttp
 import disnake
 from disnake.ext import commands
-import asyncio
-
-from modules import hypixelapi
-from modules import parser
-from modules import asyncreqs
 
 import config
+from modules import asyncreqs, hypixelapi, parser
 
 BOT_CLASS = commands.InteractionBot | commands.Bot | commands.AutoShardedBot
 AUTOCOMPLETE_IGN_CACHE: dict[str, list[str]] = {}
@@ -63,6 +61,7 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
     museum_datas = await asyncio.gather(*[
         hypixelapi.ensure_data('/skyblock/museum', {"profile": profile['profile_id']}, session=session)
         for profile in profiles_data['profiles']
+        if should_scan_museum(profile['game_mode'], profile['members'].get(uuid, {}))
     ])
     inventories = await parser.get_inventories(profiles_data)
     museum_inventories = await parser.get_museum_inventories(profiles=museum_datas)
@@ -227,4 +226,14 @@ def ign_param(description: Optional[str]=None) -> commands.Param:  # type: ignor
         max_length=16,
         autocomplete=autocomplete_ign
     )
+
+
+def should_scan_museum(game_mode: str, member: dict[str, Any]) -> bool:
+    if game_mode != 'normal' and game_mode != 'ironman':
+        return False
+    if 'museum' not in member.get('player_data', {}).get('visited_zones', []):
+        return False
+    if member.get('leveling', {}).get('experience', 0.0) < 20:
+        return False
+    return True
     
