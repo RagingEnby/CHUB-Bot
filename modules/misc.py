@@ -200,6 +200,7 @@ async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[
         params=params
     )
     data = await response.json()
+    print(json.dumps(data, indent=2)) # just here for debugging
     return [player['name'] for player in data]
 
 
