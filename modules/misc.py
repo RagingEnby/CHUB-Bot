@@ -192,7 +192,7 @@ def numerize(num: int | float) -> str:
 async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
     print(f'IGN Autocomplete > [{inter.user.name}]  {user_input}')
     params = {
-        "stem": user_input,
+        "query": user_input,
         "limit": 5
     }
     response = await asyncreqs.get(
@@ -200,7 +200,9 @@ async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[
         params=params
     )
     data = await response.json()
-    print(json.dumps(data, indent=2)) # just here for debugging
+    if response.status != 200:
+        print('ERROR RESPONSE FOR STEM', user_input, json.dumps(data))
+        return []
     return [player['name'] for player in data]
 
 
