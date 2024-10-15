@@ -191,7 +191,7 @@ def numerize(num: int | float) -> str:
 
 
 async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
-    user_input = user_input.lower().strip().replace('/', '').replace(' ', '')
+    user_input = user_input.lower().strip().replace('/', '').replace(' ', '_')
     if not user_input:
         # EASTER EGG: These are all 5 CHUB admins :3
         return [
