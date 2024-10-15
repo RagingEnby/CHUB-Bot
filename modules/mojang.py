@@ -34,7 +34,6 @@ async def get(identifier: str, session: Optional[aiohttp.ClientSession] = None,
         return datatypes.MinecraftPlayer.from_dict(await response.json())
     except Exception as e:
         if api == Api.MOJANG:
-            if str(e) != 'Connection closed':
-                print(f'mojang.get({identifier}, api=Api.MOJANG) raised:', e)
+            print(f'mojang.get({identifier}, api=Api.MOJANG) raised:', e)
             return await get(identifier, session=session, api=Api.RAGING)
         raise e # raise the error if this is from api.ragingenby.dev
