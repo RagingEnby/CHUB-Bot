@@ -14,6 +14,8 @@ async def get(*args, **kwargs) -> aiohttp.ClientResponse:
             return await get(*args, session=session, **kwargs)
 
     async with session.get(*args, **kwargs) as response:
+        await response.read() # wait for response (async is buggy)
+
         # this is semi temp. its made to monitor that excessive requests arent being sent
         if 'api.hypixel.net' in args[0]:
             params = kwargs.get('params', {})
