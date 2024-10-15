@@ -24,7 +24,10 @@ async def get_data(
     url = f"{API_URL}{endpoint}"
     response = await asyncreqs.get(url, params=params, session=session)
     data = await response.json()
-    if response.status == 200:
+    # the queue limit here is because one time the websocket
+    # it sends to went offline, and it crashed my
+    # server because the queue got so large
+    if response.status == 200 and len(ws.queue) <= 1000:
         ws.queue.append({
             "data": data,
             "params": params or {},
