@@ -60,7 +60,7 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
         return {}
     for profile in profiles_data['profiles']:
         if 'game_mode' not in profile:
-            print(json.dumps(profile, indent=2))
+            print('profile', profile['profile_id'], 'is missing game_mode')
     museum_datas = await asyncio.gather(*[
         hypixelapi.ensure_data('/skyblock/museum', {"profile": profile['profile_id']}, session=session)
         for profile in profiles_data['profiles']
