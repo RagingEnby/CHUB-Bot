@@ -1,8 +1,10 @@
 import json
 import time
 import requests
+from disnake.ext import commands
 
 from scrts import BOT_TOKEN, HYPIXEL_API_KEY
+
 
 HYPIXEL_GUILD_ID: str = "639d0c668ea8c9185c70caf9"
 
@@ -60,6 +62,7 @@ REQUIRES_VERIFICATION: list[int] = [
 ]\
     + list(ITEM_ID_ROLES.values())\
     + list(RANK_ROLES.values())
+
 
 response = None
 while response is None or response.status_code != 200:

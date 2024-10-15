@@ -9,6 +9,7 @@ import asyncio
 
 from modules import hypixelapi
 from modules import parser
+from modules import asyncreqs
 
 import config
 
@@ -186,3 +187,27 @@ def numerize(num: int | float) -> str:
         magnitude += 1
         num /= 1000.0
     return '{}{}'.format('{:f}'.format(num).rstrip('0').rstrip('.'), ['', 'K', 'M', 'B', 'T'][magnitude])
+
+
+async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
+    print(f'IGN Autocomplete > [{inter.user.name}]  {user_input}')
+    params = {
+        "stem": user_input,
+        "limit": 5
+    }
+    response = await asyncreqs.get(
+        'https://api.ragingenby.dev/stem',
+        params=params
+    )
+    data = await response.json()
+    return [player['name'] for player in data]
+
+
+def ign_param(description: Optional[str]=None) -> commands.Param:  # type: ignore
+    return commands.param(
+        description=description or "A Minecraft IGN",
+        min_length=2, # technically 3, but rarely 2 names exist so why not
+        max_length=16,
+        autocomplete=autocomplete_ign
+    )
+    

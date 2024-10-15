@@ -113,7 +113,7 @@ async def on_message(message: disnake.Message):
     description="Link your Discord account to your Hypixel account"
 )
 async def link_command(inter: disnake.AppCmdInter,
-                       ign: str = commands.param(description="Your IGN", min_length=1, max_length=16)):
+                       ign: str = misc.ign_param('Your IGN')):
     await inter.response.defer()
     if not inter.guild or (inter.guild and inter.guild.id != config.GUILD_ID):
         return await inter.send(embed=misc.NOT_GUILD_ERROR)
