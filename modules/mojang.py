@@ -35,4 +35,5 @@ async def get(identifier: str, session: Optional[aiohttp.ClientSession] = None,
     except Exception as e:
         if api == Api.MOJANG:
             print(f'mojang.get({identifier}, api=Api.MOJANG) raised:', e)
-        raise # raise the error if this is from api.ragingenby.dev
+            return await get(identifier, session=session, api=Api.RAGING)
+        raise e # raise the error if this is from api.ragingenby.dev

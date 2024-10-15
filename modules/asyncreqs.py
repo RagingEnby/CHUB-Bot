@@ -13,13 +13,14 @@ async def get(*args, **kwargs) -> aiohttp.ClientResponse:
             return await get(*args, session=session, **kwargs)
 
     # this is semi temp. its made to monitor that excessive requests arent being sent
-    params = kwargs.get('params', {})
-    # wow holy SHIT this print statement is ugly but i cba to make it better
-    # also this makes it comply with pRoPEr PrACtiCeS
-    print(args[0].split('.net')[-1] + ' - ' +
-          params.get('uuid',
-            params.get('player',
-                params.get('profile', ''))))
+    if 'api.hypixel.net' in args[0]:
+        params = kwargs.get('params', {})
+        # wow holy SHIT this print statement is ugly but i cba to make it better
+        # also this makes it comply with pRoPEr PrACtiCeS
+        print(args[0].split('.net')[-1] + ' - ' +
+            params.get('uuid',
+                params.get('player',
+                    params.get('profile', ''))))
     async with session.get(*args, **kwargs) as response:
         return response
         
