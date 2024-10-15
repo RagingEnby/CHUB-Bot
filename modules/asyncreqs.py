@@ -11,7 +11,12 @@ async def get(*args, **kwargs) -> aiohttp.ClientResponse:
                   'this will slow the bot down. Ensure this is intentional.')
         async with aiohttp.ClientSession() as session:
             return await get(*args, session=session, **kwargs)
+
+    # this is semi temp. its made to monitor that excessive requests arent being sent
+    params = kwargs.get('params', {})
+    print(args[0].split('.net/')[-1] + ' - ' +
+          params.get('uuid', params.get('player', params.get('profile', ''))))
+    
     async with session.get(*args, **kwargs) as response:
-        await response.text()  # wait for response to go through (async can be buggy so this is somewhat needed)
         return response
         

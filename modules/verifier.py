@@ -118,8 +118,10 @@ async def get_misc_roles(player: datatypes.MinecraftPlayer, player_data: dict) -
 
 async def update_member(member: disnake.Member, player: Optional[datatypes.MinecraftPlayer] = None,
                         session: Optional[aiohttp.ClientSession] = None):
+    # IDEs get mad if you dont do this:
     if member is None:
         return
+        
     if player is None:
         player = await usermanager.get_linked_player(member)
     if player is None:
@@ -225,14 +227,11 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
 async def unverify_command(inter: disnake.AppCmdInter, member: Optional[disnake.Member] = None):
     if member is None:
         member = inter.user
-    if not await usermanager.is_linked(member.id):
-        return await inter.send('You are not linked.')
     player = await usermanager.get_linked_player(member)
-    if player is None:
+    if not player:
         return await inter.send(embed=misc.make_error(
-            'nonexistent player linked',
-            'You are linked to a nonexistent player.\n'
-            f'Please message <@{config.BOT_DEVELOPER_ID}> (@ragingenby) for assistance.'
+            "not verified",
+            "You are not verified. Use the /verify command to verify your account."
         ))
     await usermanager.log_unlink(player)
     await remove_verification(member)
@@ -243,12 +242,13 @@ async def update_command(inter: disnake.AppCmdInter, member: Optional[disnake.Me
     before = time.time()
     if member is None:
         member = inter.user
-    if not await usermanager.is_linked(member.id):
+    player = await usermanager.get_linked_player(member)
+    if not player:
         return await inter.send(embed=misc.make_error(
             'not linked',
             'Please verify using the /verify command first.'
         ))
-    await update_member(member)
+    await update_member(member, player=player)
     after = time.time()
     await inter.send(embed=misc.make_success(
         "successfully updated!",
