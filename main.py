@@ -353,6 +353,14 @@ async def cc_command(inter: disnake.AppCmdInter):
         "Sell your Crystal/Fairy armor here!\nhttps://discord.gg/crystal-cafe-873758934224232468")
 
 
+@bot.slash_command(
+    name="tem",
+    description="Sends the link to Thomas's Community Discord (iTEM Discord)"
+)
+async def tem_command(inter: disnake.AppCmdInter):
+    await inter.response.send_message("Download the iTEM mod here!\nhttps://discord.gg/item-932106421338779709")
+
+
 @bot.event
 async def on_slash_command(inter: disnake.AppCmdInter):
     await cmdlogger.on_slash_command(inter)
