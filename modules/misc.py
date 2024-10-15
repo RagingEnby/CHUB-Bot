@@ -190,6 +190,15 @@ def numerize(num: int | float) -> str:
 
 
 async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
+    if not user_input.strip():
+        # EASTER EGG: These are all 5 CHUB admins :3
+        return [
+            "RagingEnby",
+            "TGWaffles",
+            "_Foe",
+            "Vinush",
+            "Bibby"
+        ]
     print(f'IGN Autocomplete > [{inter.user.name}]  {user_input}')
     params = {
         "query": user_input,
