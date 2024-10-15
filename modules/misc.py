@@ -14,6 +14,7 @@ from modules import asyncreqs
 import config
 
 BOT_CLASS = commands.InteractionBot | commands.Bot | commands.AutoShardedBot
+AUTOCOMPLETE_IGN_CACHE: dict[str, list[str]] = {}
 
 
 async def get_user_from_name(bot: BOT_CLASS, name: str) -> Optional[disnake.Member]:
@@ -190,7 +191,8 @@ def numerize(num: int | float) -> str:
 
 
 async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
-    if not user_input.strip():
+    user_input = user_input.lower().strip()
+    if not user_input:
         # EASTER EGG: These are all 5 CHUB admins :3
         return [
             "RagingEnby",
@@ -200,19 +202,13 @@ async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[
             "Bibby"
         ]
     print(f'IGN Autocomplete > [{inter.user.name}]  {user_input}')
-    params = {
-        "query": user_input,
-        "limit": 5
-    }
-    response = await asyncreqs.get(
-        'https://api.ragingenby.dev/stem',
-        params=params
-    )
+    response = await asyncreqs.get('https://api.ragingenby.dev/stem/' + user_input,)
     data = await response.json()
     if response.status != 200:
         print('ERROR RESPONSE FOR STEM', user_input, json.dumps(data))
         return []
-    return [player['name'] for player in data]
+    AUTOCOMPLETE_IGN_CACHE[user_input] = [player['name'] for player in data]
+    return AUTOCOMPLETE_IGN_CACHE[user_input]
 
 
 def ign_param(description: Optional[str]=None) -> commands.Param:  # type: ignore
