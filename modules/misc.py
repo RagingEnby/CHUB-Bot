@@ -205,7 +205,9 @@ async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[
     try:
         response = await asyncio.wait_for(
             asyncreqs.get('https://api.ragingenby.dev/stem/' + user_input),
-            timeout=5
+            # timeout so low because 1. people type fast 2. discord is unforgiving asdf
+            # with their timeouts on autocomplete
+            timeout=3
         )
         if response.status != 200:
             return []
