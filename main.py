@@ -398,10 +398,15 @@ async def ensure_all_verified_task():
 TSKS.append(ensure_all_verified_task)
 
 
-@tasks.loop(minutes=6)
+@tasks.loop(seconds=1)
 async def update_guild_members_task():
-    print('update_guild_members_task()')
-    config.guild_members = await misc.get_guild_members()
+    # we want this to loop once every 6 mins, but disnake.ext.tasks.loop()
+    # tends to get confused and fuck up at anyting more than 1 minute,
+    # so just have a perm loop that waits 600s before continuing
+    while True:
+        print('update_guild_members_task()')
+        config.guild_members = await misc.get_guild_members()
+        await asyncio.sleep(600)
 
 
 TSKS.append(update_guild_members_task)
