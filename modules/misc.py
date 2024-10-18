@@ -55,9 +55,9 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
     uuid = uuid.replace('-', '')
     profiles_data = await hypixelapi.ensure_data('/skyblock/profiles', {"uuid": uuid}, session=session)
     if not profiles_data.get('profiles'):
-        return {}
+        return {}, []
     if not profiles_data:
-        return {}
+        return {}, []
     museum_datas = await asyncio.gather(*[
         hypixelapi.ensure_data('/skyblock/museum', {"profile": profile['profile_id']}, session=session)
         for profile in profiles_data['profiles']
@@ -92,7 +92,7 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
             applied_items.append(skin)
     async with aiofiles.open(f'storage/inv/{uuid}.json', 'w') as file:
         await file.write(json.dumps({"items": items, "applied_items": applied_items}, indent=2))
-    return items, list(set(applied_items))
+    return items, applied_items
 
 
 def add_embed_footer(embed: disnake.Embed) -> disnake.Embed:
