@@ -224,7 +224,7 @@ def ign_param(description: Optional[str]=None) -> commands.Param:  # type: ignor
         description=description or "A Minecraft IGN",
         min_length=2, # technically 3, but rarely 2 names exist so why not
         max_length=16,
-        autocomplete=autocomplete_ign
+        #autocomplete=autocomplete_ign
     )
 
 
