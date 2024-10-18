@@ -230,7 +230,7 @@ def ign_param(description: Optional[str]=None) -> commands.Param:  # type: ignor
 
 def should_scan_museum(game_mode: str, member: dict[str, Any]) -> bool:
     # museum is only available to ironman and standard profiles
-    if game_mode != 'normal' and game_mode != 'ironman':
+    if game_mode not in ['normal', 'ironman']:
         return False
 
     # you cant have put items in museum if youve never been there
