@@ -66,6 +66,8 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
     inventories = await parser.get_inventories(profiles_data, debug=debug)
     museum_inventories = await parser.get_museum_inventories(profiles=museum_datas)
     items = {}
+    applied_items = []
+    
     for inventory in inventories:
         for container_items in inventory['parsed'].values():
             for item in container_items:
@@ -82,17 +84,10 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
     for profile in profiles_data['profiles']:
         for member in profile['members'].values():
             for pet in member.get('pets_data', {}).get('pets', []):
-                id_ = pet.get('uniqueId', pet.get('uuid', pet['type']))
-                item = {
-                    "ExtraAttributes": {
-                        "petInfo": json.dumps(pet),
-                        "id": "PET",
-                        "uuid": id_
-                    }
-                }
-                items[uuid] = item
+                if pet.get('skin'):
+                    applied_items.append(pet['skin'])
     async with aiofiles.open(f'storage/inv/{uuid}.json', 'w') as file:
-        await file.write(json.dumps(items, indent=2))
+        await file.write(json.dumps({"items": items, "applied_items": applied_items}, indent=2))
     return items
 
 
