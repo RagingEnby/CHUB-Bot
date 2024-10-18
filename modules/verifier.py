@@ -228,13 +228,13 @@ async def update_command(inter: disnake.AppCmdInter, member: Optional[disnake.Me
     before = time.time()
     if member is None:
         member = inter.user
-    player = await usermanager.get_linked_player(member)
-    if not player:
-        return await inter.send(embed=misc.make_error(
-            'not linked',
-            'Please verify using the /verify command first.'
-        ))
     async with aiohttp.ClientSession() as session:
+        player = await usermanager.get_linked_player(member, session=session)
+        if not player:
+            return await inter.send(embed=misc.make_error(
+                'not linked',
+                'Please verify using the /verify command first.'
+            ))
         await update_member(
             member=member,
             player=player,
