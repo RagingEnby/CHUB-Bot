@@ -17,7 +17,7 @@ async def get(*args, **kwargs) -> aiohttp.ClientResponse:
         await response.read() # wait for response (async is buggy)
 
         # this is semi temp. its made to monitor that excessive requests arent being sent
-        if 'api.hypixel.net' in args[0]:
+        """if 'api.hypixel.net' in args[0]:
             params = kwargs.get('params', {})
             # wow holy SHIT this print statement is ugly but i cba to make it better
             # also this makes it comply with pRoPEr PrACtiCeS
@@ -25,6 +25,6 @@ async def get(*args, **kwargs) -> aiohttp.ClientResponse:
                 params.get('uuid',
                     params.get('player',
                         params.get('profile', 
-                            params.get('id', json.dumps(params))))))
+                            params.get('id', json.dumps(params))))))"""
         return response
         
