@@ -51,7 +51,7 @@ async def ban_member(bot: BOT_CLASS, user_id: int, reason: Optional[str] = None)
     await guild.ban(disnake.Object(user_id), reason=reason)
 
 
-async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] = None) -> dict[str, dict]:
+async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] = None, debug: bool=False) -> dict[str, dict]:
     uuid = uuid.replace('-', '')
     profiles_data = await hypixelapi.ensure_data('/skyblock/profiles', {"uuid": uuid}, session=session)
     if not profiles_data.get('profiles'):
@@ -63,7 +63,7 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
         for profile in profiles_data['profiles']
         if should_scan_museum(profile.get('game_mode', 'normal'), profile['members'].get(uuid, {}))
     ])
-    inventories = await parser.get_inventories(profiles_data)
+    inventories = await parser.get_inventories(profiles_data, debug=debug)
     museum_inventories = await parser.get_museum_inventories(profiles=museum_datas)
     items = {}
     for inventory in inventories:

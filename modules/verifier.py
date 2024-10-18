@@ -67,9 +67,9 @@ async def get_linked_discord(player: datatypes.MinecraftPlayer, session: Optiona
     return data.get('player', {}).get('socialMedia', {}).get('links', {}).get('DISCORD', None)
 
 
-async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[aiohttp.ClientSession] = None) -> list[int]:
+async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[aiohttp.ClientSession] = None, debug: bool=False) -> list[int]:
     item_roles = []
-    items = await misc.get_player_items(player.uuid, session=session)
+    items = await misc.get_player_items(player.uuid, session=session, debug=debug)
     item_ids = [item['ExtraAttributes']['id'] for item in items.values()]
     pets = [json.loads(item['ExtraAttributes']['petInfo']) for item in items.values() if item.get('ExtraAttributes', {}).get('id') == 'PET' and 'petInfo' in item['ExtraAttributes']]
     pet_skins = list(set(['PET_SKIN_' + pet['skin'] for pet in pets if pet.get('skin')]))
@@ -92,20 +92,6 @@ async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[ai
     return item_roles
 
 
-async def give_item_roles(member: disnake.Member, player: Optional[datatypes.MinecraftPlayer] = None,
-                          session: Optional[aiohttp.ClientSession] = None):
-    if not player:
-        player = await usermanager.get_linked_player(member)
-    if not player:
-        return
-    deserved_roles = await get_item_roles(player, session=session)
-    
-    try:
-        await member.add_roles(*[disnake.Object(role) for role in deserved_roles], reason="Auto Item Roles")
-    except disnake.errors.NotFound:
-        pass
-
-
 async def get_misc_roles(player: datatypes.MinecraftPlayer, player_data: dict) -> list[int]:
     roles = []
     if player.uuid in config.guild_members:
@@ -117,7 +103,7 @@ async def get_misc_roles(player: datatypes.MinecraftPlayer, player_data: dict) -
 
 
 async def update_member(member: disnake.Member, player: Optional[datatypes.MinecraftPlayer] = None,
-                        session: Optional[aiohttp.ClientSession] = None):
+                        session: Optional[aiohttp.ClientSession] = None, debug: bool=False):
     # IDEs get mad if you dont do this:
     if member is None:
         return
@@ -137,7 +123,7 @@ async def update_member(member: disnake.Member, player: Optional[datatypes.Minec
     with suppress(disnake.NotFound):
         roles = [config.VERIFIED_ROLE]
 
-        roles.extend(await get_item_roles(player, session=session))
+        roles.extend(await get_item_roles(player, session=session, debug=debug))
         roles.extend(await get_misc_roles(player, player_data=player_data))
 
         if member.display_name != player.name:
@@ -248,7 +234,7 @@ async def update_command(inter: disnake.AppCmdInter, member: Optional[disnake.Me
             'not linked',
             'Please verify using the /verify command first.'
         ))
-    await update_member(member, player=player)
+    await update_member(member, player=player, debug=await inter.bot.is_owner(inter.user))
     after = time.time()
     await inter.send(embed=misc.make_success(
         "successfully updated!",
