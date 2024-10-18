@@ -51,7 +51,7 @@ async def ban_member(bot: BOT_CLASS, user_id: int, reason: Optional[str] = None)
     await guild.ban(disnake.Object(user_id), reason=reason)
 
 
-async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] = None, debug: bool=False) -> dict[str, dict]:
+async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] = None, debug: bool=False) -> tuple[dict[str, dict], list[str]]:
     uuid = uuid.replace('-', '')
     profiles_data = await hypixelapi.ensure_data('/skyblock/profiles', {"uuid": uuid}, session=session)
     if not profiles_data.get('profiles'):
@@ -86,9 +86,13 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
             for pet in member.get('pets_data', {}).get('pets', []):
                 if pet.get('skin'):
                     applied_items.append(pet['skin'])
+    for item in items.values():
+        skin = item.get('ExtraAttributes', {}).get('skin')
+        if skin:
+            applied_items.append(skin)
     async with aiofiles.open(f'storage/inv/{uuid}.json', 'w') as file:
         await file.write(json.dumps({"items": items, "applied_items": applied_items}, indent=2))
-    return items
+    return items, list(set(applied_items))
 
 
 def add_embed_footer(embed: disnake.Embed) -> disnake.Embed:
