@@ -234,7 +234,13 @@ async def update_command(inter: disnake.AppCmdInter, member: Optional[disnake.Me
             'not linked',
             'Please verify using the /verify command first.'
         ))
-    await update_member(member, player=player, debug=await inter.bot.is_owner(inter.user))
+    async with aiohttp.ClientSession() as session:
+        await update_member(
+            member=member,
+            player=player,
+            session=session,
+            debug=await inter.bot.is_owner(inter.user)
+        )
     after = time.time()
     await inter.send(embed=misc.make_success(
         "successfully updated!",
