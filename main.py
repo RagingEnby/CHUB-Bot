@@ -71,7 +71,7 @@ async def on_member_ban(guild: disnake.Guild, user: disnake.User):
     ban = await guild.fetch_ban(user)
     await usermanager.log_ban(user.id, reason=ban.reason if ban else None)
 
-    if not ban.reason.strip():
+    if not ban.reason:
         # im SURE there's a nicer looking way to do this, but according to the disnake support
         # server, the only way to get the moderator responsible is through audit logs
         moderator: Optional[disnake.Member] = None
