@@ -2,7 +2,7 @@ import config
 
 
 async def dctr_space_helm(item: dict) -> list[int]:
-    roles = [config.SPACE_HELM_ROLE]
+    roles = []
     extra_attributes = item['ExtraAttributes']
     if extra_attributes.get('sender_name', '').lower():
         roles.append(config.DCTR_SPACE_HELM_ROLE)
