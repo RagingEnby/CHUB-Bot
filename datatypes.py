@@ -1,5 +1,10 @@
+from typing import Literal, Optional
+import disnake
 from typing_extensions import TypedDict
 import json
+from uuid import uuid4
+
+TradePaymentType = Literal['Pure Coins', 'Coins + Items', 'Items']
 
 
 class MinecraftPlayerDict(TypedDict):
@@ -23,6 +28,9 @@ class MinecraftPlayer:
         self.name = name
         self.uuid = uuid
 
+    def __str__(self) -> str:
+        return self.name
+
     def to_dict(self) -> MinecraftPlayerDict:
         return {
             "id": self.uuid,
@@ -36,3 +44,81 @@ class MinecraftPlayer:
             return None
         return cls(name=data['name'], uuid=data['id'])
 
+
+class TradeReportAttachment:
+    def __init__(self, url: str, filename: str):
+        self.url = url
+        self.filename = filename
+
+    @property
+    def file(self) -> disnake.File:
+        return disnake.File(self.url, filename=self.filename)
+
+    def to_dict(self) -> dict:
+        return {
+            "url": self.url,
+            "filename": self.filename
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(**data)
+
+    @classmethod
+    def from_disnake_attachment(cls, attachment: disnake.Attachment):
+        return cls(
+            # use proxy_url because i dont want to risk my server being ip grabbed:
+            # (bot is hosted on RagingEnby's home server)
+            url=attachment.proxy_url,
+            filename=attachment.filename
+        )
+
+
+class TradeReport:
+    def __init__(self, author: int, seller: MinecraftPlayer, buyer: MinecraftPlayer, date: str, item: str, price: str, payment_type: TradePaymentType, image: TradeReportAttachment, notes: Optional[str], _id: Optional[str]=None):
+        self.id = _id or str(uuid4())
+        self.author=int
+        self.seller = seller
+        self.buyer = buyer
+        self.date = date
+        self.item = item
+        self.price = price
+        self.payment_type = payment_type
+        self.image = image
+        self.notes = notes
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "author": self.author,
+            "seller": self.seller.to_dict(),
+            "buyer": self.buyer.to_dict(),
+            "date": self.date,
+            "item": self.item,
+            "price": self.price,
+            "paymentType": self.payment_type,
+            "image": self.image.to_dict(),
+            "notes": self.notes,
+        }
+
+    def to_embed(self, status: str="pending") -> disnake.Embed:
+        return disnake.Embed(
+            title=f"Trade Report ({status.upper()})"
+            description='\n'.join([f"**{k.replace('_', ' ').title()}:** {v}" for k, v in self.to_dict()])
+        )
+
+    @classmethod
+    def from_dict(cls, data: dict):
+        return cls(
+            _id=data.get('id'),
+            author=data['author'],
+            seller=MinecraftPlayer.from_dict(data['seller']), # type: ignore
+            buyer=MinecraftPlayer.from_dict(data['buyer']), # type: ignore
+            date=data['date'],
+            item=data['item'],
+            price=data['price'],
+            payment_type=data['payment_type'],
+            image=TradeReportAttachment.from_dict(data['image']),
+            notes=data['notes'],
+        )
+        

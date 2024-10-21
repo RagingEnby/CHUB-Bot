@@ -1,6 +1,6 @@
 import asyncio
 from contextlib import suppress
-from typing import Optional
+from typing import Literal, Optional
 
 import aiohttp
 import disnake
@@ -8,11 +8,14 @@ from disnake.ext import commands, tasks
 
 import config
 import ws
+import datatypes
 from modules import cmdlogger
 from modules import misc
 from modules import mojang
 from modules import usermanager
 from modules import verifier
+from modules import tradereport
+
 
 TSKS = []
 
@@ -108,6 +111,18 @@ async def on_message(message: disnake.Message):
             await message.delete()
 
 
+@bot.event
+async def on_button_click(inter: disnake.MessageInteraction):
+    button_type, button_data = inter.component.custom_id.split('|', 1)
+    match button_type:
+        case tradereport.BUTTON_ID:
+            return await tradereport.on_button_click(inter, button_data)
+    await inter.send(embed=misc.make_error(
+        "Invalid Button",
+        f"Unknown button type: `{disnake.utils.escape_markdown(button_type)}`"
+    ))
+
+
 @bot.slash_command(
     name="verify",
     description="Link your Discord account to your Hypixel account"
@@ -155,6 +170,25 @@ The bot was made to give out item roles automatically, but is now much more.
 The bot is open source: <https://github.com/RagingEnby/CHUB-Bot>
 
 If you have any other questions, feel free to reach out to {config.BOT_DEVELOPER_MENTION}.""")
+
+
+@bot.slash_command(
+    name="report-trade",
+    description="Report a trade for it to be sent in <#1201283974924861470>"
+)
+async def report_trade_command(
+    inter: disnake.AppCmdInter,
+    seller: str = misc.ign_param('The player who sold the item'),
+    buyer: str = misc.ign_param('The player who bought the item'),
+    date: str = commands.param(description="PLEASE USE DD/MM/YYYY FORMAT"),
+    item: str = commands.param(),
+    price: str = commands.param(),
+    payment_type: datatypes.TradePaymentType = commands.param(description="What the buyer gave in return for the item"),
+    image: disnake.Attachment = commands.param(description="An image of the trade"),
+    notes: Optional[str] = commands.param(default=None, description="Any notes you want to add")
+):
+    await tradereport.report_trade_command(inter, seller, buyer, date, item, price, payment_type, image, notes)
+    
 
 
 @bot.slash_command(

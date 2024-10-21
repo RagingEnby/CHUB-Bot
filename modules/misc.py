@@ -241,4 +241,3 @@ def should_scan_museum(game_mode: str, member: dict[str, Any]) -> bool:
         return False
         
     return True
-    
