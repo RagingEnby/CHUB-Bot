@@ -108,10 +108,10 @@ class TradeReport:
                 f"**Author:** <@{self.author}>",
                 f"**Seller:** `{self.seller}`",
                 f"**Buyer:** `{self.buyer}`",
-                f"**Date:** `{self.date}`"
+                f"**Date:** `{self.date}`",
                 f"**Item:** `{self.item}`",
                 f"**Price:** `{self.price}`",
-                f"**Payment Type:** {self.payment_type}`",
+                f"**Payment Type:** `{self.payment_type}`",
                 f"**Notes:** `{self.notes}`"
             ])
         )

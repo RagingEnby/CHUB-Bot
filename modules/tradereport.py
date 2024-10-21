@@ -19,12 +19,12 @@ PENDING_REPORTS: dict[str, datatypes.TradeReport] = {
 }
 INACTIVE_COMPONENTS: list[disnake.ui.Button] = [
     disnake.ui.Button(
-        emoji="✅",
+        emoji=":ballot_box_with_check:",
         style=disnake.ButtonStyle.green,
         disabled=True
     ),
     disnake.ui.Button(
-        emoji="❌",
+        emoji=":regional_indicator_x:",
         style=disnake.ButtonStyle.red,
         disabled=True
     )
@@ -201,12 +201,12 @@ async def report_trade_command(
             embed=trade_report.to_embed(),
             components=[
                 disnake.ui.Button(
-                    emoji="✅",
+                    emoji=":ballot_box_with_check:",
                     style=disnake.ButtonStyle.green,
                     custom_id=f"{BUTTON_ID}|{json.dumps({'action': 'accept', 'id': trade_report.id})}"
                 ),
                 disnake.ui.Button(
-                    emoji="❌",
+                    emoji=":regional_indicator_x:",
                     style=disnake.ButtonStyle.red,
                     custom_id=f"{BUTTON_ID}|{json.dumps({'action': 'deny', 'id': trade_report.id})}"
                 )
