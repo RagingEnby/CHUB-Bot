@@ -77,7 +77,7 @@ class TradeReportAttachment:
 class TradeReport:
     def __init__(self, author: int, seller: MinecraftPlayer, buyer: MinecraftPlayer, date: str, item: str, price: str, payment_type: TradePaymentType, image: TradeReportAttachment, notes: Optional[str], _id: Optional[str]=None):
         self.id = _id or str(uuid4())
-        self.author=int
+        self.author = author
         self.seller = seller
         self.buyer = buyer
         self.date = date
