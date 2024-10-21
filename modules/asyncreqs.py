@@ -3,7 +3,7 @@ import json
 
 
 async def get(*args, **kwargs) -> aiohttp.ClientResponse:
-    session = kwargs.pop('session') if 'session' in kwargs else None
+    session = kwargs.pop('session', None)
     if session is None:
         # this api request has to be done with no session because of how disnake
         # autocomplete works
@@ -26,5 +26,15 @@ async def get(*args, **kwargs) -> aiohttp.ClientResponse:
                     params.get('player',
                         params.get('profile', 
                             params.get('id', json.dumps(params))))))"""
+        return response
+
+
+async def post(*args, **kwargs) -> aiohttp.ClientResponse:
+    session = kwargs.pop('session', None)
+    if session is None:
+        async with aiohttp.ClientSession() as session:
+            return await post(*args, session=session, **kwargs)
+    async with session.get(*args, **kwargs) as response:
+        await response.read()
         return response
         
