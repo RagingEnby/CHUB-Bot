@@ -107,8 +107,6 @@ class VerificationModal(disnake.ui.Modal):
         ]) + censor
         channel = inter.bot.get_channel(config.TRADE_REPORT_CHANNEL)
         await channel.send(content, file=self.trade.image.file)
-        
-
 
 
 async def save_pending_reports():

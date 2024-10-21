@@ -103,7 +103,7 @@ class TradeReport:
 
     def to_embed(self, status: str="pending") -> disnake.Embed:
         return disnake.Embed(
-            title=f"Trade Report ({status.upper()})"
+            title=f"Trade Report ({status.upper()})",
             description='\n'.join([f"**{k.replace('_', ' ').title()}:** {v}" for k, v in self.to_dict()])
         )
 
