@@ -104,7 +104,16 @@ class TradeReport:
     def to_embed(self, status: str="pending") -> disnake.Embed:
         return disnake.Embed(
             title=f"Trade Report ({status.upper()})",
-            description='\n'.join([f"**{k.replace('_', ' ').title()}:** {v}" for k, v in self.to_dict()])
+            description='\n'.join([
+                f"**Author:** <@{self.author}>",
+                f"**Seller:** `{self.seller}`",
+                f"**Buyer:** `{self.buyer}`",
+                f"**Date:** `{self.date}`"
+                f"**Item:** `{self.item}`",
+                f"**Price:** `{self.price}`",
+                f"**Payment Type:** {self.payment_type}`",
+                f"**Notes:** `{self.notes}`"
+            ])
         )
 
     @classmethod
