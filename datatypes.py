@@ -96,7 +96,7 @@ class TradeReport:
             "date": self.date,
             "item": self.item,
             "price": self.price,
-            "paymentType": self.payment_type,
+            "payment_type": self.payment_type,
             "image": self.image.to_dict(),
             "notes": self.notes,
         }
