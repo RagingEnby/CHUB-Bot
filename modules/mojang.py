@@ -37,3 +37,13 @@ async def get(identifier: str, session: Optional[aiohttp.ClientSession] = None,
             print(f'mojang.get({identifier}, api=Api.MOJANG) raised:', e)
             return await get(identifier, session=session, api=Api.RAGING)
         raise e # raise the error if this is from api.ragingenby.dev
+
+
+async def bulk_uuid_to_player(uuids: list[str], session: Optional[aiohttp.ClientSession] = None) -> list[datatypes.MojangPlayer]:
+    body = {
+        "uuids": uuids
+    }
+    response = await asyncreqs.post("https://api.ragingenby.dev/names", body=body, session=session)
+    data = await response.json()
+    return [datatypes.MojangPlayer.from_dict(player) for player in data['players']]
+    

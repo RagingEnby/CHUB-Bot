@@ -341,6 +341,38 @@ async def moderation_blacklist_command(inter: disnake.AppCmdInter, player: str =
 
 
 @moderation.sub_command(
+    name="bulk-blacklist",
+    description="Blacklist a group of players at once"
+)
+async def moderation_bulk_blacklist_command(inter: disnake.AppCmdInter, file: disnake.Attachment, reason: str):
+    if not await misc.validate_mod_cmd(inter):
+        return
+    invalid_format_err = misc.make_error(
+        "Invalid File",
+        "Please ensure your file is a `.txt` file in this format:\n```RagingEnby\nTGWaffles\nFoe\nVinush```"
+    )
+    if not file.filename.endswith('.txt'):
+        return await inter.send(embed=invalid_format_err)
+    data = await file.read()
+    igns = [line.strip() for line in data.decode().split('\n')]
+    players = await mojang.bulk_get(igns)
+    bans = 0
+    for player in players:
+        usermanager.BannedUsers[player.uuid] = f"{player.uuid} | {reason} | Bulk banned by {inter.author.name} ({inter.author.id})"
+        member = inter.guild.get_member(usermanager.LinkedUsers[player.uuid]) if player.uuid in usermanager.LinkedUsers else None
+        if member:
+            print(f'banning {member.name} from from a bulk blacklist ({player.name} {player.uuid})')
+            await member.ban(f"{reason} | Bulk banned by {inter.author.name} ({inter.author.id})")
+            bans += 1
+    await usermanager.BannedUsers.save()
+    await inter.send(embed=misc.make_success(
+        "Done!",
+        f"Blacklisted `{len(players)}` from the server and banned `{bans}` server members"
+    ))
+    
+
+
+@moderation.sub_command(
     name="force-verify",
     description="Runs /verify as a different user"
 )
