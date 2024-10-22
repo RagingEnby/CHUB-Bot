@@ -25,7 +25,9 @@ async def log_verification(inter: disnake.AppCmdInter, player: datatypes.Minecra
         data = await response.json()
         description = [
             f"**Linked To:** {member.mention}",
-            f"**First Login:** <t:{round(data['firstLogin']) // 1000}> (<t:{round(data['firstLogin']) // 1000}:R>)",
+            f"**Discord Created:** <t:{member.created_at.timestamp()//1000}:R>",
+            f"**Joined Server:** <t:{member.joined_at.timestamp()//1000}:R>",
+            f"**First Hypixel Login:** <t:{round(data['firstLogin']) // 1000}> (<t:{round(data['firstLogin']) // 1000}:R>)",
             f"**Possible Alts:** `{', '.join([disnake.utils.escape_markdown(player['name']) for player in data['possibleAlts']]) if data['possibleAlts'] else 'None'}`"
         ]
         embed = disnake.Embed(
@@ -39,19 +41,25 @@ async def log_verification(inter: disnake.AppCmdInter, player: datatypes.Minecra
             text=f"{member.name} ({member.id})",
             icon_url=member.display_avatar.url
         )
-        for profile in data['skyblockProfiles']:
-            value = [
-                f"Selected: {':white_check_mark:' if profile['selected'] else ':x:'}",
-                f"Profile Type: `{profile['game_mode']}`",
-                f"Networth: `{misc.numerize(profile['networth'])}`",
-                f"Level: `{profile['sbLevel']}`",
-                f"Fairy Souls: `{profile['fairySouls']}`",
-            ]
-            for weight_name, weight_value in profile['weight'].items():
-                value.append(f"-# {weight_name.title()} Weight: `{round(weight_value, 2)}`")
+        if data['skyblockProfiles']:
+            for profile in data['skyblockProfiles']:
+                value = [
+                    f"Selected: {':white_check_mark:' if profile['selected'] else ':x:'}",
+                    f"Profile Type: `{profile['game_mode']}`",
+                    f"Networth: `{misc.numerize(profile['networth'])}`",
+                    f"Level: `{profile['sbLevel']}`",
+                    f"Fairy Souls: `{profile['fairySouls']}`",
+                ]
+                for weight_name, weight_value in profile['weight'].items():
+                    value.append(f"-# {weight_name.title()} Weight: `{round(weight_value, 2)}`")
+                embed.add_field(
+                    name=profile['cute_name'],
+                    value='\n'.join(value)
+                )
+        else:
             embed.add_field(
-                name=profile['cute_name'],
-                value='\n'.join(value)
+                name="sky.shiiyu.moe Error",
+                description="The [sky.shiiyu.moe](<https://sky.shiiyu.moe/>) API is currently unavailable, so SkyBlock profiles are not shown."
             )
     channel = inter.bot.get_channel(config.VERIFICATION_LOG_CHANNEL)
     await channel.send(embed=embed)
