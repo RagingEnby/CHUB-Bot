@@ -102,7 +102,7 @@ class TradeReport:
         }
 
     def to_embed(self, status: str="pending") -> disnake.Embed:
-        return disnake.Embed(
+        embed = disnake.Embed(
             title=f"Trade Report ({status.upper()})",
             description='\n'.join([
                 f"**Author:** <@{self.author}>",
@@ -115,6 +115,8 @@ class TradeReport:
                 f"**Notes:** `{self.notes}`"
             ])
         )
+        embed.set_image(url=self.image.url)
+        return embed
 
     @classmethod
     def from_dict(cls, data: dict):

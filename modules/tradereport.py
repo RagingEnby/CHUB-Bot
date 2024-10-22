@@ -105,8 +105,11 @@ class VerificationModal(disnake.ui.Modal):
             f"**Item:** {inter.text_values['item']}",
             f"**Price:** {inter.text_values['price']}",
         ]) + censor
+        # add an empty embed with the image so i dont have to bother with downloading the image
+        embed = disnake.Embed()
+        embed.set_image(url=self.trade.image.url)
         channel = inter.bot.get_channel(config.TRADE_REPORT_CHANNEL)
-        await channel.send(content, file=self.trade.image.file)
+        await channel.send(content, embed=embed)
 
 
 async def save_pending_reports():
