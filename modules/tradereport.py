@@ -97,13 +97,13 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
             check=lambda i: i.custom_id == "send_trade_report" and i.author.id == inter.author.id,
             timeout=300
         )
-        if not inter.user.get_role(config.RECENT_SALES_JURY_ROLE):
+        if not modal_inter.user.get_role(config.RECENT_SALES_JURY_ROLE):
             return await modal_inter.send(embed=misc.make_error(
                 "No Permissions",
                 f"You must have the <@&{config.RECENT_SALES_JURY_ROLE}> role to send trade reports"
             ))
 
-        overpay_underpay = inter.text_values["overpay_underpay"] if inter.text_values["overpay_underpay"] != 'N/A' else None
+        overpay_underpay = modal_inter.text_values["overpay_underpay"] if inter.text_values["overpay_underpay"] != 'N/A' else None
         
         if overpay_underpay not in ['over', 'under', None]:
             return await modal_inter.send(embed=misc.make_error(
