@@ -114,7 +114,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
 
         censor = '||' if overpay_underpay else ''
         content = censor + '\n'.join([
-            "# " + overpay_underpay.upper() if overpay_underpay else '',
+            ("# " + overpay_underpay.upper() + "PAY") if overpay_underpay else '',
             f"**Buyer:** `{disnake.utils.escape_markdown(trade_report.buyer.name)}`",
             f"**Seller:** `{disnake.utils.escape_markdown(trade_report.seller.name)}`",
             f"**Date:** `{disnake.utils.escape_markdown(modal_inter.text_values['date'])}`",
