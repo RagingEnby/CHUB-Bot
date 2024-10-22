@@ -42,6 +42,8 @@ async def log_trade_report(report: datatypes.TradeReport):
 
 
 async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
+    # im FULLY aware this is a bad and long function. i just cba to make it better
+    # if it works it works :shrug:
     button_data: dict[str, Any] = json.loads(button_data)
     trade_report: Optional[datatypes.TradeReport] = PENDING_REPORTS.pop(button_data['id'], None)
     if trade_report is None:
@@ -51,97 +53,100 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
         ))
     author = inter.bot.get_user(trade_report.author) if trade_report.author else None
     
-    if button_data['action'] == 'accept':
+    if button_data['action'] != 'accept':
+        return await inter.send(embed=misc.make_error(
+            "Not Implimented",
+            "This action is not yet implimented. This is a dev feature and is coming soon"
+        ))
+    await inter.response.send_modal(
+        title="Send Trade Report",
+        custom_id="send_trade_report",
+        components=[
+            disnake.ui.TextInput(
+                label="Buyer",
+                custom_id="buyer",
+                style=disnake.TextInputStyle.short,
+                min_length=2, max_length=32,
+                placeholder=trade_report.buyer
+            ),
+            disnake.ui.TextInput(
+                label="Seller",
+                custom_id="seller",
+                style=disnake.TextInputStyle.short,
+                min_length=2, max_length=32,
+                placeholder=trade_report.seller
+            ),
+            disnake.ui.TextInput(
+                label="Date",
+                custom_id="date",
+                style=disnake.TextInputStyle.short,
+                min_length=6, max_length=10,
+                placeholder=trade_report.date
+            ),
+            disnake.ui.TextInput(
+                label="Item",
+                custom_id="item",
+                style=disnake.TextInputStyle.short,
+                placeholder=trade_report.item
+            ),
+            disnake.ui.TextInput(
+                label="Price",
+                custom_id="price",
+                style=disnake.TextInputStyle.short,
+                placeholder=trade_report.price
+            ),
+            disnake.ui.TextInput(
+                label="Overpay/Underpay",
+                custom_id="overpay_underpay",
+                style=disnake.TextInputStyle.short,
+                min_length=3, max_length=5,
+                placeholder="ENTER: 'over', 'under', or 'N/A'",
+            )
+        ]
+    )
+    try:
+        modal_inter: disnake.ModalInteraction = await inter.bot.wait_for(
+            "modal_submit",
+            check=lambda i: i.custom_id == "send_trade_report" and i.author.id == inter.author.id,
+            timeout=300
+        )
+        await inter.response.defer()
+        if not inter.user.get_role(config.RECENT_SALES_JURY_ROLE):
+            return await inter.send(embed=misc.make_error(
+                "No Permissions",
+                f"You must have the <@&{config.RECENT_SALES_JURY_ROLE}> role to send trade reports"
+            ))
+
+        overpay_underpay = inter.text_values["overpay_underpay"] if inter.text_values["overpay_underpay"] != 'N/A' else None
+        
+        if overpay_underpay not in ['over', 'under', None]:
+            return await inter.send(embed=misc.make_error(
+                "Invalid Overpay/Underpay value",
+                f"You entered `{disnake.utils.escape_markdown(inter.text_values['overpay_underpay'])}`"
+                " but it must be equal to `over`, `under`, or `N/A`"
+            ))
+
+        censor = '||' if overpay_underpay else ''
+        content = censor + '\n'.join([
+            "# " + overpay_underpay.upper() if overpay_underpay else '',
+            f"**Buyer:** {inter.text_values['buyer']}",
+            f"**Seller:** {inter.text_values['seller']}",
+            f"**Date:** {inter.text_values['date']}",
+            f"**Item:** {inter.text_values['item']}",
+            f"**Price:** {inter.text_values['price']}",
+        ]) + censor
+        # add an empty embed with the image so i dont have to bother with downloading the image
+        embed = disnake.Embed()
+        embed.set_image(url=self.trade.image.url)
+        channel = inter.bot.get_channel(config.TRADE_REPORT_CHANNEL)
+        await channel.send(content, embed=embed)
         await inter.message.edit(
             embed=trade_report.to_embed(status='accepted'),
             components=INACTIVE_COMPONENTS
         )
-        await inter.response.send_modal(
-            title="Send Trade Report",
-            custom_id="send_trade_report",
-            components=[
-                disnake.ui.TextInput(
-                    label="Buyer",
-                    custom_id="buyer",
-                    style=disnake.TextInputStyle.short,
-                    min_length=2, max_length=32,
-                    placeholder=trade_report.buyer
-                ),
-                disnake.ui.TextInput(
-                    label="Seller",
-                    custom_id="seller",
-                    style=disnake.TextInputStyle.short,
-                    min_length=2, max_length=32,
-                    placeholder=seller
-                ),
-                disnake.ui.TextInput(
-                    label="Date",
-                    custom_id="date",
-                    style=disnake.TextInputStyle.short,
-                    min_length=6, max_length=10,
-                    placeholder=date
-                ),
-                disnake.ui.TextInput(
-                    label="Item",
-                    custom_id="item",
-                    style=disnake.TextInputStyle.short,
-                    placeholder=item
-                ),
-                disnake.ui.TextInput(
-                    label="Price",
-                    custom_id="price",
-                    style=disnake.TextInputStyle.short,
-                    placeholder=price
-                ),
-                disnake.ui.TextInput(
-                    label="Overpay/Underpay",
-                    custom_id="overpay_underpay",
-                    style=disnake.TextInputStyle.short,
-                    min_length=3, max_length=5,
-                    placeholder="ENTER: 'over', 'under', or 'N/A'",
-                )
-            ]
-        )
-        try:
-            modal_inter: disnake.ModalInteraction = await inter.bot.wait_for(
-                "modal_submit",
-                check=lambda i: i.custom_id == "send_trade_report" and i.author.id == inter.author.id,
-                timeout=300
-            )
-            await inter.response.defer()
-            if not inter.user.get_role(config.RECENT_SALES_JURY_ROLE):
-                return await inter.send(embed=misc.make_error(
-                    "No Permissions",
-                    f"You must have the <@&{config.RECENT_SALES_JURY_ROLE}> role to send trade reports"
-                ))
 
-            overpay_underpay = inter.text_values["overpay_underpay"] if inter.text_values["overpay_underpay"] != 'N/A' else None
-            
-            if overpay_underpay not in ['over', 'under', None]:
-                return await inter.send(embed=misc.make_error(
-                    "Invalid Overpay/Underpay value",
-                    f"You entered `{disnake.utils.escape_markdown(inter.text_values['overpay_underpay'])}`"
-                    " but it must be equal to `over`, `under`, or `N/A`"
-                ))
-
-            censor = '||' if overpay_underpay else ''
-            content = censor + '\n'.join([
-                "# " + overpay_underpay.upper() if overpay_underpay else '',
-                f"**Buyer:** {inter.text_values['buyer']}",
-                f"**Seller:** {inter.text_values['seller']}",
-                f"**Date:** {inter.text_values['date']}",
-                f"**Item:** {inter.text_values['item']}",
-                f"**Price:** {inter.text_values['price']}",
-            ]) + censor
-            # add an empty embed with the image so i dont have to bother with downloading the image
-            embed = disnake.Embed()
-            embed.set_image(url=self.trade.image.url)
-            channel = inter.bot.get_channel(config.TRADE_REPORT_CHANNEL)
-            await channel.send(content, embed=embed)
-
-        except asyncio.TimeoutError:
-            await inter.author.send('Your trade report window has timed out and is no longer valid.')
-    # IMPLIMENT DENYING LATER, THIS IS UNFINSHED
+    except asyncio.TimeoutError:
+        await inter.author.send('Your trade report window has timed out and is no longer valid.')
 
 
 async def send_log_msg(inter: disnake.AppCmdInter, report: datatypes.TradeReport):
