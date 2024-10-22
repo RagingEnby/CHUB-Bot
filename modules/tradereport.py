@@ -108,6 +108,13 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
                 style=disnake.TextInputStyle.short,
                 min_length=3, max_length=5,
                 placeholder="ENTER: 'over', 'under', or 'N/A'",
+            ),
+            disnake.ui.TextInput(
+                label="Image",
+                custom_id="image_url",
+                style=disnake.TextInputStyle.short,
+                value=trade_report.image.url,
+                placeholder="https://example.com/image.png"
             )
         ]
     )
