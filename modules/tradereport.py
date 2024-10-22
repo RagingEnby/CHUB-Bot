@@ -98,7 +98,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
             timeout=300
         )
         if not inter.user.get_role(config.RECENT_SALES_JURY_ROLE):
-            return await inter.send(embed=misc.make_error(
+            return await modal_inter.send(embed=misc.make_error(
                 "No Permissions",
                 f"You must have the <@&{config.RECENT_SALES_JURY_ROLE}> role to send trade reports"
             ))
@@ -106,7 +106,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
         overpay_underpay = inter.text_values["overpay_underpay"] if inter.text_values["overpay_underpay"] != 'N/A' else None
         
         if overpay_underpay not in ['over', 'under', None]:
-            return await inter.send(embed=misc.make_error(
+            return await modal_inter.send(embed=misc.make_error(
                 "Invalid Overpay/Underpay value",
                 f"You entered `{disnake.utils.escape_markdown(inter.text_values['overpay_underpay'])}`"
                 " but it must be equal to `over`, `under`, or `N/A`"
