@@ -25,9 +25,9 @@ async def log_verification(inter: disnake.AppCmdInter, player: datatypes.Minecra
         data = await response.json()
         description = [
             f"**Linked To:** {member.mention}",
-            f"**Discord Created:** <t:{member.created_at.timestamp()//1000}:R>",
-            f"**Joined Server:** <t:{member.joined_at.timestamp()//1000}:R>",
-            f"**First Hypixel Login:** <t:{round(data['firstLogin']) // 1000}> (<t:{round(data['firstLogin']) // 1000}:R>)",
+            f"**Discord Created:** <t:{int(member.created_at.timestamp())//1000}:R>",
+            f"**Joined Server:** <t:{int(member.joined_at.timestamp())//1000}:R>",
+            f"**First Hypixel Login:** <t:{round(data['firstLogin']) // 1000}> (<t:{int(data['firstLogin']) // 1000}:R>)",
             f"**Possible Alts:** `{', '.join([disnake.utils.escape_markdown(player['name']) for player in data['possibleAlts']]) if data['possibleAlts'] else 'None'}`"
         ]
         embed = disnake.Embed(
