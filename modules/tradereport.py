@@ -150,7 +150,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
         ]) + censor
         # add an empty embed with the image so i dont have to bother with downloading the image
         embed = disnake.Embed()
-        embed.set_image(url=trade_report.image.url)
+        embed.set_image(url=modal_inter.text_values['image_url'])
         channel = inter.bot.get_channel(config.TRADE_REPORT_CHANNEL)
         msg = await channel.send(content, embed=embed)
         await inter.message.edit(
