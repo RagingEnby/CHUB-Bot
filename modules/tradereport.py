@@ -108,7 +108,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
         if overpay_underpay not in ['over', 'under', None]:
             return await modal_inter.send(embed=misc.make_error(
                 "Invalid Overpay/Underpay value",
-                f"You entered `{disnake.utils.escape_markdown(inter.text_values['overpay_underpay'])}`"
+                f"You entered `{disnake.utils.escape_markdown(overpay_underpay)}`"
                 " but it must be equal to `over`, `under`, or `N/A`"
             ))
 
