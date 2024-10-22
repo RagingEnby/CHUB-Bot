@@ -3,6 +3,7 @@ import aiohttp
 import disnake
 import aiofiles
 import json
+import asyncio
 
 from modules import mojang
 from modules import misc
