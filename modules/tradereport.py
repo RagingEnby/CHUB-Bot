@@ -60,10 +60,25 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
     author = inter.bot.get_user(trade_report.author) if trade_report.author else None
     
     if button_data['action'] != 'accept':
-        return await inter.send(embed=misc.make_error(
-            "Not Implimented",
-            "This action is not yet implimented. This is a dev feature and is coming soon"
+        await inter.message.edit(
+            embed=trade_report.to_embed(status='denied'),
+            components=INACTIVE_COMPONENTS
+        )
+        if author:
+            try:
+                await author.send(embed=misc.make_error(
+                    "Trade Report Denied",
+                    "Your trade report has been denied. For more information, open up a ticket at https://discord.com/channels/934240413974417439/1258100866804875264/1258101752054681702"
+                ))
+            except Exception as e:
+                print('error trying to dm', author, '-', e)
+        await inter.send(embed=misc.make_success(
+            "Success",
+            "The trade report has been denied and the author has been notified"
         ))
+        return await log_trade_report_completion(trade_report)
+
+    
     await inter.response.send_modal(
         title="Send Trade Report",
         custom_id="send_trade_report",
@@ -136,7 +151,6 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
             embed=trade_report.to_embed(status='accepted'),
             components=INACTIVE_COMPONENTS
         )
-        author = inter.bot.get_user(trade_report.author) if trade_report.author else None
         if author:
             try:
                 await author.send(f"Your trade report has been acccepted! View it at {msg.jump_url}")
