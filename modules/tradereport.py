@@ -117,9 +117,9 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
             "# " + overpay_underpay.upper() if overpay_underpay else '',
             f"**Buyer:** `{trade_report.buyer.name}`",
             f"**Seller:** `{trade_report.seller.name}`",
-            f"**Date:** `{inter.text_values['date']}`",
-            f"**Item:** `{inter.text_values['item']}`",
-            f"**Price:** `{inter.text_values['price']}`",
+            f"**Date:** `{modal_inter.text_values['date']}`",
+            f"**Item:** `{modal_inter.text_values['item']}`",
+            f"**Price:** `{modal_inter.text_values['price']}`",
         ]) + censor
         # add an empty embed with the image so i dont have to bother with downloading the image
         embed = disnake.Embed()
