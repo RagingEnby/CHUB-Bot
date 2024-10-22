@@ -97,7 +97,6 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
             check=lambda i: i.custom_id == "send_trade_report" and i.author.id == inter.author.id,
             timeout=300
         )
-        await inter.response.defer()
         if not inter.user.get_role(config.RECENT_SALES_JURY_ROLE):
             return await inter.send(embed=misc.make_error(
                 "No Permissions",
