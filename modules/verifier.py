@@ -59,7 +59,7 @@ async def log_verification(inter: disnake.AppCmdInter, player: datatypes.Minecra
         else:
             embed.add_field(
                 name="sky.shiiyu.moe Error",
-                description="The [sky.shiiyu.moe](<https://sky.shiiyu.moe/>) API is currently unavailable, so SkyBlock profiles are not shown."
+                value="The [sky.shiiyu.moe](<https://sky.shiiyu.moe/>) API is currently unavailable, so SkyBlock profiles are not shown."
             )
     channel = inter.bot.get_channel(config.VERIFICATION_LOG_CHANNEL)
     await channel.send(embed=embed)
