@@ -41,11 +41,7 @@ async def get_linked_player(
         if discord_id == member:
             return await mojang.get(uuid, session=session)
     return None
-
-
-async def is_linked(member: disnake.Member | int) -> bool:
-    return await get_linked_player(member) is not None
-
+    
 
 async def log_ban(member: disnake.Member | int, reason: Optional[str]):
     if isinstance(member, disnake.Member):
