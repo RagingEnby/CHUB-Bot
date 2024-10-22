@@ -63,20 +63,6 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
         custom_id="send_trade_report",
         components=[
             disnake.ui.TextInput(
-                label="Buyer",
-                custom_id="buyer",
-                style=disnake.TextInputStyle.short,
-                min_length=2, max_length=32,
-                placeholder=trade_report.buyer
-            ),
-            disnake.ui.TextInput(
-                label="Seller",
-                custom_id="seller",
-                style=disnake.TextInputStyle.short,
-                min_length=2, max_length=32,
-                placeholder=trade_report.seller
-            ),
-            disnake.ui.TextInput(
                 label="Date",
                 custom_id="date",
                 style=disnake.TextInputStyle.short,
@@ -129,11 +115,11 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
         censor = '||' if overpay_underpay else ''
         content = censor + '\n'.join([
             "# " + overpay_underpay.upper() if overpay_underpay else '',
-            f"**Buyer:** {inter.text_values['buyer']}",
-            f"**Seller:** {inter.text_values['seller']}",
-            f"**Date:** {inter.text_values['date']}",
-            f"**Item:** {inter.text_values['item']}",
-            f"**Price:** {inter.text_values['price']}",
+            f"**Buyer:** `{trade_report.buyer.name}`",
+            f"**Seller:** `{trade_report.seller.name}`",
+            f"**Date:** `{inter.text_values['date']}`",
+            f"**Item:** `{inter.text_values['item']}`",
+            f"**Price:** `{inter.text_values['price']}`",
         ]) + censor
         # add an empty embed with the image so i dont have to bother with downloading the image
         embed = disnake.Embed()
