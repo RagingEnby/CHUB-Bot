@@ -87,6 +87,17 @@ class TradeReport:
         self.image = image
         self.notes = notes
 
+    def color(self, status: str="pending") -> disnake.Color:
+        match status:
+            case "pending":
+                return disnake.Color.yellow()
+            case "accepted":
+                return disnake.Color.green()
+            case "denied":
+                return disnake.Color.red()
+            case _:
+                return disnake.Color.black()
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -104,6 +115,7 @@ class TradeReport:
     def to_embed(self, status: str="pending") -> disnake.Embed:
         embed = disnake.Embed(
             title=f"Trade Report ({status.upper()})",
+            color=self.color(status),
             description='\n'.join([
                 f"**Author:** <@{self.author}>",
                 f"**Seller:** `{self.seller}`",
