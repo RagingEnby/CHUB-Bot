@@ -139,11 +139,17 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
                 " but it must be equal to `over`, `under`, or `N/A`"
             ))
 
+        buyer_user: Optional[disnake.User] = misc.uuid_to_user(trade_report.buyer.uuid, inter.bot)
+        buyer_ping = (' ' + buyer_user.mention) if buyer_user else ''
+        
+        seller_user: Optional[disnake.User] = misc.uuid_to_user(trade_report.seller.uuid, inter.bot)
+        seller_ping = (' ' + seller_user.mention) if seller_user else ''
+
         censor = '||' if overpay_underpay else ''
         content = '\n'.join([
             ("# " + overpay_underpay.upper() + "PAY") if overpay_underpay else '',
-            f"{censor}**Buyer:** `{disnake.utils.escape_markdown(trade_report.buyer.name)}`",
-            f"**Seller:** `{disnake.utils.escape_markdown(trade_report.seller.name)}`",
+            f"{censor}**Buyer:** `{disnake.utils.escape_markdown(trade_report.buyer.name)}`{buyer_ping}",
+            f"**Seller:** `{disnake.utils.escape_markdown(trade_report.seller.name)}`{seller_ping}",
             f"**Date:** `{disnake.utils.escape_markdown(modal_inter.text_values['date'])}`",
             f"**Item:** `{disnake.utils.escape_markdown(modal_inter.text_values['item'])}`",
             f"**Price:** `{disnake.utils.escape_markdown(modal_inter.text_values['price'])}`",

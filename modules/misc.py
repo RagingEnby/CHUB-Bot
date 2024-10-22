@@ -223,7 +223,7 @@ def ign_param(description: Optional[str]=None) -> commands.Param:  # type: ignor
         description=description or "A Minecraft IGN",
         min_length=2, # technically 3, but rarely 2 names exist so why not
         max_length=16,
-        #autocomplete=autocomplete_ign
+        autocomplete=autocomplete_ign
     )
 
 
@@ -241,3 +241,11 @@ def should_scan_museum(game_mode: str, member: dict[str, Any]) -> bool:
         return False
         
     return True
+
+
+def uuid_to_user(uuid: str, bot: BOT_CLASS) -> Optional[disnake.User]:
+    user_id = usermanager.LinkedUsers.get(uuid)
+    if user_id is None:
+        return None
+    return bot.get_user(user_id)
+    
