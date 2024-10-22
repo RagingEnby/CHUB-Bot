@@ -103,7 +103,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
                 f"You must have the <@&{config.RECENT_SALES_JURY_ROLE}> role to send trade reports"
             ))
 
-        overpay_underpay = modal_inter.text_values["overpay_underpay"] if inter.text_values["overpay_underpay"] != 'N/A' else None
+        overpay_underpay = modal_inter.text_values["overpay_underpay"] if modal_inter.text_values["overpay_underpay"] != 'N/A' else None
         
         if overpay_underpay not in ['over', 'under', None]:
             return await modal_inter.send(embed=misc.make_error(
