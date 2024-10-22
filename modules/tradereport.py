@@ -115,15 +115,15 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
         censor = '||' if overpay_underpay else ''
         content = censor + '\n'.join([
             "# " + overpay_underpay.upper() if overpay_underpay else '',
-            f"**Buyer:** `{trade_report.buyer.name}`",
-            f"**Seller:** `{trade_report.seller.name}`",
-            f"**Date:** `{modal_inter.text_values['date']}`",
-            f"**Item:** `{modal_inter.text_values['item']}`",
-            f"**Price:** `{modal_inter.text_values['price']}`",
+            f"**Buyer:** `{disnake.utils.escape_markdown(trade_report.buyer.name)}`",
+            f"**Seller:** `{disnake.utils.escape_markdown(trade_report.seller.name)}`",
+            f"**Date:** `{disnake.utils.escape_markdown(modal_inter.text_values['date'])}`",
+            f"**Item:** `{disnake.utils.escape_markdown(modal_inter.text_values['item'])}`",
+            f"**Price:** `{disnake.utils.escape_markdown(modal_inter.text_values['price'])}`",
         ]) + censor
         # add an empty embed with the image so i dont have to bother with downloading the image
         embed = disnake.Embed()
-        embed.set_image(url=self.trade.image.url)
+        embed.set_image(url=trade_report.image.url)
         channel = inter.bot.get_channel(config.TRADE_REPORT_CHANNEL)
         await channel.send(content, embed=embed)
         await inter.message.edit(
