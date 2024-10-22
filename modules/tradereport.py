@@ -247,4 +247,7 @@ async def report_trade_command(
                 )
             ]
         )
-        
+        return await inter.send(embed=misc.make_success(
+            "Success",
+            "Your trade report has been sent off to server staff to be reviewed. When it is accepted or denied, you will recieve a DM."
+        ))
