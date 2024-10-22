@@ -42,6 +42,11 @@ async def log_trade_report(report: datatypes.TradeReport):
     await save_pending_reports()
 
 
+async def log_trade_report_completion(report: datatypes.TradeReport):
+    PENDING_REPORTS.pop(report.id)
+    await save_pending_reports()
+
+
 async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
     # im FULLY aware this is a bad and long function. i just cba to make it better
     # if it works it works :shrug:
@@ -125,11 +130,24 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
         embed = disnake.Embed()
         embed.set_image(url=trade_report.image.url)
         channel = inter.bot.get_channel(config.TRADE_REPORT_CHANNEL)
-        await channel.send(content, embed=embed)
+        msg = await channel.send(content, embed=embed)
         await inter.message.edit(
+            content=msg.jump_url,
             embed=trade_report.to_embed(status='accepted'),
             components=INACTIVE_COMPONENTS
         )
+        author = inter.bot.get_user(trade_report.author) if trade_report.author else None
+        if author:
+            try:
+                await author.send(f"Your trade report has been acccepted! View it at {msg.jump_url}")
+            except Exception as e:
+                print('error trying to dm', trade_report.author, ' - ', e)
+
+        await log_trade_report_completion(trade_report)
+        await modal_inter.send(embed=misc.make_success(
+            "Sent Trade Report!",
+            f"View it at {msg.jump_url}"
+        ))
 
     except asyncio.TimeoutError:
         await inter.author.send('Your trade report window has timed out and is no longer valid.')
