@@ -67,9 +67,7 @@ class TradeReportAttachment:
     @classmethod
     def from_disnake_attachment(cls, attachment: disnake.Attachment):
         return cls(
-            # use proxy_url because i dont want to risk my server being ip grabbed:
-            # (bot is hosted on RagingEnby's home server)
-            url=attachment.proxy_url,
+            url=attachment.url,
             filename=attachment.filename
         )
 
