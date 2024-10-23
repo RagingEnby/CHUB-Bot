@@ -448,7 +448,7 @@ async def update_linked_players_task():
         member_dict = await misc.get_member_dict(bot)
         linked_users = await misc.randomize_dict_order(usermanager.LinkedUsers.data)
         for uuid, discord_id in linked_users.items():
-            if discord_id not in member_dict:
+            if discord_id not in member_dict or discord_id == bot.user.id:
                 continue
             await update_players_task_single(uuid, member_dict[discord_id], session=session)
             await asyncio.sleep(6.5)  # rate limit sucks ass
