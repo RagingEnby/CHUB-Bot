@@ -192,7 +192,6 @@ async def report_trade_command(
     date: str,
     item: str,
     price: str,
-    payment_type: datatypes.TradePaymentType,
     image: disnake.Attachment,
     notes: Optional[str]
 ):
@@ -225,7 +224,6 @@ async def report_trade_command(
             date=date,
             item=item,
             price=price,
-            payment_type=payment_type,
             image=datatypes.TradeReportAttachment.from_disnake_attachment(image),
             notes=notes
         )

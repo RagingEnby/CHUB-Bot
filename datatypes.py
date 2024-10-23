@@ -4,8 +4,6 @@ from typing_extensions import TypedDict
 import json
 from uuid import uuid4
 
-TradePaymentType = Literal['Pure Coins', 'Coins + Items', 'Items']
-
 
 class MinecraftPlayerDict(TypedDict):
     id: str
@@ -73,7 +71,7 @@ class TradeReportAttachment:
 
 
 class TradeReport:
-    def __init__(self, author: int, seller: MinecraftPlayer, buyer: MinecraftPlayer, date: str, item: str, price: str, payment_type: TradePaymentType, image: TradeReportAttachment, notes: Optional[str], _id: Optional[str]=None):
+    def __init__(self, author: int, seller: MinecraftPlayer, buyer: MinecraftPlayer, date: str, item: str, price: str, image: TradeReportAttachment, notes: Optional[str], _id: Optional[str]=None):
         self.id = _id or str(uuid4())
         self.author = author
         self.seller = seller
@@ -81,7 +79,6 @@ class TradeReport:
         self.date = date
         self.item = item
         self.price = price
-        self.payment_type = payment_type
         self.image = image
         self.notes = notes
 
@@ -105,7 +102,6 @@ class TradeReport:
             "date": self.date,
             "item": self.item,
             "price": self.price,
-            "payment_type": self.payment_type,
             "image": self.image.to_dict(),
             "notes": self.notes,
         }
@@ -121,7 +117,6 @@ class TradeReport:
                 f"**Date:** `{self.date}`",
                 f"**Item:** `{self.item}`",
                 f"**Price:** `{self.price}`",
-                f"**Payment Type:** `{self.payment_type}`",
                 f"**Notes:** `{self.notes}`"
             ])
         )
@@ -138,7 +133,6 @@ class TradeReport:
             date=data['date'],
             item=data['item'],
             price=data['price'],
-            payment_type=data['payment_type'],
             image=TradeReportAttachment.from_dict(data['image']),
             notes=data['notes'],
         )

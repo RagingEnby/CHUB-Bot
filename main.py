@@ -183,11 +183,10 @@ async def report_trade_command(
     date: str = commands.param(description="PLEASE USE DD/MM/YYYY FORMAT"),
     item: str = commands.param(),
     price: str = commands.param(),
-    payment_type: datatypes.TradePaymentType = commands.param(description="What the buyer gave in return for the item"),
     image: disnake.Attachment = commands.param(description="An image of the trade"),
     notes: Optional[str] = commands.param(default=None, description="Any notes you want to add")
 ):
-    await tradereport.report_trade_command(inter, seller, buyer, date, item, price, payment_type, image, notes)
+    await tradereport.report_trade_command(inter, seller, buyer, date, item, price, image, notes)
     
 
 
