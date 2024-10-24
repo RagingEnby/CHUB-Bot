@@ -159,7 +159,8 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
         member = inter.user
     async with aiohttp.ClientSession() as session:
         player = await mojang.get(ign, session=session)
-        if player is not None:
+        
+        if player.uuid in usermanager.LinkedUsers:
             return await inter.send(embed=misc.make_error(
                 title="already verified",
                 description="Your discord account is already linked. Use /unverify first."

@@ -127,7 +127,7 @@ async def on_button_click(inter: disnake.MessageInteraction):
     name="verify",
     description="Link your Discord account to your Hypixel account"
 )
-async def link_command(inter: disnake.AppCmdInter,
+async def verify_command(inter: disnake.AppCmdInter,
                        ign: str = misc.ign_param('Your IGN')):
     await inter.response.defer()
     if not inter.guild or (inter.guild and inter.guild.id != config.GUILD_ID):
@@ -139,7 +139,7 @@ async def link_command(inter: disnake.AppCmdInter,
     name="unverify",
     description="Unlink your Discord account from your Hypixel account"
 )
-async def unlink_command(inter: disnake.AppCmdInter):
+async def unverify_command(inter: disnake.AppCmdInter):
     await inter.response.defer()
     if not inter.guild or (inter.guild and inter.guild.id != config.GUILD_ID):
         return await inter.send(embed=misc.NOT_GUILD_ERROR)
