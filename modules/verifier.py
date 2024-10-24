@@ -159,7 +159,7 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
         member = inter.user
     async with aiohttp.ClientSession() as session:
         player = await mojang.get(ign, session=session)
-        if player is None:
+        if player is not None:
             return await inter.send(embed=misc.make_error(
                 title="already verified",
                 description="Your discord account is already linked. Use /unverify first."
@@ -185,7 +185,7 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
             ))
 
         # bot ONLY gets here if the user has put in THEIR account
-        is_banned, reason = await usermanager.is_banned(player)
+        is_banned, reason = usermanager.is_banned(player)
         if is_banned:
             embed = misc.make_error(
                 title="ban evader detected",
@@ -200,20 +200,15 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
                 print(f"couldn't dm ban evading user {member.name} ({member.id}): {e}")
             return await misc.ban_member(inter.bot, member.id, reason)
 
-        try:
+        with suppress(Forbidden):
             await member.add_roles(disnake.Object(config.VERIFIED_ROLE), reason=f'Verified to {player.name}')
-        except Forbidden:
-            print('do not have permission to add roles')
 
         await usermanager.log_link(member, player)
 
         await update_member(member, session=session)
 
-        try:
+        with suppress(disnake.NotFound):
             await inter.send(embed=misc.make_success(title="Successfully Linked!"))
-        except disnake.NotFound:
-            # this just means the interaction timed out (likely due to hypixel rate limits)
-            pass
 
         await log_verification(inter, player, member, session=session)
 
