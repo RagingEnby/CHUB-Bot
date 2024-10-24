@@ -157,14 +157,15 @@ async def remove_verification(member: disnake.Member):
 async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[disnake.Member] = None):
     if member is None:
         member = inter.user
-    async with aiohttp.ClientSession() as session:
-        player = await mojang.get(ign, session=session)
-        
-        if player.uuid in usermanager.LinkedUsers:
+    async with aiohttp.ClientSession() as session:        
+        if await usermanager.is_linked(member):
             return await inter.send(embed=misc.make_error(
                 title="already verified",
                 description="Your discord account is already linked. Use /unverify first."
             ))
+
+        player = await mojang.get(ign, session=session)
+
 
         if player is None:
             return await inter.send(embed=misc.make_error(
@@ -239,6 +240,7 @@ async def update_command(inter: disnake.AppCmdInter, member: Optional[disnake.Me
                 'not linked',
                 'Please verify using the /verify command first.'
             ))
+        
         await update_member(
             member=member,
             player=player,
