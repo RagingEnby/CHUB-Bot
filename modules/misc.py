@@ -6,6 +6,7 @@ from typing import Optional, Any
 import aiofiles
 import aiohttp
 import disnake
+from disnake import user
 from disnake.ext import commands
 
 import config
@@ -200,9 +201,15 @@ async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[
             "Vinush",
             "Bibby"
         ]
+
+    # try to use locally saved response first if possible
+    if user_input in AUTOCOMPLETE_IGN_CACHE:
+        return AUTOCOMPLETE_IGN_CACHE[user_input]
+        
     # API has a temp minimum of 3 chars to speed up the process
     if len(user_input) < 3:
-        return [user_input]
+        AUTOCOMPLETE_IGN_CACHE[user_input] = [user_input]
+        return AUTOCOMPLETE_IGN_CACHE[user_input]
         
     try:
         response = await asyncio.wait_for(
@@ -212,14 +219,16 @@ async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[
             timeout=3
         )
         if response.status != 200:
-            return [user_input]
+            AUTOCOMPLETE_IGN_CACHE[user_input] = [user_input]
+            return AUTOCOMPLETE_IGN_CACHE[user_input]
         AUTOCOMPLETE_IGN_CACHE[user_input] = [
             player['name'] for player in await response.json()
         ]
         return AUTOCOMPLETE_IGN_CACHE[user_input]
     except asyncio.TimeoutError:
         print('Timeout error for stem', user_input)
-        return [user_input]
+        AUTOCOMPLETE_IGN_CACHE[user_input] = [user_input]
+        return AUTOCOMPLETE_IGN_CACHE[user_input]
 
 
 def ign_param(description: Optional[str]=None) -> commands.Param:  # type: ignore
