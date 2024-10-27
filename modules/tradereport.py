@@ -43,7 +43,7 @@ async def log_trade_report(report: datatypes.TradeReport):
 
 
 async def log_trade_report_completion(report: datatypes.TradeReport):
-    PENDING_REPORTS.pop(report.id)
+    PENDING_REPORTS.pop(report.id, None)
     await save_pending_reports()
 
 
@@ -51,12 +51,12 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
     # im FULLY aware this is a bad and long function. i just cba to make it better
     # if it works it works :shrug:
     button_data: dict[str, Any] = json.loads(button_data)
-    trade_report: Optional[datatypes.TradeReport] = PENDING_REPORTS.pop(button_data['id'], None)
+    trade_report: Optional[datatypes.TradeReport] = PENDING_REPORTS.get(button_data['id'])
     if trade_report is None:
         return await inter.send(embed=misc.make_error(
             "Invalid Trade",
             f"No trade with the ID `{disnake.utils.escape_markdown(button_data['id'])}`. This is likely because the trade has already been accepted or denied"
-        ))
+        ), ephemeral=True)
     author = inter.bot.get_user(trade_report.author) if trade_report.author else None
     
     if button_data['action'] != 'accept':
@@ -128,7 +128,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
             return await modal_inter.send(embed=misc.make_error(
                 "No Permissions",
                 f"You must have the <@&{config.RECENT_SALES_JURY_ROLE}> role to send trade reports"
-            ))
+            ), ephemeral=True)
 
         overpay_underpay = modal_inter.text_values["overpay_underpay"] if modal_inter.text_values["overpay_underpay"] != 'N/A' else None
         
@@ -137,7 +137,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
                 "Invalid Overpay/Underpay value",
                 f"You entered `{disnake.utils.escape_markdown(overpay_underpay)}`"
                 " but it must be equal to `over`, `under`, or `N/A`"
-            ))
+            ), ephemeral=True)
 
         buyer_user: Optional[disnake.User] = misc.uuid_to_user(trade_report.buyer.uuid, inter.bot)
         buyer_ping = (' ' + buyer_user.mention) if buyer_user else ''
@@ -174,7 +174,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
         await modal_inter.send(embed=misc.make_success(
             "Sent Trade Report!",
             f"View it at {msg.jump_url}"
-        ))
+        ), ephemeral=True)
 
     except asyncio.TimeoutError:
         await inter.author.send('Your trade report window has timed out and is no longer valid.')
