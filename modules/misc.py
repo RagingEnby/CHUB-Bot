@@ -10,7 +10,7 @@ from disnake import user
 from disnake.ext import commands
 
 import config
-from modules import asyncreqs, hypixelapi, parser
+from modules import asyncreqs, hypixelapi, parser, usermanager
 
 BOT_CLASS = commands.InteractionBot | commands.Bot | commands.AutoShardedBot
 AUTOCOMPLETE_IGN_CACHE: dict[str, list[str]] = {}
