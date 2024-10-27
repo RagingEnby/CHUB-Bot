@@ -200,6 +200,10 @@ async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[
             "Vinush",
             "Bibby"
         ]
+    # API has a temp minimum of 3 chars to speed up the process
+    if len(user_input) < 3:
+        return []
+        
     try:
         response = await asyncio.wait_for(
             asyncreqs.get('https://api.ragingenby.dev/stem/' + user_input),
