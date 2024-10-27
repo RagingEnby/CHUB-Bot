@@ -190,6 +190,7 @@ def numerize(num: int | float) -> str:
 
 async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
     user_input = user_input.lower().strip().replace('/', '').replace(' ', '_')
+    print(f'IGN Autocomplete > [{inter.user.name}]  {user_input}')
     if not user_input:
         # EASTER EGG: These are all 5 CHUB admins :3
         return [
@@ -199,7 +200,6 @@ async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[
             "Vinush",
             "Bibby"
         ]
-    print(f'IGN Autocomplete > [{inter.user.name}]  {user_input}')
     try:
         response = await asyncio.wait_for(
             asyncreqs.get('https://api.ragingenby.dev/stem/' + user_input),
