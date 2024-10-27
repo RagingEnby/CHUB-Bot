@@ -202,7 +202,7 @@ async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[
         ]
     # API has a temp minimum of 3 chars to speed up the process
     if len(user_input) < 3:
-        return []
+        return [user_input]
         
     try:
         response = await asyncio.wait_for(
@@ -212,14 +212,14 @@ async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[
             timeout=3
         )
         if response.status != 200:
-            return []
+            return [user_input]
         AUTOCOMPLETE_IGN_CACHE[user_input] = [
             player['name'] for player in await response.json()
         ]
         return AUTOCOMPLETE_IGN_CACHE[user_input]
     except asyncio.TimeoutError:
         print('Timeout error for stem', user_input)
-        return []
+        return [user_input]
 
 
 def ign_param(description: Optional[str]=None) -> commands.Param:  # type: ignore
