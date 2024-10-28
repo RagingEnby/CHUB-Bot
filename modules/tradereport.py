@@ -18,6 +18,7 @@ PENDING_REPORTS: dict[str, datatypes.TradeReport] = {
     id_: datatypes.TradeReport.from_dict(trade)
     for id_, trade in json.load(open(config.TRADE_REPORT_FILE_PATH, 'r')).items()
 }
+# this is no longer used, but its here for the future if needed
 INACTIVE_COMPONENTS: list[disnake.ui.Button] = [
     disnake.ui.Button(
         label="Accept",
@@ -60,10 +61,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
     author = inter.bot.get_user(trade_report.author) if trade_report.author else None
     
     if button_data['action'] != 'accept':
-        await inter.message.edit(
-            embed=trade_report.to_embed(status='denied'),
-            components=INACTIVE_COMPONENTS
-        )
+        await inter.message.delete()
         if author:
             try:
                 await author.send(embed=misc.make_error(
@@ -146,7 +144,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
         seller_ping = (' ' + seller_user.mention) if seller_user else ''
 
         censor = '||' if overpay_underpay else ''
-        content = '\n'.join([
+        description = '\n'.join([
             ("# " + overpay_underpay.upper() + "PAY") if overpay_underpay else '',
             f"{censor}**Buyer:** `{disnake.utils.escape_markdown(trade_report.buyer.name)}`{buyer_ping}",
             f"**Seller:** `{disnake.utils.escape_markdown(trade_report.seller.name)}`{seller_ping}",
@@ -155,15 +153,15 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
             f"**Price:** `{disnake.utils.escape_markdown(modal_inter.text_values['price'])}`",
         ]) + censor
         # add an empty embed with the image so i dont have to bother with downloading the image
-        embed = disnake.Embed()
+        embed = disnake.Embed(description=description)
+        embed.set_footer(
+            icon_url=modal_inter.user.display_avatar,
+            text=f"Approved by {modal_inter.user.display_name}"
+        )
         embed.set_image(url=modal_inter.text_values['image_url'])
         channel = inter.bot.get_channel(config.TRADE_REPORT_CHANNEL)
-        msg = await channel.send(content, embed=embed)
-        await inter.message.edit(
-            content=msg.jump_url,
-            embed=trade_report.to_embed(status='accepted'),
-            components=INACTIVE_COMPONENTS
-        )
+        msg = await channel.send(embed=embed)
+        await inter.message.delete()
         if author:
             try:
                 await author.send(f"Your trade report has been acccepted! View it at {msg.jump_url}")
