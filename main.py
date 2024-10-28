@@ -1,6 +1,8 @@
+
 import asyncio
 from contextlib import suppress
 from typing import Literal, Optional
+import traceback
 
 import aiohttp
 import disnake
@@ -101,10 +103,11 @@ async def on_message(message: disnake.Message):
                                                                          .replace("‘", "'"))
             print(executing_string)
             exec(executing_string, {**globals(), **locals()}, tmp_dic)
-            await tmp_dic['temp_func']()
+            await tmp_dic['temp_func']()            
         except Exception as e:
-            print(f"Error while running exec code:\n{e}")
-            await message.reply(f"Error while running code:\n```{e}```")
+            error = traceback.format_exc()
+            print(f">exec ERROR:\n{error}")
+            await message.reply(f"Error while running code:\n```py{error}```")
     if message.channel.id == config.VERIFICATION_CHANNEL and not await bot.is_owner(message.author):
         await asyncio.sleep(60)
         with suppress(disnake.errors.NotFound):
