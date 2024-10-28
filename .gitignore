@@ -10,3 +10,4 @@ data.json
 /storage/sbdata
 /storage/inv
 /storage/*.json
+venv/*
