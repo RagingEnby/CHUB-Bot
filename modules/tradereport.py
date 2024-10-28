@@ -105,7 +105,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
             disnake.ui.TextInput(
                 label="Overpay/Underpay",
                 custom_id="overpay_underpay",
-                style=disnake.TextInputStyle.short[:100],
+                style=disnake.TextInputStyle.short,
                 min_length=3, max_length=5,
                 placeholder="ENTER: 'over', 'under', or 'N/A'",
             ),
