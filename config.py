@@ -35,21 +35,22 @@ RAFFLE_SPACE_HELM_ROLE: int = 1261200915109773405
 
 # noinspection PyInterpreter
 ITEM_ID_ROLES: dict[str, int] = {
-    "KLOONBOAT": 1217172737160904715, # @Kloonboat
-    "ANCIENT_ELEVATOR": 1134970925784256572, # @Ancient Elevator
-    "CREATIVE_MIND": 1201988405420888155, # @Creative Mind
-    "GAME_BREAKER": 1221149287484887141, # @Gamebreaker
-    "POTATO_BASKET": 1261201356073603072, # @Basket of Hope
-    "DEAD_BUSH_OF_LOVE": 1245118825746268190, # @Dead Bush of Love*
-    "SNOW_SNOWGLOBE": 1221630825830027325, # @Snowglobe
+    "POTATO_SILVER_MEDAL": 1295569723118981171,  # @Potato War Silver Medal
+    "POTATO_CROWN": 1295569723118981171, # @Potato War Silver Medal (this gives the same role because I wanted to for fun, but i cba to make a seperate role for it)
+    "SHINY_RELIC": 1295569295195242586,  # @Shiny Relic
+    "GAME_ANNIHILATOR": 1295563935096766485,  # @Game Annihilator
+    "DEAD_BUSH_OF_LOVE": 1245118825746268190,  # @Dead Bush of Love*
+    "KLOONBOAT": 1217172737160904715,  # @Kloonboat
+    "CREATIVE_MIND": 1201988405420888155,  # @Creative Mind
+    "GAME_BREAKER": 1221149287484887141,  # @Gamebreaker
+    "POTATO_BASKET": 1261201356073603072,  # @Basket of Hope
+    "ANCIENT_ELEVATOR": 1134970925784256572,  # @Ancient Elevator
+    "SNOW_SNOWGLOBE": 1221630825830027325,  # @Snowglobe
+    "PET_SKIN_GUARDIAN": 1296969495386128475,  # @Watcher Guardian
+
     "WIKI_JOURNAL": 1296881300711538749, # @Wiki Editor
     "EDITOR_PENCIL": 1296881300711538749, # @Wiki Editor
-    "GAME_ANNIHILATOR": 1295563935096766485, # @Game Annihilator
-    "SHINY_RELIC": 1295569295195242586, # @Shiny Relic
-    "POTATO_SILVER_MEDAL": 1295569723118981171, # @Potato War Silver Medal
-    "POTATO_CROWN": 1295569723118981171, # @Potato War Silver Medal (this gives the same role because I wanted to for fun, but i cba to make a seperate role for it)
     "PET_SKIN_TIGER_TWILIGHT": 934261802815070269, # @Twilight Tiger
-    "PET_SKIN_GUARDIAN": 1296969495386128475,  # @Watcher Guardian
 
     # You must have ALL of these items:
     "PET_SKIN_SHEEP_PURPLE,PET_SKIN_SHEEP_WHITE,PET_SKIN_SHEEP_LIGHT_BLUE,PET_SKIN_SHEEP_LIGHT_GREEN,PET_SKIN_SHEEP_PINK,PET_SKIN_SHEEP_BLACK": 934254703578079292, # @OG Sheeps
