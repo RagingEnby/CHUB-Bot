@@ -86,7 +86,7 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
         for member in profile['members'].values():
             for pet in member.get('pets_data', {}).get('pets', []):
                 if pet.get('skin'):
-                    applied_items.append(pet['skin'])
+                    applied_items.append('PET_SKIN_' + pet['skin'])
     for item in items.values():
         skin = item.get('ExtraAttributes', {}).get('skin')
         if skin:

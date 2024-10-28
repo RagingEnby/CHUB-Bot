@@ -31,7 +31,8 @@ async def websocket_connector():
         await websocket_connector()
 
     except Exception as e:
-        print('unknown ws error:', e)
+        if 'Connect call failed' not in str(e):
+           print('unknown ws error:', e)
         await asyncio.sleep(3)
         await websocket_connector()
 
