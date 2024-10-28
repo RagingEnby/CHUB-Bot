@@ -231,6 +231,7 @@ async def report_trade_command(
         
         channel = inter.bot.get_channel(config.TRADE_REPORT_VERIFICATION_CHANNEL)
         await channel.send(
+            content=f"<@&{config.RECENT_SALES_JURY_ROLE}>",
             embed=trade_report.to_embed(),
             components=[
                 disnake.ui.Button(
