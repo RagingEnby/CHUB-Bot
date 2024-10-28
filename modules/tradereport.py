@@ -88,24 +88,24 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
                 custom_id="date",
                 style=disnake.TextInputStyle.short,
                 min_length=6, max_length=10,
-                placeholder=trade_report.date
+                placeholder=trade_report.date[:100]
             ),
             disnake.ui.TextInput(
                 label="Item",
                 custom_id="item",
                 style=disnake.TextInputStyle.short,
-                placeholder=trade_report.item
+                placeholder=trade_report.item[:100]
             ),
             disnake.ui.TextInput(
                 label="Price",
                 custom_id="price",
                 style=disnake.TextInputStyle.short,
-                placeholder=trade_report.price
+                placeholder=trade_report.price[:100]
             ),
             disnake.ui.TextInput(
                 label="Overpay/Underpay",
                 custom_id="overpay_underpay",
-                style=disnake.TextInputStyle.short,
+                style=disnake.TextInputStyle.short[:100],
                 min_length=3, max_length=5,
                 placeholder="ENTER: 'over', 'under', or 'N/A'",
             ),
@@ -113,7 +113,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
                 label="Image",
                 custom_id="image_url",
                 style=disnake.TextInputStyle.short,
-                value=trade_report.image.url,
+                value=trade_report.image.url[:100],
                 placeholder="https://example.com/image.png"
             )
         ]
