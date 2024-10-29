@@ -111,7 +111,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
                 label="Image",
                 custom_id="image_url",
                 style=disnake.TextInputStyle.short,
-                value=trade_report.image.url[:100],
+                value='default',
                 placeholder="https://example.com/image.png"
             )
         ]
@@ -158,7 +158,8 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
             icon_url=modal_inter.user.display_avatar,
             text=f"Approved by {modal_inter.user.display_name}"
         )
-        embed.set_image(url=modal_inter.text_values['image_url'])
+        image = trade_report.image.url if modal_inter.text_values['image_url'] == 'default' else modal_inter.text_values['image_url']
+        embed.set_image(url=image)
         channel = inter.bot.get_channel(config.TRADE_REPORT_CHANNEL)
         msg = await channel.send(embed=embed)
         await inter.message.delete()
