@@ -93,6 +93,11 @@ async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[ai
         req_item_ids = req_item_ids.split(',')
         if all(req_item_id in item_ids for req_item_id in req_item_ids):
             item_roles.append(role_id)
+        elif debug:
+            for req_item_id in req_item_ids:
+                if req_item_id not in item_ids:
+                    print(role_id, player.name, 'MISSING:', req_item_id)
+                    break
 
             
     item_roles.extend(await roles.get_checker_roles(list(items.values())))

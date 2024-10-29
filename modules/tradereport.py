@@ -228,7 +228,7 @@ async def report_trade_command(
         await log_trade_report(trade_report)
         
         channel = inter.bot.get_channel(config.TRADE_REPORT_VERIFICATION_CHANNEL)
-        await channel.send(
+        msg = await channel.send(
             content=f"<@&{config.RECENT_SALES_JURY_ROLE}>",
             embed=trade_report.to_embed(),
             components=[
@@ -244,6 +244,7 @@ async def report_trade_command(
                 )
             ]
         )
+        await msg.pin()
         return await inter.send(embed=misc.make_success(
             "Success",
             "Your trade report has been sent off to server staff to be reviewed. When it is accepted or denied, you will recieve a DM."
