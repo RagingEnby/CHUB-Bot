@@ -107,7 +107,7 @@ async def on_message(message: disnake.Message):
         except Exception as e:
             error = traceback.format_exc()
             print(f">exec ERROR:\n{error}")
-            await message.reply(f"Error while running code:\n```py{error}```")
+            await message.reply(f"Error while running code:\n```py\n{error}```")
     if message.channel.id == config.VERIFICATION_CHANNEL and not await bot.is_owner(message.author):
         await asyncio.sleep(60)
         with suppress(disnake.errors.NotFound):
