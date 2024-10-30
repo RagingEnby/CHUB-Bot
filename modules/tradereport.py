@@ -62,6 +62,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
     
     if button_data['action'] != 'accept':
         await inter.message.delete()
+        await log_trade_report_completion(trade_report)
         if author:
             try:
                 await author.send(embed=misc.make_error(
@@ -70,11 +71,10 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
                 ))
             except Exception as e:
                 print('error trying to dm', author, '-', e)
-        await inter.send(embed=misc.make_success(
+        return await inter.send(embed=misc.make_success(
             "Success",
             "The trade report has been denied and the author has been notified"
         ))
-        return await log_trade_report_completion(trade_report)
 
     
     await inter.response.send_modal(
@@ -161,7 +161,11 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
         image = trade_report.image.url if modal_inter.text_values['image_url'] == 'default' else modal_inter.text_values['image_url']
         embed.set_image(url=image)
         channel = inter.bot.get_channel(config.TRADE_REPORT_CHANNEL)
+        if trade_report.id not in PENDING_REPORTS:
+            # this is a duplicate interaction call
+            return
         msg = await channel.send(embed=embed)
+        await log_trade_report_completion(trade_report)
         await inter.message.delete()
         if author:
             try:
@@ -169,7 +173,6 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
             except Exception as e:
                 print('error trying to dm', trade_report.author, ' - ', e)
 
-        await log_trade_report_completion(trade_report)
         await modal_inter.send(embed=misc.make_success(
             "Sent Trade Report!",
             f"View it at {msg.jump_url}"
