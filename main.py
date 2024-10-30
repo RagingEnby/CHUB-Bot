@@ -454,7 +454,7 @@ async def update_linked_players_task():
             if discord_id not in member_dict or discord_id == bot.user.id:
                 continue
             await update_players_task_single(uuid, member_dict[discord_id], session=session)
-            await asyncio.sleep(6.5)  # rate limit sucks ass
+            await asyncio.sleep(3.5)  # rate limit sucks ass
 
 
 TSKS.append(update_linked_players_task)
