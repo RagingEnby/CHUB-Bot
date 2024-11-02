@@ -56,7 +56,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
     if trade_report is None:
         return await inter.send(embed=misc.make_error(
             "Invalid Trade",
-            f"No trade with the ID `{disnake.utils.escape_markdown(button_data['id'])}`. This is likely because the trade has already been accepted or denied"
+            f"No trade with the ID `{button_data['id']}`. This is likely because the trade has already been accepted or denied"
         ), ephemeral=True)
     author = inter.bot.get_user(trade_report.author) if trade_report.author else None
     
@@ -134,7 +134,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
         if overpay_underpay not in ['over', 'under', None]:
             return await modal_inter.send(embed=misc.make_error(
                 "Invalid Overpay/Underpay value",
-                f"You entered `{disnake.utils.escape_markdown(overpay_underpay)}`"
+                f"You entered `{overpay_underpay}`"
                 " but it must be equal to `over`, `under`, or `N/A`"
             ), ephemeral=True)
 
@@ -149,9 +149,9 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
             ("# " + overpay_underpay.upper() + "PAY") if overpay_underpay else '',
             f"{censor}**Buyer:** `{trade_report.buyer.name}`{buyer_ping}",
             f"**Seller:** `{trade_report.seller.name}`{seller_ping}",
-            f"**Date:** `{disnake.utils.escape_markdown(modal_inter.text_values['date'])}`",
-            f"**Item:** `{disnake.utils.escape_markdown(modal_inter.text_values['item'])}`",
-            f"**Price:** `{disnake.utils.escape_markdown(modal_inter.text_values['price'])}`",
+            f"**Date:** `{modal_inter.text_values['date']}`",
+            f"**Item:** `{modal_inter.text_values['item']}`",
+            f"**Price:** `{modal_inter.text_values['price']}`",
         ]) + censor
         # add an empty embed with the image so i dont have to bother with downloading the image
         embed = disnake.Embed(description=description)
@@ -210,13 +210,13 @@ async def report_trade_command(
         if seller is None:
             return await inter.send(embed=misc.make_error(
                 "Invalid Seller",
-                f"`{disnake.utils.escape_markdown(seller_name)}` is not a valid Minecraft IGN."
+                f"`{seller_name}` is not a valid Minecraft IGN."
             ))
         buyer = await mojang.get(buyer_name, session=session)
         if buyer is None:
             return await inter.send(embed=misc.make_error(
                 "Invalid Buyer",
-                f"`{disnake.utils.escape_markdown(buyer_name)}` is not a valid Minecraft IGN."
+                f"`{buyer_name}` is not a valid Minecraft IGN."
             ))
 
         
