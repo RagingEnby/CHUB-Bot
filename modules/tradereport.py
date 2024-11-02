@@ -43,9 +43,11 @@ async def log_trade_report(report: datatypes.TradeReport):
     await save_pending_reports()
 
 
-async def log_trade_report_completion(report: datatypes.TradeReport):
-    PENDING_REPORTS.pop(report.id, None)
-    await save_pending_reports()
+async def log_trade_report_completion(report: datatypes.TradeReport) -> bool:
+    report = PENDING_REPORTS.pop(report.id, None) # type: ignore
+    if report:
+        await save_pending_reports()
+    return bool(report)
 
 
 async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
@@ -122,65 +124,66 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
             check=lambda i: i.custom_id == "send_trade_report" and i.author.id == inter.author.id,
             timeout=300
         )
-        if not modal_inter.user.get_role(config.RECENT_SALES_JURY_ROLE):
-            return await modal_inter.send(embed=misc.make_error(
-                "No Permissions",
-                f"You must have the <@&{config.RECENT_SALES_JURY_ROLE}> role to send trade reports"
-            ), ephemeral=True)
+    except asyncio.TimeoutError:
+        return await inter.author.send('Your trade report window has timed out and is no longer valid.')
 
-        raw_overpay_underpay = modal_inter.text_values['overpay_underpay'].lower()
-        overpay_underpay = raw_overpay_underpay if raw_overpay_underpay != 'n/a' else None
-        
-        if overpay_underpay not in ['over', 'under', None]:
-            return await modal_inter.send(embed=misc.make_error(
-                "Invalid Overpay/Underpay value",
-                f"You entered `{overpay_underpay}`"
-                " but it must be equal to `over`, `under`, or `N/A`"
-            ), ephemeral=True)
-
-        buyer_user: Optional[disnake.User] = misc.uuid_to_user(trade_report.buyer.uuid, inter.bot)
-        buyer_ping = (' ' + buyer_user.mention) if buyer_user else ''
-        
-        seller_user: Optional[disnake.User] = misc.uuid_to_user(trade_report.seller.uuid, inter.bot)
-        seller_ping = (' ' + seller_user.mention) if seller_user else ''
-
-        censor = '||' if overpay_underpay else ''
-        description = '\n'.join([
-            ("# " + overpay_underpay.upper() + "PAY") if overpay_underpay else '',
-            f"{censor}**Buyer:** `{trade_report.buyer.name}`{buyer_ping}",
-            f"**Seller:** `{trade_report.seller.name}`{seller_ping}",
-            f"**Date:** `{modal_inter.text_values['date']}`",
-            f"**Item:** `{modal_inter.text_values['item']}`",
-            f"**Price:** `{modal_inter.text_values['price']}`",
-        ]) + censor
-        # add an empty embed with the image so i dont have to bother with downloading the image
-        embed = disnake.Embed(description=description)
-        embed.set_footer(
-            icon_url=modal_inter.user.display_avatar,
-            text=f"Approved by {modal_inter.user.display_name}"
-        )
-        image = trade_report.image.url if modal_inter.text_values['image_url'] == 'default' else modal_inter.text_values['image_url']
-        embed.set_image(url=image)
-        channel = inter.bot.get_channel(config.TRADE_REPORT_CHANNEL)
-        if trade_report.id not in PENDING_REPORTS:
-            # this is a duplicate interaction call
-            return
-        msg = await channel.send(embed=embed)
-        await log_trade_report_completion(trade_report)
-        await inter.message.delete()
-        if author:
-            try:
-                await author.send(f"Your trade report has been acccepted! View it at {msg.jump_url}")
-            except Exception as e:
-                print('error trying to dm', trade_report.author, ' - ', e)
-
-        await modal_inter.send(embed=misc.make_success(
-            "Sent Trade Report!",
-            f"View it at {msg.jump_url}"
+    if not modal_inter.user.get_role(config.RECENT_SALES_JURY_ROLE):
+        return await modal_inter.send(embed=misc.make_error(
+            "No Permissions",
+            f"You must have the <@&{config.RECENT_SALES_JURY_ROLE}> role to send trade reports"
         ), ephemeral=True)
 
-    except asyncio.TimeoutError:
-        await inter.author.send('Your trade report window has timed out and is no longer valid.')
+    raw_overpay_underpay = modal_inter.text_values['overpay_underpay'].lower()
+    overpay_underpay = raw_overpay_underpay if raw_overpay_underpay != 'n/a' else None
+    
+    if overpay_underpay not in ['over', 'under', None]:
+        return await modal_inter.send(embed=misc.make_error(
+            "Invalid Overpay/Underpay value",
+            f"You entered `{overpay_underpay}`"
+            " but it must be equal to `over`, `under`, or `N/A`"
+        ), ephemeral=True)
+
+    buyer_user: Optional[disnake.User] = misc.uuid_to_user(trade_report.buyer.uuid, inter.bot)
+    buyer_ping = (' ' + buyer_user.mention) if buyer_user else ''
+    
+    seller_user: Optional[disnake.User] = misc.uuid_to_user(trade_report.seller.uuid, inter.bot)
+    seller_ping = (' ' + seller_user.mention) if seller_user else ''
+
+    censor = '||' if overpay_underpay else ''
+    description = '\n'.join([
+        ("# " + overpay_underpay.upper() + "PAY") if overpay_underpay else '',
+        f"{censor}**Buyer:** `{trade_report.buyer.name}`{buyer_ping}",
+        f"**Seller:** `{trade_report.seller.name}`{seller_ping}",
+        f"**Date:** `{modal_inter.text_values['date']}`",
+        f"**Item:** `{modal_inter.text_values['item']}`",
+        f"**Price:** `{modal_inter.text_values['price']}`",
+    ]) + censor
+    # add an empty embed with the image so i dont have to bother with downloading the image
+    embed = disnake.Embed(description=description)
+    embed.set_footer(
+        icon_url=modal_inter.user.display_avatar,
+        text=f"Approved by {modal_inter.user.display_name}"
+    )
+    image = trade_report.image.url if modal_inter.text_values['image_url'] == 'default' else modal_inter.text_values['image_url']
+    embed.set_image(url=image)
+    channel = inter.bot.get_channel(config.TRADE_REPORT_CHANNEL)
+    exists = await log_trade_report_completion(trade_report)
+    if not exists:
+        print('recieved duplicate modal response')
+        # this is a duplicate interaction call
+        return
+    msg = await channel.send(embed=embed)
+    await inter.message.delete()
+    if author:
+        try:
+            await author.send(f"Your trade report has been acccepted! View it at {msg.jump_url}")
+        except Exception as e:
+            print('error trying to dm', trade_report.author, ' - ', e)
+
+    await modal_inter.send(embed=misc.make_success(
+        "Sent Trade Report!",
+        f"View it at {msg.jump_url}"
+    ), ephemeral=True)
 
 
 async def send_log_msg(inter: disnake.AppCmdInter, report: datatypes.TradeReport):
