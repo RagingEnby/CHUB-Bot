@@ -418,7 +418,7 @@ async def ec_command(inter: disnake.AppCmdInter):
 )
 async def cc_command(inter: disnake.AppCmdInter):
     await inter.response.send_message(
-        "Sell your Crystal/Fairy armor here!\nhttps://discord.gg/crystal-cafe-873758934224232468")
+        "Sell your Crystal/Fairy armor here!\nhttps://discord.gg/crystalcafe")
 
 
 @bot.slash_command(
