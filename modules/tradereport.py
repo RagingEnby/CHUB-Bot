@@ -128,7 +128,8 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
                 f"You must have the <@&{config.RECENT_SALES_JURY_ROLE}> role to send trade reports"
             ), ephemeral=True)
 
-        overpay_underpay = modal_inter.text_values["overpay_underpay"] if modal_inter.text_values["overpay_underpay"] != 'N/A' else None
+        raw_overpay_underpay = modal_inter.text_values['overpay_underpay'].lower()
+        overpay_underpay = raw_overpay_underpay if raw_overpay_underpay != 'n/a' else None
         
         if overpay_underpay not in ['over', 'under', None]:
             return await modal_inter.send(embed=misc.make_error(
@@ -146,8 +147,8 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
         censor = '||' if overpay_underpay else ''
         description = '\n'.join([
             ("# " + overpay_underpay.upper() + "PAY") if overpay_underpay else '',
-            f"{censor}**Buyer:** `{disnake.utils.escape_markdown(trade_report.buyer.name)}`{buyer_ping}",
-            f"**Seller:** `{disnake.utils.escape_markdown(trade_report.seller.name)}`{seller_ping}",
+            f"{censor}**Buyer:** `{trade_report.buyer.name}`{buyer_ping}",
+            f"**Seller:** `{trade_report.seller.name}`{seller_ping}",
             f"**Date:** `{disnake.utils.escape_markdown(modal_inter.text_values['date'])}`",
             f"**Item:** `{disnake.utils.escape_markdown(modal_inter.text_values['item'])}`",
             f"**Price:** `{disnake.utils.escape_markdown(modal_inter.text_values['price'])}`",
