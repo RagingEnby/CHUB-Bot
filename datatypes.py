@@ -48,10 +48,6 @@ class TradeReportAttachment:
         self.url = url
         self.filename = filename
 
-    @property
-    def file(self) -> disnake.File:
-        return disnake.File(self.url, filename=self.filename)
-
     def to_dict(self) -> dict:
         return {
             "url": self.url,
