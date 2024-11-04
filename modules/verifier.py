@@ -150,13 +150,12 @@ async def update_member(member: disnake.Member, player: Optional[datatypes.Minec
 
 
 async def remove_verification(member: disnake.Member):
-    to_remove = [disnake.Object(role) for role in config.REQUIRES_VERIFICATION if
-                 role in [role.id for role in member.roles]]
-    await member.remove_roles(*to_remove, reason="Unverified")
-    try:
+    to_remove = [disnake.Object(role) for role in config.REQUIRES_VERIFICATION
+                 if member.get_role(role)]
+    with suppress(disnake.NotFound):
+        await member.remove_roles(*to_remove, reason="Unverified")
+    with suppress(Forbidden):
         await member.edit(nick=None)
-    except Forbidden:
-        pass
 
 
 async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[disnake.Member] = None):
