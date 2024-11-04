@@ -10,10 +10,9 @@ from disnake import user
 from disnake.ext import commands
 
 import config
-from modules import asyncreqs, hypixelapi, parser, usermanager
+from modules import hypixelapi, parser, usermanager, autocomplete
 
 BOT_CLASS = commands.InteractionBot | commands.Bot | commands.AutoShardedBot
-AUTOCOMPLETE_IGN_CACHE: dict[str, list[str]] = {}
 
 
 async def get_user_from_name(bot: BOT_CLASS, name: str) -> Optional[disnake.Member]:
@@ -189,46 +188,6 @@ def numerize(num: int | float) -> str:
     return '{}{}'.format('{:f}'.format(num).rstrip('0').rstrip('.'), ['', 'K', 'M', 'B', 'T'][magnitude])
 
 
-async def autocomplete_ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
-    user_input = user_input.lower().strip().replace('/', '').replace(' ', '_')
-    print(f'IGN Autocomplete > [{inter.user.name}]  {user_input}')
-    if not user_input:
-        # EASTER EGG: These are all 5 CHUB admins :3
-        return [
-            "RagingEnby",
-            "TGWaffles",
-            "_Foe",
-            "Vinush",
-            "Bibby"
-        ]
-
-    # try to use locally saved response first if possible
-    if user_input in AUTOCOMPLETE_IGN_CACHE:
-        return AUTOCOMPLETE_IGN_CACHE[user_input]
-        
-    # API has a temp minimum of 3 chars to speed up the process
-    if len(user_input) < 3:
-        AUTOCOMPLETE_IGN_CACHE[user_input] = [user_input]
-        return AUTOCOMPLETE_IGN_CACHE[user_input]
-        
-    try:
-        response = await asyncio.wait_for(
-            asyncreqs.get('https://api.ragingenby.dev/stem/' + user_input),
-            # timeout so low because 1. people type fast 2. discord is unforgiving asdf
-            # with their timeouts on autocomplete
-            timeout=3
-        )
-        if response.status != 200:
-            AUTOCOMPLETE_IGN_CACHE[user_input] = [user_input]
-            return AUTOCOMPLETE_IGN_CACHE[user_input]
-        AUTOCOMPLETE_IGN_CACHE[user_input] = [
-            player['name'] for player in await response.json()
-        ]
-        return AUTOCOMPLETE_IGN_CACHE[user_input]
-    except asyncio.TimeoutError:
-        print('Timeout error for stem', user_input)
-        AUTOCOMPLETE_IGN_CACHE[user_input] = [user_input]
-        return AUTOCOMPLETE_IGN_CACHE[user_input]
 
 
 def ign_param(description: Optional[str]=None) -> commands.Param:  # type: ignore
@@ -236,7 +195,7 @@ def ign_param(description: Optional[str]=None) -> commands.Param:  # type: ignor
         description=description or "A Minecraft IGN",
         min_length=2, # technically 3, but rarely 2 names exist so why not
         max_length=16,
-        autocomplete=autocomplete_ign
+        autocomplete=autocomplete.ign
     )
 
 
@@ -250,7 +209,7 @@ def should_scan_museum(game_mode: str, member: dict[str, Any]) -> bool:
         return False
 
     # players with low levels probably havent donated much/anything to museum
-    if member.get('leveling', {}).get('experience', 0.0) < 20:
+    if member.get('leveling', {}).get('experience', 0.0) < 30:
         return False
         
     return True

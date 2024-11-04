@@ -190,7 +190,9 @@ async def report_trade_command(
     notes: Optional[str] = commands.param(default=None, description="Any notes you want to add")
 ):
     await tradereport.report_trade_command(inter, seller, buyer, date, item, price, image, notes)
-    
+
+
+
 
 
 @bot.slash_command(
