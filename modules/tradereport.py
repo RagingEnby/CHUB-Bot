@@ -18,6 +18,8 @@ PENDING_REPORTS: dict[str, datatypes.TradeReport] = {
     id_: datatypes.TradeReport.from_dict(trade)
     for id_, trade in json.load(open(config.TRADE_REPORT_FILE_PATH, 'r')).items()
 }
+# this is just here becauase i use this to stop multi-sending at the very last chance it has
+SENT_REPORTS: list[str] = []
 # this is no longer used, but its here for the future if needed
 INACTIVE_COMPONENTS: list[disnake.ui.Button] = [
     disnake.ui.Button(
@@ -179,10 +181,11 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
     embed.set_image(url=modal_inter.text_values['image_url'])
     channel = inter.bot.get_channel(config.TRADE_REPORT_CHANNEL)
     exists = await log_trade_report_completion(trade_report)
-    if not exists:
+    if not exists or trade_report.id in SENT_REPORTS:
         print('recieved duplicate modal response')
         # this is a duplicate interaction call
         return
+    SENT_REPORTS.append(trade_report.id)
     msg = await channel.send(embed=embed)
     await inter.message.delete()
     if author:
