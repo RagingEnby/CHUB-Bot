@@ -3,7 +3,7 @@ import time
 import requests
 from disnake.ext import commands
 
-from scrts import BOT_TOKEN, HYPIXEL_API_KEY
+from scrts import BOT_TOKEN, HYPIXEL_API_KEY, RAGINGENBY_API_KEY
 
 
 TRADE_REPORT_FILE_PATH: str = "storage/tradereports.json"

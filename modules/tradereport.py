@@ -33,6 +33,19 @@ INACTIVE_COMPONENTS: list[disnake.ui.Button] = [
 ]
 
 
+async def upload_image(url: str, session: aiohttp.ClientSession) -> datatypes.TradeReportAttachment:
+    response = await session.post(
+        'https://api.ragingenby.dev/download',
+        params={
+            "key": config.RAGINGENBY_API_KEY
+        },
+        json={
+            "url": url
+        }
+    )
+    return datatypes.TradeReportAttachment.from_dict(await response.json())
+
+
 async def save_pending_reports():
     async with aiofiles.open(config.TRADE_REPORT_FILE_PATH, 'w') as file:
         await file.write(json.dumps({k: v.to_dict() for k, v in PENDING_REPORTS.items()}))
@@ -158,7 +171,6 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
         f"**Item:** `{modal_inter.text_values['item']}`",
         f"**Price:** `{modal_inter.text_values['price']}`",
     ]) + censor
-    # add an empty embed with the image so i dont have to bother with downloading the image
     embed = disnake.Embed(description=description)
     embed.set_footer(
         icon_url=modal_inter.user.display_avatar,
@@ -230,7 +242,7 @@ async def report_trade_command(
             date=date,
             item=item,
             price=price,
-            image=datatypes.TradeReportAttachment.from_disnake_attachment(image),
+            image=await upload_image(image.proxy_url, session=session),
             notes=notes
         )
         await log_trade_report(trade_report)

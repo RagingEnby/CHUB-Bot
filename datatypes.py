@@ -56,6 +56,8 @@ class TradeReportAttachment:
 
     @classmethod
     def from_dict(cls, data: dict):
+        if 'name' in data:
+            data['filename'] = data.pop('name')
         return cls(**data)
 
     @classmethod
