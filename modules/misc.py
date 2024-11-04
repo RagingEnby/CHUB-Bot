@@ -199,6 +199,13 @@ def ign_param(description: Optional[str]=None) -> commands.Param:  # type: ignor
     )
 
 
+def profile_param(description: Optional[str]=None) -> commands.Param:
+    return commands.param(
+        description=description or "A profile name",
+        autocomplete=autocomplete.profile
+    )
+
+
 def should_scan_museum(game_mode: str, member: dict[str, Any]) -> bool:
     # museum is only available to ironman and standard profiles
     if game_mode not in ['normal', 'ironman']:

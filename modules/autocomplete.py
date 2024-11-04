@@ -24,10 +24,10 @@ async def ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
     if user_input in AUTOCOMPLETE_IGN_CACHE:
         return AUTOCOMPLETE_IGN_CACHE[user_input]
 
-    # API has a temp minimum of 3 chars to speed up the process
+    """# API has a temp minimum of 3 chars to speed up the process
     if len(user_input) < 3:
         AUTOCOMPLETE_IGN_CACHE[user_input] = [user_input]
-        return AUTOCOMPLETE_IGN_CACHE[user_input]
+        return AUTOCOMPLETE_IGN_CACHE[user_input]"""
 
     try:
         response = await asyncio.wait_for(
@@ -47,3 +47,13 @@ async def ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
         print('Timeout error for stem', user_input)
         AUTOCOMPLETE_IGN_CACHE[user_input] = [user_input]
         return AUTOCOMPLETE_IGN_CACHE[user_input]
+
+
+async def profile(inter: disnake.AppCmdInter, user_input: str):
+    print(inter.filled_options)
+    return [
+        "test command",
+        "why are you using this",
+        "aaaaaaaaaaaaa"
+    ]
+    

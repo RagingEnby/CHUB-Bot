@@ -1,4 +1,4 @@
-
+import json
 import asyncio
 from contextlib import suppress
 from typing import Literal, Optional
@@ -10,7 +10,6 @@ from disnake.ext import commands, tasks
 
 import config
 import ws
-import datatypes
 from modules import cmdlogger
 from modules import misc
 from modules import mojang
@@ -177,7 +176,7 @@ If you have any other questions, feel free to reach out to {config.BOT_DEVELOPER
 
 @bot.slash_command(
     name="report-trade",
-    description="Report a trade for it to be sent in <#1201283974924861470>"
+    description="Report a trade for it to be sent in #recent-sales"
 )
 async def report_trade_command(
     inter: disnake.AppCmdInter,
@@ -191,6 +190,20 @@ async def report_trade_command(
 ):
     await tradereport.report_trade_command(inter, seller, buyer, date, item, price, image, notes)
 
+
+
+@bot.slash_command(
+    name="test-command",
+    description="Test command for /report-trade"
+)
+async def test_command(
+    inter: disnake.AppCmdInter,
+    seller: str = misc.ign_param('The player who sold the item'),
+    seller_profile: str = misc.profile_param('The profile of the player who sold the item'),
+    buyer: str = misc.ign_param('The player who bought the item'),
+    buyer_profile: str = misc.profile_param('The profile of the player who bought the item')
+):
+    await inter.response.send_message(f"```json\n{json.dumps(inter.filled_options, indent=2)}```")
 
 
 
