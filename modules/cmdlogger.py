@@ -11,7 +11,7 @@ async def on_slash_command(inter: disnake.AppCmdInter):
     print(f'{inter.author.name} used {full_command}')
     embed = disnake.Embed(
         color=disnake.Color.red(),
-        title=full_command,
+        title=full_command[:256],
         description="Command is still processing or has crashed..."
     )
     embed.set_author(
