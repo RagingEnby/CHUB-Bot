@@ -44,7 +44,7 @@ class MinecraftPlayer:
         if not data.get('id') or not data.get('name'):
             print('invalid player data:', json.dumps(data, indent=2))
             return None
-        return cls(name=data['name'], uuid=data.get('id', data.get('uuid'))))
+        return cls(name=data['name'], uuid=data.get('id', data.get('uuid')))
 
 
 class TradeReportAttachment:
