@@ -188,8 +188,6 @@ def numerize(num: int | float) -> str:
     return '{}{}'.format('{:f}'.format(num).rstrip('0').rstrip('.'), ['', 'K', 'M', 'B', 'T'][magnitude])
 
 
-
-
 def ign_param(description: Optional[str]=None) -> commands.Param:  # type: ignore
     return commands.param(
         description=description or "A Minecraft IGN",
