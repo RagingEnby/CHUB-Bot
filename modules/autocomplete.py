@@ -1,5 +1,7 @@
+from typing import Optional
 import asyncio
 import disnake
+import json
 
 from modules import asyncreqs
 
