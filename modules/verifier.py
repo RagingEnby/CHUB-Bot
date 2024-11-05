@@ -164,8 +164,8 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
     async with aiohttp.ClientSession() as session:        
         if await usermanager.is_linked(member):
             return await inter.send(embed=misc.make_error(
-                title="already verified",
-                description="Your discord account is already linked. Use /unverify first."
+                "Already Verified",
+                "Your discord account is already linked. Use /unverify first."
             ))
 
         player = await mojang.get(ign, session=session)
@@ -173,17 +173,17 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
 
         if player is None:
             return await inter.send(embed=misc.make_error(
-                title="invalid IGN",
-                description=f"The IGN [{disnake.utils.escape_markdown(ign)}]"
-                            f"(<https://namemc.com/profile/{disnake.utils.escape_markdown(ign)}>) "
-                            f"does not belong to any Minecraft player!."
+                "Invalid IGN",
+                f"The IGN [{disnake.utils.escape_markdown(ign)}]"
+                f"(<https://namemc.com/profile/{disnake.utils.escape_markdown(ign)}>) "
+                f"does not belong to any Minecraft player!."
             ))
 
         discord = await get_linked_discord(player, session=session)
         if str(discord).lower() != member.name.lower():
             return await inter.send(embed=misc.make_error(
-                title="discord mismatch",
-                description={
+                "Discord Mismatch",
+                {
                     "IGN": player.name,
                     "Your Discord": member.name,
                     "Linked Discord": discord
@@ -194,8 +194,8 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
         is_banned, reason = usermanager.is_banned(player)
         if is_banned:
             embed = misc.make_error(
-                title="ban evader detected",
-                description="You've been detected ban evading. Please reach out to a staff member if this is incorrect."
+                "Ban Evader Detected",
+                "You've been detected ban evading. Please reach out to a staff member if this is incorrect."
             )
             await inter.send(embed=embed)
             print(f'found a smelly ban evader (ign: {ign}, uuid: {player.uuid}, reason: {reason}, '
@@ -225,7 +225,7 @@ async def unverify_command(inter: disnake.AppCmdInter, member: Optional[disnake.
     player = await usermanager.get_linked_player(member)
     if not player:
         return await inter.send(embed=misc.make_error(
-            "not verified",
+            "Not Verified",
             "You are not verified. Use the /verify command to verify your account."
         ))
     await usermanager.log_unlink(player)
@@ -241,8 +241,8 @@ async def update_command(inter: disnake.AppCmdInter, member: Optional[disnake.Me
         player = await usermanager.get_linked_player(member, session=session)
         if not player:
             return await inter.send(embed=misc.make_error(
-                'not linked',
-                'Please verify using the /verify command first.'
+                "Unverified",
+                "Please verify using the /verify command first."
             ))
         
         await update_member(

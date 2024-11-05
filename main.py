@@ -249,18 +249,18 @@ async def moderation_give_role_command(inter: disnake.AppCmdInter, member: disna
         return
     if role.id == config.STAFF_ROLE:
         return await inter.send(embed=misc.make_error(
-            "cannot give this role",
+            "Staff Role",
             f"The bot is manually set to not give out the <@{config.STAFF_ROLE}> role."
         ))
     try:
         await member.add_roles(role)
     except disnake.Forbidden:
         return await inter.send(embed=misc.make_error(
-            "no permissions",
+            "No Permissions",
             f"I do not have permissions to give out the {role.mention} role."
         ))
     await inter.send(embed=misc.make_success(
-        "success",
+        "Success",
         f"Granted {member.mention} the {role.mention} role!"
     ))
 
@@ -276,7 +276,7 @@ async def moderation_remove_role_command(inter: disnake.AppCmdInter, member: dis
         await member.remove_roles(role)
     except disnake.Forbidden:
         return await inter.send(embed=misc.make_error(
-            "no permissions",
+            "No Permissions",
             f"I do not have permissions to remove the {role.mention} role."
         ))
     await inter.send(embed=misc.make_success(
@@ -294,7 +294,7 @@ async def moderation_ban_command(inter: disnake.AppCmdInter, member: disnake.Mem
         return
     if not reason.replace(' ', ''):
         return await inter.send(embed=misc.make_error(
-            "no ban reason",
+            "No Ban Reason",
             "You must provide a ban reason."
         ))
 
@@ -307,7 +307,7 @@ async def moderation_ban_command(inter: disnake.AppCmdInter, member: disnake.Mem
         await member.ban(reason=reason)
     except disnake.Forbidden:
         return await inter.send(embed=misc.make_error(
-            "no permissions",
+            "No Permissions",
             f"I do not have permissions to ban {member.mention}."
         ))
     await inter.send(embed=misc.make_success(
@@ -334,13 +334,13 @@ async def moderation_unban_command(inter: disnake.AppCmdInter, player: str = com
 
     if player_obj is None:
         return await inter.send(embed=misc.make_error(
-            "invalid account",
+            "Invalid Account",
             f"There is no account with the UUID `{disnake.utils.escape_markdown(player)}`!"
         ))
 
     if player_obj.uuid not in usermanager.BannedUsers:
         return await inter.send(embed=misc.make_error(
-            "not banned",
+            "Not Banned",
             f"Account `{disnake.utils.escape_markdown(player)}` is not blacklisted."
         ))
     del usermanager.BannedUsers[player_obj.uuid]
@@ -368,13 +368,13 @@ async def moderation_blacklist_command(inter: disnake.AppCmdInter, player: str =
 
     if player_obj is None:
         return await inter.send(embed=misc.make_error(
-            "invalid account",
+            "Invalid Account",
             f"There is no account with the UUID `{disnake.utils.escape_markdown(player)}`!"
         ))
 
     if player_obj.uuid in usermanager.BannedUsers:
         return await inter.send(embed=misc.make_error(
-            "already banned",
+            "Already Bbanned",
             f"Account `{disnake.utils.escape_markdown(player)}` is already blacklisted."
         ))
     usermanager.BannedUsers[player_obj.uuid] = f"{player_obj.uuid} | Banned by {inter.author.name} ({inter.author.id})"

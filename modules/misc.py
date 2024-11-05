@@ -134,7 +134,7 @@ def format_description(description: Optional[list[str] | str | dict]) -> str:
 def make_error(title: str, description: Optional[list[str] | str | dict] = None) -> disnake.Embed:
     description_str = format_description(description)
     embed = disnake.Embed(
-        title="Error: " + title.title(),
+        title="Error: " + title,
         color=disnake.Color.red(),
         description=description_str
     )
