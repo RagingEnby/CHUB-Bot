@@ -1,4 +1,5 @@
 from typing import Optional
+from contextlib import suppress
 import asyncio
 import disnake
 import aiohttp
@@ -31,7 +32,7 @@ async def ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
         AUTOCOMPLETE_IGN_CACHE[user_input] = [user_input]
         return AUTOCOMPLETE_IGN_CACHE[user_input]"""
 
-    try:
+    with suppress(asyncio.TimeoutError):
         response = await asyncio.wait_for(
             asyncreqs.get('https://api.ragingenby.dev/stem/' + user_input),
             # timeout so low because 1. people type fast 2. discord is unforgiving asf
@@ -45,10 +46,6 @@ async def ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
             player['name'] for player in await response.json()
         ]
         return AUTOCOMPLETE_IGN_CACHE[user_input]
-    except asyncio.TimeoutError:
-        print('Timeout error for stem', user_input)
-        #AUTOCOMPLETE_IGN_CACHE[user_input] = [user_input]
-        #return AUTOCOMPLETE_IGN_CACHE[user_input]
 
 
 async def profile(inter: disnake.AppCmdInter, user_input: str, ign: Optional[str] = None) -> list[str]:
