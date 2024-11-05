@@ -218,7 +218,7 @@ async def test_command(
                 "Invalid Buyer",
                 f"The IGN [{buyer}](<https://namemc.com/search?q={buyer}>) is not a valid Minecraft username."
             ))
-await inter.response.send_message(f"```json\n{json.dumps(inter.filled_options, indent=2)}```")
+    await inter.response.send_message(f"```json\n{json.dumps(inter.filled_options, indent=2)}```")
 
 
 
