@@ -199,9 +199,9 @@ async def report_trade_command(
 async def test_command(
     inter: disnake.AppCmdInter,
     seller: str = misc.ign_param('The player who sold the item'),
-    seller_profile: str = misc.profile_param('The profile of the player who sold the item'),
+    seller_profile: str = misc.profile_param('The profile of the player who sold the item', 'seller'),
     buyer: str = misc.ign_param('The player who bought the item'),
-    buyer_profile: str = misc.profile_param('The profile of the player who bought the item')
+    buyer_profile: str = misc.profile_param('The profile of the player who bought the item', 'buyer')
 ):
     await inter.response.send_message(f"```json\n{json.dumps(inter.filled_options, indent=2)}```")
 
