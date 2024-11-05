@@ -7,6 +7,7 @@ import asyncio
 
 from modules import mojang
 from modules import misc
+from modules import asyncreqs
 
 import datatypes
 import config
@@ -63,6 +64,11 @@ async def log_trade_report_completion(report: datatypes.TradeReport) -> bool:
     if report:
         await save_pending_reports()
     return bool(report)
+
+
+async def get_item_list(session: Optional[aiohttp.ClientSession]=None) -> dict[str, str]:
+    item_data = await asyncreqs.get('https://api.ragingnenby.dev/skyblock/items', session=session)
+    return {}
 
 
 async def on_button_click(inter: disnake.MessageInteraction, button_data: str):

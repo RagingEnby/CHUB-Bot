@@ -45,7 +45,9 @@ bot = commands.InteractionBot(
         presences=False,
         voice_states=False,
         webhooks=False
-    )
+    ),
+    # this restricts slash commands to ONLY work in collector's hub:
+    test_guilds=[934240413974417439]
 )
 
 
@@ -181,13 +183,13 @@ If you have any other questions, feel free to reach out to {config.BOT_DEVELOPER
 )
 async def report_trade_command(
     inter: disnake.AppCmdInter,
-    seller: str = misc.ign_param('The player who sold the item'),
-    buyer: str = misc.ign_param('The player who bought the item'),
+    seller: str = misc.ign_param(description='The player who sold the item'),
+    buyer: str = misc.ign_param(description='The player who bought the item'),
     date: str = commands.param(description="PLEASE USE DD/MM/YYYY FORMAT"),
     item: str = commands.param(),
     price: str = commands.param(),
     image: disnake.Attachment = commands.param(description="An image of the trade"),
-    notes: Optional[str] = commands.param(default=None, description="Any notes you want to add")
+    notes: Optional[str] = commands.param(description="Any notes you want to add", default=None)
 ):
     await tradereport.report_trade_command(inter, seller, buyer, date, item, price, image, notes)
 
@@ -199,11 +201,26 @@ async def report_trade_command(
 )
 async def test_command(
     inter: disnake.AppCmdInter,
-    seller: str = misc.ign_param('The player who sold the item'),
+    item: str = commands.Param(description='Item traded'),
+    value: int = commands.Param(description='Value of the item traded (if more than one quantity, value should be price per unit times quantity)', ge=750000000),
+    date: str = commands.Param(description='Date and time of sale in EST (MM/DD/YYYY HH:MM AM/PM)'),
+    seller: str = misc.ign_param(description='The player who sold the item'),
     seller_profile: str = misc.profile_param('The profile of the player who sold the item', 'seller'),
-    buyer: str = misc.ign_param('The player who bought the item'),
-    buyer_profile: str = misc.profile_param('The profile of the player who bought the item', 'buyer')
+    buyer: str = misc.ign_param(description='The player who bought the item'),
+    buyer_profile: str = misc.profile_param('The profile of the player who bought the item', 'buyer'),
+    image: disnake.Attachment = commands.Param(description='A screenshot of the trade'),
+    note: Optional[str] = commands.Param(description='Any extra info about the trade you want to include (OPTIONAL)', default=None),
+    screenshot_2: Optional[disnake.Attachment] = commands.Param(description='Extra Screenshot (OPTIONAL)', default=None),
+    screenshot_3: Optional[disnake.Attachment] = commands.Param(description='Extra Screenshot (OPTIONAL)', default=None),
+    screenshot_4: Optional[disnake.Attachment] = commands.Param(description='Extra Screenshot (OPTIONAL)', default=None),
+    screenshot_5: Optional[disnake.Attachment] = commands.Param(description='Extra Screenshot (OPTIONAL)', default=None)
 ):
+    date_obj = misc.parse_date(date)
+    if date_obj is None:
+        return await inter.send(embed=misc.make_error(
+            "Invalid Date",
+            f"Please make sure your date is in EST and the uses the format `MM/DD/YYYY HH:MM AM/PM`. for example: `{misc.get_date()}`"
+        ))
     async with aiohttp.ClientSession() as session:
         seller_profile = seller_profile.lower()
         buyer_profile = buyer_profile.lower()
@@ -300,7 +317,7 @@ async def moderation_ban_command(inter: disnake.AppCmdInter, member: disnake.Mem
 
     reason = reason + f" | Banned by {inter.author.name} ({inter.author.id})"
     try:
-        await member.send(f'You were banned from CHUB for reason `{disnake.utils.escape_markdown(reason)}`')
+        await member.send(f'You were banned from Collector\'s Hub for reason `{disnake.utils.escape_markdown(reason)}`')
     except Exception as e:
         print("unable to dm member during ban:", member.name, member.id, e)
     try:
@@ -312,8 +329,40 @@ async def moderation_ban_command(inter: disnake.AppCmdInter, member: disnake.Mem
         ))
     await inter.send(embed=misc.make_success(
         "success",
-        f"Banned {member.mention} for reason `{disnake.utils.escape_markdown(reason)}`."
+        f"Banned {member.mention} for reason `{reason}`."
     ))
+
+
+@moderation.sub_command(
+    name="kick",
+    description="Kick a user from the server"
+)
+async def moderation_kick_command(inter: disnake.AppCmdInter, member: disnake.Member, reason: str):
+    if not await misc.validate_mod_cmd(inter, member.top_role):
+        return
+    if not reason.replace(' ', ''):
+        return await inter.send(embed=misc.make_error(
+            "No Kick Reason",
+            "You must provide a kick reason."
+        ))
+    reason = reason + f" | Kicked by {inter.author.name} ({inter.author.id})"
+    try:
+        await member.send(f'You were kicked from Collector\'s Hub for reason `{disnake.utils.escape_markdown(reason)}`')
+    except Exception as e:
+        print("unable to dm member during kick:", member.name, member.id, e)
+    try:
+        await member.kick(reason=reason)
+    except disnake.Forbidden:
+        return await inter.send(embed=misc.make_error(
+            "No Permissions",
+            f"I do not have permissions to kick {member.mention}."
+        ))
+    await inter.send(embed=misc.make_success(
+        "success",
+        f"Kicked {member.mention} for reason `{reason}`."
+    ))
+
+
 
 
 # noinspection DuplicatedCode

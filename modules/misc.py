@@ -8,6 +8,7 @@ import aiohttp
 import disnake
 from disnake import user
 from disnake.ext import commands
+from datetime import datetime
 
 import config
 from modules import hypixelapi, parser, usermanager, autocomplete
@@ -225,4 +226,21 @@ def uuid_to_user(uuid: str, bot: BOT_CLASS) -> Optional[disnake.User]:
     if user_id is None:
         return None
     return bot.get_user(user_id)
-    
+
+
+def parse_date(date: str) -> Optional[datetime]:
+    # expected date format:
+    # MM/DD/YYYY HH:MM AM/PM
+    # 11/5/2024 12:25 PM
+    try:
+        parsed_date = datetime.strptime(date, "%m/%d/%Y %I:%M %p")
+        current_time = datetime.now()
+        if parsed_date < current_time:
+            return parsed_date
+        return None
+    except ValueError:
+        return None
+
+
+def get_date() -> str:
+    return datetime.now().strftime("%m/%d/%Y %I:%M %p")
