@@ -13,14 +13,14 @@ async def ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
     print(f'IGN Autocomplete > [{inter.user.name}]  {user_input}')
     if not user_input:
         # EASTER EGG: These are all 5 CHUB admins :3
-        return [
+        return list(set([
             inter.author.display_name, # this is just the authors ign 99% of the time
             "RagingEnby",
             "TGWaffles",
             "_Foe",
             "Vinush",
             "Bibby"
-        ]
+        ]))
 
     # try to use locally saved response first if possible
     if user_input in AUTOCOMPLETE_IGN_CACHE:
