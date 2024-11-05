@@ -26,6 +26,10 @@ class MinecraftPlayer:
         self.name = name
         self.uuid = uuid
 
+    @property
+    def id(self) -> str:
+        return self.uuid
+
     def __str__(self) -> str:
         return self.name
 
@@ -40,7 +44,7 @@ class MinecraftPlayer:
         if not data.get('id') or not data.get('name'):
             print('invalid player data:', json.dumps(data, indent=2))
             return None
-        return cls(name=data['name'], uuid=data['id'])
+        return cls(name=data['name'], uuid=data.get('id', data.get('uuid'))))
 
 
 class TradeReportAttachment:

@@ -6,6 +6,7 @@ import aiohttp
 from modules import asyncreqs, hypixelapi, mojang
 
 AUTOCOMPLETE_IGN_CACHE: dict[str, list[str]] = {}
+PROFILE_NAMES_CACHE: dict[str, list[str]] = {}
 
 
 async def ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
@@ -54,15 +55,20 @@ async def profile(inter: disnake.AppCmdInter, user_input: str, ign: Optional[str
     print(f'profile Autocomplete > [{inter.user.name}]  {user_input}')
     if not ign:
         return []
+    ign = ign.lower()
+    if ign in PROFILE_NAMES_CACHE:
+        return PROFILE_NAMES_CACHE[ign]
     async with aiohttp.ClientSession() as session:
         player = await mojang.get(ign, session=session)
         if not player:
             return []
-        return await hypixelapi.get_profile_names(
+        PROFILE_NAMES_CACHE[player.uuid] = await hypixelapi.get_profile_names(
             uuid=player.uuid,
             session=session,
             allowed_types=['normal']
         )
+        PROFILE_NAMES_CACHE[player.name.lower()] = PROFILE_NAMES_CACHE[player.uuid]
+        return PROFILE_NAMES_CACHE[player.uuid]
 
 
 async def buyer_profile(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
