@@ -30,11 +30,15 @@ async def websocket_connector():
         await asyncio.sleep(3)
         await websocket_connector()
 
+    except KeyboardInterrupt:
+        return
+    
     except Exception as e:
         if 'Connect call failed' not in str(e):
            print('unknown ws error:', e)
         await asyncio.sleep(3)
         await websocket_connector()
+
 
 async def start():
     asyncio.create_task(websocket_connector())
