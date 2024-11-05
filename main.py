@@ -203,7 +203,22 @@ async def test_command(
     buyer: str = misc.ign_param('The player who bought the item'),
     buyer_profile: str = misc.profile_param('The profile of the player who bought the item', 'buyer')
 ):
-    await inter.response.send_message(f"```json\n{json.dumps(inter.filled_options, indent=2)}```")
+    async with aiohttp.ClientSession() as session:
+        seller_player, buyer_player = await asyncio.gather(
+            mojang.get(seller, session=session),
+            mojang.get(buyer, session=session)
+        )
+        if not seller_player:
+            return await inter.send(embed=misc.make_error(
+                "Invalid Seller",
+                f"The IGN [{seller}](<https://namemc.com/search?q={seller}>) is not a valid Minecraft username."
+            ))
+        if not buyer_player:
+            return await inter.send(embed=misc.make_error(
+                "Invalid Buyer",
+                f"The IGN [{buyer}](<https://namemc.com/search?q={buyer}>) is not a valid Minecraft username."
+            ))
+await inter.response.send_message(f"```json\n{json.dumps(inter.filled_options, indent=2)}```")
 
 
 

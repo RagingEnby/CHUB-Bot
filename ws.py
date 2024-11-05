@@ -16,7 +16,7 @@ queue = []
 async def websocket_connector():
     global queue
     try:
-        async with websockets.connect("ws://localhost:42069/hypixeltracking/ws") as websocket:
+        async with websockets.connect("wss://api.ragingenby.dev/hypixeltracking/ws") as websocket:
             print('ws connected')
             await websocket.send(json.dumps({"method": "login", "content": "ChubBot"}))
             while True:

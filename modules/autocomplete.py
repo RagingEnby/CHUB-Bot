@@ -58,11 +58,11 @@ async def profile(inter: disnake.AppCmdInter, user_input: str, ign: Optional[str
         player = await mojang.get(ign, session=session)
         if not player:
             return []
-        profiles_data = await hypixelapi.ensure_data('/skyblock/profiles', {"uuid": player.uuid}, session=session)
-        return [
-            profile['cute_name'] for profile in profiles_data['profiles']
-            if profile.get('game_mode', 'normal') == 'normal'
-        ]
+        return await hypixelapi.get_profile_names(
+            uuid=player.uuid,
+            session=session,
+            allowed_types=['normal']
+        )
 
 
 async def buyer_profile(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
