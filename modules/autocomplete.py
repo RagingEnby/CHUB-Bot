@@ -47,8 +47,8 @@ async def ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
         return AUTOCOMPLETE_IGN_CACHE[user_input]
     except asyncio.TimeoutError:
         print('Timeout error for stem', user_input)
-        AUTOCOMPLETE_IGN_CACHE[user_input] = [user_input]
-        return AUTOCOMPLETE_IGN_CACHE[user_input]
+        #AUTOCOMPLETE_IGN_CACHE[user_input] = [user_input]
+        #return AUTOCOMPLETE_IGN_CACHE[user_input]
 
 
 async def profile(inter: disnake.AppCmdInter, user_input: str, ign: Optional[str] = None) -> list[str]:
