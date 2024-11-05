@@ -55,10 +55,10 @@ async def profile(inter: disnake.AppCmdInter, user_input: str, ign: Optional[str
     if not ign:
         return []
     async with aiohttp.ClientSession() as session:
-        player = await mojang.get(ign)
+        player = await mojang.get(ign, session=session)
         if not player:
             return []
-        profiles_data = await hypixelapi.ensure_data('/skyblock/profiles', {"uuid": player.uuid})
+        profiles_data = await hypixelapi.ensure_data('/skyblock/profiles', {"uuid": player.uuid}, session=session)
         return [
             profile['cute_name'] for profile in profiles_data['profiles']
             if profile.get('game_mode', 'normal') == 'normal'
