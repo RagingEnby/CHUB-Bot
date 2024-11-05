@@ -1,9 +1,9 @@
 from typing import Optional
 import asyncio
 import disnake
-import json
+import aiohttp
 
-from modules import asyncreqs
+from modules import asyncreqs, hypixelapi, mojang
 
 AUTOCOMPLETE_IGN_CACHE: dict[str, list[str]] = {}
 
@@ -51,24 +51,24 @@ async def ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
         return AUTOCOMPLETE_IGN_CACHE[user_input]
 
 
-async def profile(inter: disnake.AppCmdInter, ign: Optional[str] = None) -> list[str]:
+async def profile(inter: disnake.AppCmdInter, user_input: str, ign: Optional[str] = None) -> list[str]:
+    print(f'profile Autocomplete > [{inter.user.name}]  {user_input}')
     if not ign:
         return []
-    return [
-        ign,
-        json.dumps(inter.filled_options)
-    ]
-    print(inter.filled_options)
-    return [
-        "test command",
-        "why are you using this",
-        "aaaaaaaaaaaaa"
-    ]
+    async with aiohttp.ClientSession() as session:
+        player = await mojang.get(ign)
+        if not player:
+            return []
+        profiles_data = await hypixelapi.ensure_data('/skyblock/profiles', {"uuid": player.uuid})
+        return [
+            profile['cute_name'] for profile in profiles_data['profiles']
+            if profile.get('game_mode', 'normal') == 'normal'
+        ]
 
 
 async def buyer_profile(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
-    return await profile(inter, inter.filled_options.get('buyer'))
+    return await profile(inter, user_input, inter.filled_options.get('buyer'))
 
 
 async def seller_profile(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
-    return await profile(inter, inter.filled_options.get('seller'))
+    return await profile(inter, user_input, inter.filled_options.get('seller'))
