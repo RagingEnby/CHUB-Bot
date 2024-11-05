@@ -69,7 +69,7 @@ async def ensure_data(endpoint: str,
 async def get_profile_names(uuid: str, session: Optional[aiohttp.ClientSession] = None, allowed_types: Optional[list[str]] = None) -> list[str]:
     profiles_data = await ensure_data('/skyblock/profiles', {"uuid": uuid}, session=session)
     return [
-        profile['cute_name'] for profile in profiles_data['profiles']
+        profile['cute_name'].lower() for profile in profiles_data['profiles']
         if (allowed_types and profile.get('game_mode', 'normal') in allowed_types)
         or not allowed_types
     ]

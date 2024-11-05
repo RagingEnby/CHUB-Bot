@@ -62,13 +62,13 @@ async def profile(inter: disnake.AppCmdInter, user_input: str, ign: Optional[str
         player = await mojang.get(ign, session=session)
         if not player:
             return []
-        PROFILE_NAMES_CACHE[player.uuid] = await hypixelapi.get_profile_names(
+        profile_names = await hypixelapi.get_profile_names(
             uuid=player.uuid,
             session=session,
             allowed_types=['normal']
         )
-        PROFILE_NAMES_CACHE[player.name.lower()] = PROFILE_NAMES_CACHE[player.uuid]
-        return PROFILE_NAMES_CACHE[player.uuid]
+        PROFILE_NAMES_CACHE[player.name.lower()] = [p.title() for p in profile_names]
+        return PROFILE_NAMES_CACHE[player.name.lower()]
 
 
 async def buyer_profile(inter: disnake.AppCmdInter, user_input: str) -> list[str]:

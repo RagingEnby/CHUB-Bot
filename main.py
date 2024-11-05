@@ -16,6 +16,7 @@ from modules import mojang
 from modules import usermanager
 from modules import verifier
 from modules import tradereport
+from modules import hypixelapi
 
 
 TSKS = []
@@ -204,20 +205,28 @@ async def test_command(
     buyer_profile: str = misc.profile_param('The profile of the player who bought the item', 'buyer')
 ):
     async with aiohttp.ClientSession() as session:
+        seller_profile = seller_profile.lower()
+        buyer_profile = buyer_profile.lower()
+
         seller_player, buyer_player = await asyncio.gather(
             mojang.get(seller, session=session),
             mojang.get(buyer, session=session)
         )
-        if not seller_player:
+        if not seller_player or not buyer_player:
             return await inter.send(embed=misc.make_error(
-                "Invalid Seller",
-                f"The IGN [{seller}](<https://namemc.com/search?q={seller}>) is not a valid Minecraft username."
+                "Invalid Player(s)",
+                "One or more inputted IGNs are invalid. Please double check your spelling and try again."
             ))
-        if not buyer_player:
+        seller_profiles, buyer_profiles = await asyncio.gather(
+            hypixelapi.get_profile_names(seller_player.uuid, session=session, allowed_types=['normal']),
+            hypixelapi.get_profile_names(buyer_player.uuid, session=session, allowed_types=['normal'])
+        )
+        if seller_profile not in seller_profiles or buyer_profile not in buyer_profiles:
             return await inter.send(embed=misc.make_error(
-                "Invalid Buyer",
-                f"The IGN [{buyer}](<https://namemc.com/search?q={buyer}>) is not a valid Minecraft username."
+                "Invalid Profile(s)",
+                "One or more inputted profile names are invalid. Please double check your spelling and try again."
             ))
+
     await inter.response.send_message(f"```json\n{json.dumps(inter.filled_options, indent=2)}```")
 
 
