@@ -49,11 +49,24 @@ async def ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
         return AUTOCOMPLETE_IGN_CACHE[user_input]
 
 
-async def profile(inter: disnake.AppCmdInter, user_input: str):
+async def profile(inter: disnake.AppCmdInter, ign: Optional[str] = None) -> list[str]:
+    if not ign:
+        return []
+    return [
+        ign,
+        json.dumps(inter.filled_options)
+    ]
     print(inter.filled_options)
     return [
         "test command",
         "why are you using this",
         "aaaaaaaaaaaaa"
     ]
-    
+
+
+async def buyer_profile(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
+    return await profile(inter, inter.filled_options.get('buyer'))
+
+
+async def seller_profile(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
+    return await profile(inter, inter.filled_options.get('seller'))

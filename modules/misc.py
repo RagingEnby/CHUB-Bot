@@ -199,10 +199,10 @@ def ign_param(description: Optional[str]=None) -> commands.Param:  # type: ignor
     )
 
 
-def profile_param(description: Optional[str]=None) -> commands.Param:
+def profile_param(description: str, who: Literal['buyer', 'seller']) -> commands.Param:
     return commands.param(
-        description=description or "A profile name",
-        autocomplete=autocomplete.profile
+        description=description,
+        autocomplete=autocomplete.buyer_profile if who == 'buyer' else autocomplete.seller_profile
     )
 
 
