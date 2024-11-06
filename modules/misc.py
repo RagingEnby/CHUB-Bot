@@ -11,7 +11,7 @@ from disnake.ext import commands
 
 import config
 import datatypes
-from modules import autocomplete, hypixelapi, parser, usermanager
+from modules import autocomplete, hypixelapi, parser, usermanager, asyncreqs
 
 BOT_CLASS = commands.InteractionBot | commands.Bot | commands.AutoShardedBot
 
