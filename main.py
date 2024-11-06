@@ -147,7 +147,11 @@ async def on_message(message: disnake.Message):
                 f"(<https://namemc.com/profile/{disnake.utils.escape_markdown(ign)}>) "
                 "is not a valid Minecraft username."
             ))
-        non_staff = [m for m in message.channel.members if not m.get_role(config.STAFF_ROLE)]
+        non_staff = [
+            m for m in message.channel.members if\
+            not m.get_role(config.APPEAL_STAFF_ROLE) and\
+            not m.bot
+        ]
         if len(non_staff) != 1:
             print("non_staff:", [m.id for m in non_staff])
             return await message.channel.send(f"{config.BOT_DEVELOPER_MENTION} Found multiple non-staff members, see console for details")
