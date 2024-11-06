@@ -158,8 +158,9 @@ async def on_message(message: disnake.Message):
         member = non_staff[0]
         chub = await misc.get_guild(bot)
         ban = None
-        async for ban in chub.bans(limit=None):
+        async for ban_ in chub.bans(limit=None):
             if ban.user.id == member.id:
+                ban = ban_
                 break
         if ban is None:
             return await message.channel.send(f"{member.mention} I was unable to find your ban, please try rejoining Collector's Hub\nhttps://discord.gg/collectors")
