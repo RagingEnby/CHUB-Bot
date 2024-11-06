@@ -159,7 +159,7 @@ async def on_message(message: disnake.Message):
         chub = await misc.get_guild(bot)
         ban = None
         async for ban_ in chub.bans(limit=None):
-            if ban.user.id == member.id:
+            if ban_.user.id == member.id:
                 ban = ban_
                 break
         if ban is None:
