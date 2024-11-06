@@ -154,7 +154,7 @@ async def on_message(message: disnake.Message):
         ]
         if len(non_staff) != 1:
             print("non_staff:", [m.id for m in non_staff])
-            return await message.channel.send(f"{config.BOT_DEVELOPER_MENTION} Found multiple non-staff members, see console for details")
+            return await message.channel.send(f"{config.BOT_DEVELOPER_MENTION} Found multiple (or none) non-staff members, see console for details")
         member = non_staff[0]
         chub = await misc.get_guild(bot)
         ban = None
