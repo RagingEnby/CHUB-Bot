@@ -468,7 +468,6 @@ async def moderation_bulk_blacklist_command(inter: disnake.AppCmdInter, file: di
         "Done!",
         f"Blacklisted `{len(players)}` from the server and banned `{bans}` server members"
     ))
-    
 
 
 @moderation.sub_command(
@@ -499,6 +498,28 @@ async def moderation_force_unverify_command(inter: disnake.AppCmdInter, member: 
     if not await misc.validate_mod_cmd(inter):
         return
     await verifier.unverify_command(inter, member)
+
+
+@moderation.sub_command(
+    name="backgroundcheck",
+    description="Sends an embed with some brief info about a player"
+)
+async def moderation_backgroundcheck_command(inter: disnake.AppCmdInter, member: disnake.Member):
+    if not await misc.validate_mod_cmd(inter):
+        return
+    async with aiohttp.ClientSession() as session:
+        player = await usermanager.get_linked_player(member, session=session)
+        if player is None:
+            return await inter.send(embed=misc.make_error(
+                "Unverified",
+                "The member you tried to background check is not verified."
+            ))
+        embed = await misc.make_backgroundcheck_embed(
+            player=player,
+            member=member,
+            session=session
+        )
+        await inter.send(embed=embed)
 
 
 @bot.slash_command(

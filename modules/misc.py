@@ -243,3 +243,47 @@ def parse_date(date: str) -> Optional[datetime]:
 
 def get_date() -> str:
     return datetime.now().strftime("%m/%d/%Y %I:%M %p")
+
+
+async def make_backgroundcheck_embed(player: datatypes.MinecraftPlayer, member: Optional[disnake.Member]=None, session: Optional[aiohttp.ClientSession]=None) -> disnake.Embed:
+    response = await asyncreqs.get(f'https://api.ragingenby.dev/backgroundcheck/{player.uuid}')
+    data = await response.json()
+    description = [
+        f"**Linked To:** {member.mention}" if member else "",
+        f"**Discord Created:** <t:{int(member.created_at.timestamp())}:R>" if member else "",
+        f"**Joined Server:** <t:{int(member.joined_at.timestamp())}:R>",
+        f"**First Hypixel Login:** <t:{round(data['firstLogin'])//1000}:R>",
+        f"**Possible Alts:** `{', '.join([disnake.utils.escape_markdown(player['name']) for player in data['possibleAlts']]) if data['possibleAlts'] else 'None'}`"
+    ]
+    embed = disnake.Embed(
+        description='\n'.join(description)
+    )
+    embed.set_author(
+        name=data['rankname'],
+        icon_url="https://mc-heads.net/avatar/" + player.uuid
+    )
+    if member:
+        embed.set_footer(
+            text=f"{member.name} ({member.id})",
+            icon_url=member.display_avatar.url
+        )
+    if data['skyblockProfiles']:
+        for profile in data['skyblockProfiles']:
+            value = [
+                f"Selected: {':white_check_mark:' if profile['selected'] else ':x:'}",
+                f"Profile Type: `{profile['game_mode']}`",
+                f"Networth: `{misc.numerize(profile['networth'])}`",
+                f"Level: `{profile['sbLevel']}`",
+                f"Fairy Souls: `{profile['fairySouls']}`",
+            ]
+            for weight_name, weight_value in profile['weight'].items():
+                value.append(f"-# {weight_name.title()} Weight: `{round(weight_value, 2)}`")
+            embed.add_field(
+                name=profile['cute_name'],
+                value='\n'.join(value)
+            )
+    else:
+        embed.add_field(
+            name="sky.shiiyu.moe Error",
+            value="The [sky.shiiyu.moe](<https://sky.shiiyu.moe/>) API is currently unavailable, so SkyBlock profiles are not shown."
+        )

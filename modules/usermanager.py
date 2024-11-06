@@ -21,17 +21,12 @@ async def log_unlink(player: datatypes.MinecraftPlayer):
         await LinkedUsers.save()
 
 
-async def get_linked_player(
-        member: disnake.Member | int, session: Optional[aiohttp.ClientSession] = None, return_player: bool = True
-) -> Optional[datatypes.MinecraftPlayer|str]:
+async def get_linked_player(member: disnake.Member | int, session: Optional[aiohttp.ClientSession] = None) -> Optional[datatypes.MinecraftPlayer]:
     if isinstance(member, disnake.Member):
         member = member.id
     for uuid, discord_id in LinkedUsers.items():
         if discord_id == member:
-            if return_player:
-                return await mojang.get(uuid, session=session)
-            else:
-                return uuid
+            return await mojang.get(uuid, session=session)
     return None
 
 
