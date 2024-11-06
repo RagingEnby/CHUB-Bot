@@ -97,6 +97,17 @@ async def on_member_ban(guild: disnake.Guild, user: disnake.User):
 
 
 @bot.event
+async def on_guild_channel_create(channel: disnake.abc.GuildChannel):
+    if channel.guild.id != config.APPEAL_GUILD_ID:
+        return
+    if not isinstance(channel, disnake.TextChannel):
+        return
+    if not channel.name.startswith('ticket-'):
+        return
+    
+
+
+@bot.event
 async def on_message(message: disnake.Message):
     if message.content.startswith('>exec') and await bot.is_owner(message.author):
         try:
@@ -113,10 +124,44 @@ async def on_message(message: disnake.Message):
             error = traceback.format_exc()
             print(f">exec ERROR:\n{error}")
             await message.reply(f"Error while running code:\n```py\n{error}```")
-    if message.channel.id == config.VERIFICATION_CHANNEL and not await bot.is_owner(message.author):
+    elif message.channel.id == config.VERIFICATION_CHANNEL and not await bot.is_owner(message.author):
         await asyncio.sleep(60)
         with suppress(disnake.errors.NotFound):
             await message.delete()
+    elif message.guild and message.guild.id == config.APPEAL_GUILD_ID and\
+    isinstance(message.channel, disnake.TextChannel) and\
+    message.channel.name.startswith('ticket-') and\
+    message.author.id == config.TICKET_TOOL_ID and 'Welcome' in message.content and\
+    len(message.embeds) == 2:
+        # this is the welcome message in a ticket, for example:
+        # https://i.ragingenby.dev/u/nQpvHm.png
+        description = message.embeds[1].description.replace('**', '').replace('```', '').split('\n')
+        description = [i.strip() for i in description]
+        ign = description[1]
+        inputted_ban_reason = description[3]
+        inputted_ban_date = description[5]
+        player = await mojang.get(ign)
+        if player is None:
+            return await message.reply(embed=misc.make_error(
+                "Invalid IGN",
+                f"(<https://namemc.com/profile/{disnake.utils.escape_markdown(ign)}>) "
+                "is not a valid Minecraft username."
+            ))
+        non_staff = [m for m in message.channel.members if not m.get_role(config.STAFF_ROLE)]
+        if len(non_staff) != 1:
+            print("non_staff:", [m.id for m in non_staff])
+            return await message.channel.send(f"{config.BOT_DEVELOPER_MENTION} Found multiple non-staff members, see console for details")
+        member = non_staff[0]
+        chub = await misc.get_guild(bot)
+        ban = None
+        async for ban in chub.bans(limit=None):
+            if ban.user.id == member.id:
+                break
+        if ban is None:
+            return await message.channel.send(f"{member.mention} I was unable to find your ban, please try rejoining Collector's Hub\nhttps://discord.gg/collectors")
+        embed = await misc.make_backgroundcheck_embed(player=player, member=member)
+        await message.channel.send(f"{member.mention} was banned from CHUB for reason `{ban.reason}`", embed=embed)
+        
 
 
 @bot.event
