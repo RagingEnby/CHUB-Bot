@@ -84,3 +84,10 @@ async def buyer_profile(inter: disnake.AppCmdInter, user_input: str) -> list[str
 
 async def seller_profile(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
     return await profile(inter, user_input, inter.filled_options.get('seller'))
+
+
+async def item(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
+    print(f'Item Autocomplete > [{inter.user.name}]  {user_input}')
+    best_results = [item for item in ITEMS if item.startswith(user_input.lower())]
+    other_results = [item for item in ITEMS if user_input.lower() in item]
+    return (best_results + other_results)[0:25]
