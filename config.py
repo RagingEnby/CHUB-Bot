@@ -1,10 +1,10 @@
 import json
 import time
+
 import requests
 from disnake.ext import commands
 
 from scrts import BOT_TOKEN, HYPIXEL_API_KEY, RAGINGENBY_API_KEY
-
 
 TRADE_REPORT_FILE_PATH: str = "storage/tradereports.json"
 TRADE_REPORT_VERIFICATION_CHANNEL: int = 1297080682517889045

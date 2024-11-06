@@ -1,8 +1,9 @@
-from typing import Literal, Optional
+import json
+from typing import Optional
+from uuid import uuid4
+
 import disnake
 from typing_extensions import TypedDict
-import json
-from uuid import uuid4
 
 
 class MinecraftPlayerDict(TypedDict):

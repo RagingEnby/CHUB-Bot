@@ -1,17 +1,16 @@
 import asyncio
 import json
 import random
-from typing import Optional, Any, Literal
+from datetime import datetime
+from typing import Any, Literal, Optional
 
 import aiofiles
 import aiohttp
 import disnake
-from disnake import user
 from disnake.ext import commands
-from datetime import datetime
 
 import config
-from modules import hypixelapi, parser, usermanager, autocomplete
+from modules import autocomplete, hypixelapi, parser, usermanager
 
 BOT_CLASS = commands.InteractionBot | commands.Bot | commands.AutoShardedBot
 

@@ -1,10 +1,11 @@
-from typing import Optional
-import json
-import base64
-from nbt import nbt
-import io
 import asyncio
+import base64
+import io
+import json
+from typing import Optional
+
 import aiofiles
+from nbt import nbt
 
 
 async def nbt_to_dict(nbt_data) -> dict:

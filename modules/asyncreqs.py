@@ -1,5 +1,4 @@
 import aiohttp
-import json
 
 
 async def get(*args, **kwargs) -> aiohttp.ClientResponse:

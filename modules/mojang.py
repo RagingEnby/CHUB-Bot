@@ -1,7 +1,8 @@
 from typing import Optional
-import aiohttp
-import datatypes
 
+import aiohttp
+
+import datatypes
 from modules import asyncreqs
 
 

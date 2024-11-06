@@ -1,8 +1,9 @@
-from typing import Optional
-from contextlib import suppress
 import asyncio
-import disnake
+from contextlib import suppress
+from typing import Optional
+
 import aiohttp
+import disnake
 import requests
 
 from modules import asyncreqs, hypixelapi, mojang, usermanager

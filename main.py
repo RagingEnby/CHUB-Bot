@@ -1,8 +1,8 @@
-import json
 import asyncio
-from contextlib import suppress
-from typing import Literal, Optional
+import json
 import traceback
+from contextlib import suppress
+from typing import Optional
 
 import aiohttp
 import disnake
@@ -10,15 +10,17 @@ from disnake.ext import commands, tasks
 
 import config
 import ws
-from modules import cmdlogger
-from modules import misc
-from modules import mojang
-from modules import usermanager
-from modules import verifier
-from modules import tradereport
-from modules import hypixelapi
-from modules import asyncreqs
-from modules import autocomplete
+from modules import (
+    asyncreqs,
+    autocomplete,
+    cmdlogger,
+    hypixelapi,
+    misc,
+    mojang,
+    tradereport,
+    usermanager,
+    verifier,
+)
 
 TSKS = []
 

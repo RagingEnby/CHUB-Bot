@@ -1,11 +1,10 @@
-import aiohttp
 from typing import Optional
+
+import aiohttp
 import disnake
 
-from modules import datamanager
-from modules import mojang
-
 import datatypes
+from modules import datamanager, mojang
 
 LinkedUsers = datamanager.DictManager('storage/linkedusers.json')
 BannedUsers = datamanager.DictManager('storage/bannedusers.json')

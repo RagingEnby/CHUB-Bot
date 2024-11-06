@@ -1,16 +1,14 @@
-from typing import Optional, Literal, Any
+import asyncio
+import json
+from typing import Any, Optional
+
+import aiofiles
 import aiohttp
 import disnake
-import aiofiles
-import json
-import asyncio
 
-from modules import mojang
-from modules import misc
-from modules import asyncreqs
-
-import datatypes
 import config
+import datatypes
+from modules import asyncreqs, misc, mojang
 
 BUTTON_ID = 'TradeReport'
 

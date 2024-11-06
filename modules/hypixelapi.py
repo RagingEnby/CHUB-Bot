@@ -1,12 +1,12 @@
+import asyncio
 import json
 from typing import Optional
-import asyncio
-import aiohttp
 
-from modules import asyncreqs
+import aiohttp
 
 import config
 import ws
+from modules import asyncreqs
 
 PLAYER_RATE_LIMIT_MSG = "You have already looked up this player too recently, please try again shortly"
 API_URL = "https://api.hypixel.net/v2"

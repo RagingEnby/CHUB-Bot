@@ -4,11 +4,11 @@
 # with the central program that controls this.
 
 import asyncio
+import json
+from asyncio import CancelledError, TimeoutError
+
 import websockets
 from websockets import ConnectionClosedError, InvalidStatusCode
-from asyncio import CancelledError, TimeoutError
-import json
-
 
 queue = []
 
