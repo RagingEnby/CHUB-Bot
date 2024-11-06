@@ -17,7 +17,8 @@ from modules import usermanager
 from modules import verifier
 from modules import tradereport
 from modules import hypixelapi
-
+from modules import asyncreqs
+from modules import autocomplete
 
 TSKS = []
 
@@ -560,6 +561,17 @@ async def ensure_all_verified_task():
 
 
 TSKS.append(ensure_all_verified_task)
+
+
+
+@tasks.loop(seconds=6000)
+async def update_constants_task():
+    items_response = await asyncreqs.get('https://api.ragingenby.dev/skyblock/item_ids')
+    items_data = await items_response.json()
+    autocomplete.ITEMS = items_data['items']
+
+
+TSKS.append(update_constants_task)
 
 
 @tasks.loop(seconds=30)
