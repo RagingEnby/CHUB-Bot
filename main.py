@@ -204,7 +204,7 @@ async def report_trade_command(
 )
 async def test_command(
     inter: disnake.AppCmdInter,
-    item: str = commands.Param(description='Item traded'),
+    item: str = commands.Param(description='Item traded (one report per unique item)', autocomplete=autocomplete.item),
     value: int = commands.Param(description='Value of the item traded (if more than one quantity, value should be price per unit times quantity)', ge=750000000),
     date: str = commands.Param(description='Date and time of sale in EST (MM/DD/YYYY HH:MM AM/PM)'),
     seller: str = misc.ign_param(description='The player who sold the item'),
