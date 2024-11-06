@@ -56,6 +56,7 @@ async def banned(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
     other_results = [user for user in usermanager.BannedUsers if user_input.lower() in user]
     return (best_results + other_results)[0:25]
 
+
 async def profile(inter: disnake.AppCmdInter, user_input: str, ign: Optional[str] = None) -> list[str]:
     print(f'Profile Autocomplete > [{inter.user.name}]  {user_input}')
     if not ign:
