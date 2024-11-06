@@ -3,9 +3,11 @@ from contextlib import suppress
 import asyncio
 import disnake
 import aiohttp
+import requests
 
-from modules import asyncreqs, hypixelapi, mojang
+from modules import asyncreqs, hypixelapi, mojang, usermanager
 
+ITEMS: dict[str, str] = requests.get('https://api.ragingenby.dev/skyblock/item_ids').json()['items']
 AUTOCOMPLETE_IGN_CACHE: dict[str, list[str]] = {}
 PROFILE_NAMES_CACHE: dict[str, list[str]] = {}
 
@@ -48,8 +50,14 @@ async def ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
         return AUTOCOMPLETE_IGN_CACHE[user_input]
 
 
+async def banned(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
+    print(f'Banned Autocomplete > [{inter.user.name}]  {user_input}')
+    best_results = [user for user in usermanager.BannedUsers if user.startswith(user_input.lower())]
+    other_results = [user for user in usermanager.BannedUsers if user_input.lower() in user]
+    return (best_results + other_results)[0:25]
+
 async def profile(inter: disnake.AppCmdInter, user_input: str, ign: Optional[str] = None) -> list[str]:
-    print(f'profile Autocomplete > [{inter.user.name}]  {user_input}')
+    print(f'Profile Autocomplete > [{inter.user.name}]  {user_input}')
     if not ign:
         return []
     ign = ign.lower()

@@ -11,16 +11,6 @@ LinkedUsers = datamanager.DictManager('storage/linkedusers.json')
 BannedUsers = datamanager.DictManager('storage/bannedusers.json')
 
 
-class AutocompleteOption:
-    LinkedUUIDs = 0
-    BannedUuids = 1
-
-
-async def autocomplete_banned(_: disnake.AppCmdInter, arg: str) -> list[str]:
-    results = [user for user in BannedUsers.keys() if arg.lower() in user.lower()]
-    return results[0:25]
-    
-
 async def log_link(member: disnake.Member, player: datatypes.MinecraftPlayer):
     LinkedUsers.data[player.uuid] = member.id
     await LinkedUsers.save()

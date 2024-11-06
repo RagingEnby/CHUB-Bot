@@ -370,8 +370,8 @@ async def moderation_kick_command(inter: disnake.AppCmdInter, member: disnake.Me
     name="unblacklist",
     description="Unblacklist a Minecraft player from the server"
 )
-async def moderation_unban_command(inter: disnake.AppCmdInter, player: str = commands.Param(
-    autocomplete=usermanager.autocomplete_banned,
+async def moderation_unblacklist_command(inter: disnake.AppCmdInter, player: str = commands.Param(
+    autocomplete=autocomplete.banned,
     description="The Minecraft UUID of the player to unblacklist",
     min_length=32,
     max_length=32
