@@ -246,7 +246,7 @@ def get_date() -> str:
 
 
 async def make_backgroundcheck_embed(player: datatypes.MinecraftPlayer, member: Optional[disnake.Member]=None, session: Optional[aiohttp.ClientSession]=None) -> disnake.Embed:
-    response = await asyncreqs.get(f'https://api.ragingenby.dev/backgroundcheck/{player.uuid}')
+    response = await asyncreqs.get(f'https://api.ragingenby.dev/backgroundcheck/{player.uuid}', session=session)
     data = await response.json()
     description = [
         f"**Linked To:** {member.mention}" if member else "",
@@ -272,7 +272,7 @@ async def make_backgroundcheck_embed(player: datatypes.MinecraftPlayer, member: 
             value = [
                 f"Selected: {':white_check_mark:' if profile['selected'] else ':x:'}",
                 f"Profile Type: `{profile['game_mode']}`",
-                f"Networth: `{misc.numerize(profile['networth'])}`",
+                f"Networth: `{numerize(profile['networth'])}`",
                 f"Level: `{profile['sbLevel']}`",
                 f"Fairy Souls: `{profile['fairySouls']}`",
             ]
