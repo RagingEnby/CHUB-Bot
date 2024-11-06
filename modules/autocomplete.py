@@ -13,7 +13,7 @@ AUTOCOMPLETE_IGN_CACHE: dict[str, list[str]] = {}
 PROFILE_NAMES_CACHE: dict[str, list[str]] = {}
 
 
-async def ign(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
+async def ign(inter: disnake.AppCmdInter, user_input: str) -> Optional[list[str]]:
     user_input = user_input.lower().strip().replace('/', '').replace(' ', '_')
     print(f'IGN Autocomplete > [{inter.user.name}]  {user_input}')
     if not user_input:

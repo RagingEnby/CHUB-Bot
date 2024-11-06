@@ -54,7 +54,8 @@ class ListManager:
     def __init__(self, file_path: str):
         self.file_path = file_path
         try:
-            self.data = json.load(open(file_path, 'r'))
+            with open(file_path, 'r') as file:
+                self.data = json.load(file)
         except FileNotFoundError:
             self.data = []
 

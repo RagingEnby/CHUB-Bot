@@ -52,7 +52,7 @@ async def ensure_data(endpoint: str,
         data = await response.json()
         if data.get('cause') == PLAYER_RATE_LIMIT_MSG:
             if id_ in LAST_RESPONSE:
-                return LAST_RESPONSE[id_]
+                return LAST_RESPONSE[id_] # type: ignore
             await asyncio.sleep(35)
             return await ensure_data(endpoint, params, session=session)
         important_headers = {k: v for k, v in dict(response.headers).items() if k.startswith('ratelimit-')}

@@ -69,7 +69,7 @@ async def get_item_list(session: Optional[aiohttp.ClientSession]=None) -> dict[s
     return {}
 
 
-async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
+async def on_button_click(inter: disnake.MessageInteraction, button_data: str): # type: ignore
     # im FULLY aware this is a bad and long function. i just cba to make it better
     # if it works it works :shrug:
     button_data: dict[str, Any] = json.loads(button_data)
@@ -146,7 +146,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
     except asyncio.TimeoutError:
         return await inter.author.send('Your trade report window has timed out and is no longer valid.')
 
-    if not modal_inter.user.get_role(config.RECENT_SALES_JURY_ROLE):
+    if not modal_inter.user.get_role(config.RECENT_SALES_JURY_ROLE): # type: ignore
         return await modal_inter.send(embed=misc.make_error(
             "No Permissions",
             f"You must have the <@&{config.RECENT_SALES_JURY_ROLE}> role to send trade reports"
@@ -190,7 +190,7 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
         # this is a duplicate interaction call
         return
     SENT_REPORTS.append(trade_report.id)
-    msg = await channel.send(embed=embed)
+    msg = await channel.send(embed=embed) # type: ignore
     await inter.message.delete()
     if author:
         try:
@@ -202,11 +202,6 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str):
         "Sent Trade Report!",
         f"View it at {msg.jump_url}"
     ), ephemeral=True)
-
-
-async def send_log_msg(inter: disnake.AppCmdInter, report: datatypes.TradeReport):
-    channel = inter.bot.get_channel(config.TRADE_REPORT_VERIFICATION_CHANNEL)
-    await channel.send()
 
 
 async def report_trade_command(
@@ -254,7 +249,7 @@ async def report_trade_command(
         await log_trade_report(trade_report)
         
         channel = inter.bot.get_channel(config.TRADE_REPORT_VERIFICATION_CHANNEL)
-        msg = await channel.send(
+        msg = await channel.send( # type: ignore
             content=f"<@&{config.RECENT_SALES_JURY_ROLE}>",
             embed=trade_report.to_embed(),
             components=[

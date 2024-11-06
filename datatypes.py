@@ -94,7 +94,7 @@ class TradeReport:
             case "denied":
                 return disnake.Color.red()
             case _:
-                return disnake.Color.black()
+                return disnake.Color.dark_gray()
 
     def to_dict(self) -> dict:
         return {

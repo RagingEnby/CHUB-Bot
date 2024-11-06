@@ -16,14 +16,14 @@ BOT_CLASS = commands.InteractionBot | commands.Bot | commands.AutoShardedBot
 
 
 async def get_user_from_name(bot: BOT_CLASS, name: str) -> Optional[disnake.Member]:
-    for member in bot.get_guild(config.GUILD_ID).members:
+    for member in bot.get_guild(config.GUILD_ID).members: # type: ignore
         if member.name == name:
             return member
     return None
 
 
 async def get_guild(bot: BOT_CLASS) -> disnake.Guild:
-    return bot.get_guild(config.GUILD_ID)
+    return bot.get_guild(config.GUILD_ID) # type: ignore
 
 
 async def get_members(bot: BOT_CLASS) -> list[disnake.Member]:
@@ -164,17 +164,17 @@ async def validate_mod_cmd(inter: disnake.AppCmdInter, role: Optional[disnake.Ro
     if not inter.guild or (inter.guild and inter.guild.id != config.GUILD_ID):
         await inter.send(embed=NOT_GUILD_ERROR)
         return False
-    if not inter.author.get_role(config.STAFF_ROLE):
+    if not inter.author.get_role(config.STAFF_ROLE): # type: ignore
         await inter.send(embed=make_error(
             "no permissions",
             f"You must have the <@&{config.STAFF_ROLE}> role to use this command!"
         ))
         return False
-    if role and inter.author.top_role <= role:
+    if role and inter.author.top_role <= role: # type: ignore
         await inter.send(embed=make_error(
             "not allowed",
             f"You are not allowed to give away this role as it is above your top role "
-            f"({inter.author.top_role.mention()})"
+            f"({inter.author.top_role.mention()})" # type: ignore
         ))
     return True
 
@@ -197,7 +197,7 @@ def ign_param(description: Optional[str]=None) -> commands.Param:  # type: ignor
     )
 
 
-def profile_param(description: str, who: Literal['buyer', 'seller']) -> commands.Param:
+def profile_param(description: str, who: Literal['buyer', 'seller']) -> commands.Param: # type: ignore
     return commands.param(
         description=description,
         autocomplete=autocomplete.buyer_profile if who == 'buyer' else autocomplete.seller_profile

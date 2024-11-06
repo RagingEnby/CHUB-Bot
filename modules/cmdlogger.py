@@ -28,7 +28,7 @@ async def on_slash_command(inter: disnake.AppCmdInter):
             text='DMs'
         )
     channel = inter.bot.get_channel(config.LOG_CHANNEL)
-    log_msgs[inter.id] = await channel.send(embed=embed)
+    log_msgs[inter.id] = await channel.send(embed=embed) # type: ignore
 
 
 async def on_slash_command_completion(inter: disnake.AppCmdInter):
