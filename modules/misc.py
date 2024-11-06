@@ -114,8 +114,7 @@ async def get_guild_members(session: Optional[aiohttp.ClientSession] = None) -> 
 
 
 def make_cmd_str(inter: disnake.AppCmdInter) -> str:
-    params_data = {option.name: option.value for option in inter.data.options}
-    log_params = " ".join([f"{name}:{value}" for name, value in params_data.items()])
+    log_params = " ".join([f"{name}:{value}" for name, value in inter.filled_options.items()])
     return f"/{inter.data.name} {log_params}" if log_params else f"/{inter.data.name}"
 
 
