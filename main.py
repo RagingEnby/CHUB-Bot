@@ -68,7 +68,7 @@ async def on_ready():
         if not TSK.is_running():
             TSK.start()
     verification_channel = bot.get_channel(config.VERIFICATION_CHANNEL)
-    async for msg in verification_channel.history(limit=None):
+    async for msg in verification_channel.history(limit=None): # type: ignore
         if msg.author.id != config.BOT_DEVELOPER_ID:
             asyncio.create_task(msg.delete())
     print('bot ready')
@@ -86,12 +86,12 @@ async def on_member_ban(guild: disnake.Guild, user: disnake.User):
         # server, the only way to get the moderator responsible is through audit logs
         moderator: Optional[disnake.Member] = None
         async for audit_ban in guild.audit_logs(limit=5, action=disnake.AuditLogAction.ban):
-            if audit_ban.target.id == user.id:
+            if audit_ban.target.id == user.id: # type: ignore
                 # IDEs don't like this since AuditLogEntry.user isn't always Member, but in this instance it is:
-                moderator = audit_ban.user
+                moderator = audit_ban.user # type: ignore
                 break
         channel = bot.get_channel(config.STAFF_CHANNEL)
-        await channel.send(f"{(moderator.mention + ' ') if moderator else ''}"
+        await channel.send(f"{(moderator.mention + ' ') if moderator else ''}" # type: ignore
                            f"**{disnake.utils.escape_markdown(ban.user.name)}** ({ban.user.mention}) "
                            f"was banned without reason. Please remember to provide a reason when banning users!!!!")
 
@@ -121,7 +121,7 @@ async def on_message(message: disnake.Message):
 
 @bot.event
 async def on_button_click(inter: disnake.MessageInteraction):
-    button_type, button_data = inter.component.custom_id.split('|', 1)
+    button_type, button_data = inter.component.custom_id.split('|', 1) # type: ignore
     match button_type:
         case tradereport.BUTTON_ID:
             return await tradereport.on_button_click(inter, button_data)
@@ -438,6 +438,12 @@ async def moderation_blacklist_command(inter: disnake.AppCmdInter, player: str =
     description="Blacklist a group of players at once"
 )
 async def moderation_bulk_blacklist_command(inter: disnake.AppCmdInter, file: disnake.Attachment, reason: str):
+    return await inter.response.send_message(embed=misc.make_error(
+        "Broken Command",
+        "This command is broken and I haven't bothered fixing it because afaik, "
+        "it's not needed atm. If you have a use case for this command, ping "
+        "RagingEnby and I'll fix it."
+    ))
     if not await misc.validate_mod_cmd(inter):
         return
     invalid_format_err = misc.make_error(
@@ -583,7 +589,7 @@ async def ensure_tasks_working():
         return
     channel = bot.get_channel(config.BOT_DEV_CHANNEL)
     formatted_tasks = '\n'.join([str(tsk) for tsk in broken_tasks])
-    await channel.send(f"{config.BOT_DEVELOPER_MENTION} `{len(broken_tasks)}` tasks broke:\n```{formatted_tasks}```")
+    await channel.send(f"{config.BOT_DEVELOPER_MENTION} `{len(broken_tasks)}` tasks broke:\n```{formatted_tasks}```") # type: ignore
     for tsk in broken_tasks:
         tsk.start()
 
