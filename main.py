@@ -358,7 +358,7 @@ async def moderation_kick_command(inter: disnake.AppCmdInter, member: disnake.Me
             f"I do not have permissions to kick {member.mention}."
         ))
     await inter.send(embed=misc.make_success(
-        "success",
+        "Success",
         f"Kicked {member.mention} for reason `{reason}`."
     ))
 
