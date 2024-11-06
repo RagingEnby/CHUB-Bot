@@ -1,3 +1,5 @@
 BOT_TOKEN: str = "DISCORD_BOT_TOKEN"
 
 HYPIXEL_API_KEY: str = "HYPIXEL_API_KEY"
+
+RAGINGENBY_API_KEY: str = "these are private, if you decide to selfhost this bot, dm me on disc @ragingenby and i can help you out"
