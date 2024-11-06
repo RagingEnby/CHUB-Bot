@@ -10,6 +10,7 @@ import disnake
 from disnake.ext import commands
 
 import config
+import datatypes
 from modules import autocomplete, hypixelapi, parser, usermanager
 
 BOT_CLASS = commands.InteractionBot | commands.Bot | commands.AutoShardedBot
