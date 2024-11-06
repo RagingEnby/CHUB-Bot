@@ -52,13 +52,15 @@ async def ign(inter: disnake.AppCmdInter, user_input: str) -> Optional[list[str]
 
 
 async def banned(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
+    user_input = user_input.lower()
     print(f'Banned Autocomplete > [{inter.user.name}]  {user_input}')
-    best_results = [user for user in usermanager.BannedUsers if user.startswith(user_input.lower())]
-    other_results = [user for user in usermanager.BannedUsers if user_input.lower() in user]
+    best_results = [user for user in usermanager.BannedUsers if user.startswith(user_input)]
+    other_results = [user for user in usermanager.BannedUsers if user_input in user]
     return (best_results + other_results)[0:25]
 
 
 async def profile(inter: disnake.AppCmdInter, user_input: str, ign: Optional[str] = None) -> list[str]:
+    user_input = user_input.lower()
     print(f'Profile Autocomplete > [{inter.user.name}]  {user_input}')
     if not ign:
         return []
@@ -87,7 +89,8 @@ async def seller_profile(inter: disnake.AppCmdInter, user_input: str) -> list[st
 
 
 async def item(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
+    user_input = user_input.lower()
     print(f'Item Autocomplete > [{inter.user.name}]  {user_input}')
-    best_results = [item for item in ITEMS if item.startswith(user_input.lower())]
-    other_results = [item for item in ITEMS if user_input.lower() in item]
+    best_results = [item for item in ITEMS if item.startswith(user_input)]
+    other_results = [item for item in ITEMS if user_input in item]
     return (best_results + other_results)[0:25]
