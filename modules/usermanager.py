@@ -18,7 +18,6 @@ async def log_link(member: disnake.Member, player: datatypes.MinecraftPlayer):
 async def log_unlink(player: datatypes.MinecraftPlayer|str):
     if isinstance(player, datatypes.MinecraftPlayer):
         player = player.uuid
-    print('UNLINKING:', player)
     if player in LinkedUsers.data:
         del LinkedUsers[player]
 

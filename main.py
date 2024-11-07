@@ -634,6 +634,7 @@ async def update_linked_players_task():
         linked_users = await misc.randomize_dict_order(usermanager.LinkedUsers.data)
         for uuid, discord_id in linked_users.items():
             if discord_id not in member_dict:
+                print("UNLINKING:", uuid, discord_id)
                 await usermanager.log_unlink(uuid)
                 continue
             elif discord_id == bot.user.id:
