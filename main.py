@@ -104,6 +104,15 @@ async def on_member_unban(guild: disnake.Guild, user: disnake.User):
 
 
 @bot.event
+async def on_member_remove(member: disnake.Member):
+    if member.guild.id != config.GUILD_ID:
+        return
+    uuid = await usermanager.get_linked_player(member, return_uuid=True)
+    if uuid:
+        await usermanager.log_unlink(uuid)
+
+
+@bot.event
 async def on_guild_channel_create(channel: disnake.abc.GuildChannel):
     if channel.guild.id != config.APPEAL_GUILD_ID:
         return
@@ -624,7 +633,9 @@ async def update_linked_players_task():
         member_dict = await misc.get_member_dict(bot)
         linked_users = await misc.randomize_dict_order(usermanager.LinkedUsers.data)
         for uuid, discord_id in linked_users.items():
-            if discord_id not in member_dict or discord_id == bot.user.id:
+            if discord_id not in member_dict:
+                await usermanager.log_unlink(uuid)
+            elif discord_id == bot.user.id:
                 continue
             await update_players_task_single(uuid, member_dict[discord_id], session=session)
             await asyncio.sleep(3.5)  # rate limit sucks ass
