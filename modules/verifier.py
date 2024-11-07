@@ -121,8 +121,11 @@ async def remove_verification(member: disnake.Member):
 async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[disnake.Member] = None):
     if member is None:
         member = inter.user
-    async with aiohttp.ClientSession() as session:        
-        if await usermanager.is_linked(member):
+    async with aiohttp.ClientSession() as session:
+        linked_player = await usermanager.get_linked_player(inter.author, session=session)
+        if linked_player and linked_player.name.lower() == ign.lower():
+            return await update_command(inter, member)
+        elif linked_player:
             return await inter.send(embed=misc.make_error(
                 "Already Verified",
                 "Your discord account is already linked. Use /unverify first."

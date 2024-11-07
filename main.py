@@ -97,6 +97,13 @@ async def on_member_ban(guild: disnake.Guild, user: disnake.User):
 
 
 @bot.event
+async def on_member_unban(guild: disnake.Guild, user: disnake.User):
+    if guild.id != config.GUILD_ID:
+        return
+    await usermanager.log_unban(user.id)
+
+
+@bot.event
 async def on_guild_channel_create(channel: disnake.abc.GuildChannel):
     if channel.guild.id != config.APPEAL_GUILD_ID:
         return
@@ -298,8 +305,6 @@ async def test_command(
             ))
 
     await inter.response.send_message(f"```json\n{json.dumps(inter.filled_options, indent=2)}```")
-
-
 
 
 @bot.slash_command(

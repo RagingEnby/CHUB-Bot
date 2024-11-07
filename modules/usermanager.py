@@ -44,5 +44,13 @@ async def log_ban(member: disnake.Member | int, reason: Optional[str]):
     await BannedUsers.save()
 
 
+async def log_unban(member: disnake.Member | int):
+    if isinstance(member, disnake.Member):
+        member = member.id
+    uuids = [uuid for uuid, reason in BannedUsers.items() if reason.startswith(f"{member} | ")]
+    for uuid in uuids:
+        del BannedUsers.data[uuid]
+
+
 def is_banned(player: datatypes.MinecraftPlayer) -> tuple[bool, Optional[str]]:
     return player.uuid in BannedUsers, BannedUsers.get(player.uuid)
