@@ -635,6 +635,7 @@ async def update_linked_players_task():
         for uuid, discord_id in linked_users.items():
             if discord_id not in member_dict:
                 await usermanager.log_unlink(uuid)
+                continue
             elif discord_id == bot.user.id:
                 continue
             await update_players_task_single(uuid, member_dict[discord_id], session=session)
