@@ -370,7 +370,7 @@ async def moderation_ban_command(inter: disnake.AppCmdInter, member: disnake.Mem
 
     reason = reason + f" | Banned by {inter.author.name} ({inter.author.id})"
     try:
-        await member.send(f'You were banned from Collector\'s Hub for reason `{disnake.utils.escape_markdown(reason)}`\nYou can appeal your ban at https://discord.gg/xzPzwR6AFu')
+        await member.send(f'You were banned from Collector\'s Hub for reason `{disnake.utils.escape_markdown(reason)}`\nYou can appeal your ban at https://discord.gg/6VAAvW7pAm')
     except Exception as e:
         print("unable to dm member during ban:", member.name, member.id, e)
     try:
