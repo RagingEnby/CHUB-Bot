@@ -284,8 +284,8 @@ async def make_backgroundcheck_embed(player: datatypes.MinecraftPlayer, member: 
             )
     else:
         embed.add_field(
-            name="sky.shiiyu.moe Error",
-            value="The [sky.shiiyu.moe](<https://sky.shiiyu.moe/>) API is currently unavailable, so SkyBlock profiles are not shown."
+            name="No Profiles",
+            value="No SkyBlock profiles found"
         )
     return embed
     
