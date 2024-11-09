@@ -587,20 +587,27 @@ async def moderation_backgroundcheck_command(inter: disnake.AppCmdInter, member:
 
 
 @bot.slash_command(
-    name="ec",
+    name="exotic",
     description="Sends the link to Exotic Cafe Discord"
 )
-async def ec_command(inter: disnake.AppCmdInter):
-    await inter.response.send_message("You can sell your Exotics here!\nhttps://discord.gg/QumkPh6vGd")
+async def exotic_command(inter: disnake.AppCmdInter):
+    await inter.response.send_message("Sell your Exotics here!\nhttps://discord.gg/QumkPh6vGd")
 
 
 @bot.slash_command(
-    name="cc",
+    name="crystal",
     description="Sends the link to Crystal Cafe Discord"
 )
-async def cc_command(inter: disnake.AppCmdInter):
-    await inter.response.send_message(
-        "Sell your Crystal/Fairy armor here!\nhttps://discord.gg/crystalcafe")
+async def crystal_command(inter: disnake.AppCmdInter):
+    await inter.response.send_message("Sell your Crystal/Fairy armor here!\nhttps://discord.gg/crystalcafe")
+
+
+@bot.slash_command(
+    name="seymour",
+    description="Sends the link to Tuxedo Cafe Discord"
+)
+async def seymour_command(inter: disnake.AppCmdInter):
+    await inter.response.send_message("Sell your Seymour armor here!\nhttps://discord.gg/uSB4XUGh3e")
 
 
 @bot.slash_command(
