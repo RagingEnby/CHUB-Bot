@@ -13,41 +13,41 @@ import config
 import datatypes
 from modules import autocomplete, hypixelapi, parser, usermanager, asyncreqs
 
-BOT_CLASS = commands.InteractionBot | commands.Bot | commands.AutoShardedBot
+Bot = commands.InteractionBot | commands.Bot | commands.AutoShardedBot
 
 
-async def get_user_from_name(bot: BOT_CLASS, name: str) -> Optional[disnake.Member]:
+async def get_user_from_name(bot: Bot, name: str) -> Optional[disnake.Member]:
     for member in bot.get_guild(config.GUILD_ID).members: # type: ignore
         if member.name == name:
             return member
     return None
 
 
-async def get_guild(bot: BOT_CLASS) -> disnake.Guild:
+async def get_guild(bot: Bot) -> disnake.Guild:
     return bot.get_guild(config.GUILD_ID) # type: ignore
 
 
-async def get_members(bot: BOT_CLASS) -> list[disnake.Member]:
+async def get_members(bot: Bot) -> list[disnake.Member]:
     guild = await get_guild(bot)
     return guild.members
 
 
-async def get_member(bot: BOT_CLASS, user_id: int) -> Optional[disnake.Member]:
+async def get_member(bot: Bot, user_id: int) -> Optional[disnake.Member]:
     guild = await get_guild(bot)
     return guild.get_member(user_id)
 
 
-async def get_member_dict(bot: BOT_CLASS) -> dict[int, disnake.Member]:
+async def get_member_dict(bot: Bot) -> dict[int, disnake.Member]:
     members = await get_members(bot)
     return {member.id: member for member in members}
 
 
-async def get_role(bot: BOT_CLASS, role_id: int) -> Optional[disnake.Role]:
+async def get_role(bot: Bot, role_id: int) -> Optional[disnake.Role]:
     guild = await get_guild(bot)
     return guild.get_role(role_id)
 
 
-async def ban_member(bot: BOT_CLASS, user_id: int, reason: Optional[str] = None):
+async def ban_member(bot: Bot, user_id: int, reason: Optional[str] = None):
     guild = await get_guild(bot)
     await guild.ban(disnake.Object(user_id), reason=reason)
 
@@ -220,7 +220,7 @@ def should_scan_museum(game_mode: str, member: dict[str, Any]) -> bool:
     return True
 
 
-def uuid_to_user(uuid: str, bot: BOT_CLASS) -> Optional[disnake.User]:
+def uuid_to_user(uuid: str, bot: Bot) -> Optional[disnake.User]:
     user_id = usermanager.LinkedUsers.get(uuid)
     if user_id is None:
         return None
