@@ -93,4 +93,4 @@ async def item(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
     print(f'Item Autocomplete > [{inter.user.name}]  {user_input}')
     best_results = [item for item in ITEMS if item.lower().startswith(user_input)]
     other_results = [item for item in ITEMS if user_input in item.lower()]
-    return (best_results + other_results)[0:25]
+    return list(set(best_results + other_results))[0:25]
