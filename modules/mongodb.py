@@ -2,6 +2,7 @@ from bson import Timestamp
 import disnake
 import asyncio
 from typing import Optional
+import time
 
 import motor.motor_asyncio
 from pymongo import InsertOne, UpdateOne
