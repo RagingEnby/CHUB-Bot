@@ -1,21 +1,15 @@
-from contextlib import suppress
 import json
 import time
+from contextlib import suppress
 from typing import Optional
 
-import aiofiles
 import aiohttp
 import disnake
 from disnake.errors import Forbidden
-from requests.sessions import SessionRedirectMixin
 
 import config
 import datatypes
-from modules import hypixelapi
-from modules import misc
-from modules import mojang
-from modules import roles
-from modules import usermanager
+from modules import hypixelapi, misc, mojang, roles, usermanager
 
 
 async def log_verification(inter: disnake.AppCmdInter, player: datatypes.MinecraftPlayer,
