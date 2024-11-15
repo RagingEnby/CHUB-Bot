@@ -599,7 +599,7 @@ async def exotic_command(inter: disnake.AppCmdInter):
     description="Sends the link to Crystal Cafe Discord"
 )
 async def crystal_command(inter: disnake.AppCmdInter):
-    await inter.response.send_message("Sell your Crystal/Fairy armor here!\nhttps://discord.gg/crystalcafe")
+    await inter.response.send_message("Sell your Crystal/Fairy armor here!\nhttps://discord.gg/CqutNumHB3")
 
 
 @bot.slash_command(
