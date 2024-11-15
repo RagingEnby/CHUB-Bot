@@ -86,6 +86,7 @@ async def message_to_dict(message: disnake.Message) -> dict:
         "cleanContent": message.clean_content,
         "systemContent": message.system_content,
         "author": message.author.id,
+        "bot": author.bot,
         "channel": message.channel.id,
         "category": message.channel.category_id if hasattr(message.channel, 'category_id') else None, # type: ignore
         "guild": message.guild.id if message.guild else None,
