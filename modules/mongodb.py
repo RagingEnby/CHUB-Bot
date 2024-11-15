@@ -134,6 +134,6 @@ async def message_to_dict(message: disnake.Message, deleted: bool=False) -> dict
     }
 
 
-async def log_msg(message: disnake.Message):
-    await message_db.add(await message_to_dict(message))
+async def log_msg(message: disnake.Message, deleted: bool=False):
+    await message_db.add(await message_to_dict(message, deleted=deleted))
     
