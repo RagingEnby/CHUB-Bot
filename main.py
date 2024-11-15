@@ -201,7 +201,14 @@ async def on_message(message: disnake.Message):
 
 @bot.event
 async def on_message_delete(message: disnake.Message):
-    await mongodb.log_msg(message, deleted=True)
+    await mongodb.log_msg_delete(message)
+
+
+@bot.event
+async def on_raw_message_delete(payload: disnake.RawMessageDeleteEvent):
+    if payload.cached_message:
+        return
+    await mongodb.log_msg_delete(payload.message_id)
 
 
 @bot.event

@@ -136,4 +136,19 @@ async def message_to_dict(message: disnake.Message, deleted: bool=False) -> dict
 
 async def log_msg(message: disnake.Message, deleted: bool=False):
     await message_db.add(await message_to_dict(message, deleted=deleted))
+
+
+async def log_msg_delete(message: disnake.Message|int):
+    if isinstance(message, disnake.Message):
+        return await log_msg(message, deleted=True)
+        
+    await message_db.collection.update_one(
+        {"_id": message},
+        {
+            "$set": {
+                "deleted": True,
+                "deletedAt": Timestamp(int(time.time()), 1),
+            }
+        }
+    )
     
