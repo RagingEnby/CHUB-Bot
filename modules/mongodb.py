@@ -1,3 +1,4 @@
+from bson import Timestamp
 import disnake
 import asyncio
 from typing import Optional
@@ -75,18 +76,20 @@ message_db = Database(
 )
 
 
-async def message_to_dict(message: disnake.Message) -> dict:
+async def message_to_dict(message: disnake.Message, deleted: bool=False) -> dict:
     return {
         "_id": message.id,
         "type": message.type,
-        "createdAt": message.created_at.timestamp(),
-        "editedAt": message.edited_at.timestamp() if message.edited_at else None,
+        "createdAt": Timestamp(int(message.created_at.timestamp()), 1),
+        "editedAt": Timestamp(int(message.edited_at.timestamp()), 1) if message.edited_at else None,
+        "deletedAt": Timestamp(int(time.time()), 1) if deleted else None,
         "pinned": message.pinned,
         "content": message.content,
+        "deleted": deleted,
         "cleanContent": message.clean_content,
         "systemContent": message.system_content,
         "author": message.author.id,
-        "bot": author.bot,
+        "bot": message.author.bot,
         "channel": message.channel.id,
         "category": message.channel.category_id if hasattr(message.channel, 'category_id') else None, # type: ignore
         "guild": message.guild.id if message.guild else None,

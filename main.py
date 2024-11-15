@@ -197,7 +197,21 @@ async def on_message(message: disnake.Message):
             return await message.channel.send(f"{member.mention} I was unable to find your ban, please try rejoining Collector's Hub\nhttps://discord.gg/collectors")
         embed = await misc.make_backgroundcheck_embed(player=player, member=member)
         await message.channel.send(f"{member.mention} was banned from CHUB for reason `{ban.reason}`", embed=embed)
-        
+
+
+@bot.event
+async def on_message_delete(message: disnake.Message):
+    await mongodb.log_msg(message, deleted=True)
+
+
+@bot.event
+async def on_reaction_add(reaction: disnake.Reaction, user: disnake.User):
+    await mongodb.log_msg(reaction.message)
+
+
+@bot.event
+async def on_reaction_remove(reaction: disnake.Reaction, user: disnake.User):
+    await mongodb.log_msg(reaction.message)
 
 
 @bot.event
