@@ -80,8 +80,8 @@ async def message_to_dict(message: disnake.Message, deleted: bool=False) -> dict
     return {
         "_id": message.id,
         "type": message.type,
-        "createdAt": Timestamp(int(message.created_at.timestamp()*1000), 1),
-        "editedAt": Timestamp(int(message.edited_at.timestamp()*1000), 1) if message.edited_at else None,
+        "createdAt": Timestamp(int(message.created_at.timestamp()), 1),
+        "editedAt": Timestamp(int(message.edited_at.timestamp()), 1) if message.edited_at else None,
         "deletedAt": Timestamp(int(time.time()), 1) if deleted else None,
         "pinned": message.pinned,
         "content": message.content,
