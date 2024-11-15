@@ -17,4 +17,5 @@ async def get(
     data = await response.json()
     if 'id' in data and 'name' in data:
         return datatypes.MinecraftPlayer.from_dict(data)
+    print(f'mojang.get({identifier}) > {data}')
     return None
