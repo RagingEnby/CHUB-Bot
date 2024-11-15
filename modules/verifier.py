@@ -119,20 +119,16 @@ async def remove_verification(member: disnake.Member):
 
 
 async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[disnake.Member] = None):
-    if member is None:
-        member = inter.user
+    member: disnake.Member = member or inter.user # type: ignore
     async with aiohttp.ClientSession() as session:
-        linked_player = await usermanager.get_linked_player(inter.author, session=session)
-        if linked_player and linked_player.name.lower() == ign.lower():
-            return await update_command(inter, member)
-        elif linked_player:
+        linked_player = await usermanager.get_linked_player(inter.author, session=session) # type: ignore
+        if linked_player:
             return await inter.send(embed=misc.make_error(
                 "Already Verified",
                 "Your discord account is already linked. Use /unverify first."
             ))
 
         player = await mojang.get(ign, session=session)
-
 
         if player is None:
             return await inter.send(embed=misc.make_error(
@@ -143,12 +139,12 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
             ))
 
         discord = await get_linked_discord(player, session=session)
-        if str(discord).lower() != member.name.lower():
+        if str(discord).lower() != member.name.lower(): # type: ignore
             return await inter.send(embed=misc.make_error(
                 "Discord Mismatch",
                 {
                     "IGN": player.name,
-                    "Your Discord": member.name,
+                    "Your Discord": member.name, # type: ignore
                     "Linked Discord": discord
                 }
             ))
@@ -161,45 +157,44 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
                 "You've been detected ban evading. Please reach out to a staff member if this is incorrect."
             )
             await inter.send(embed=embed)
-            print(f'found a smelly ban evader (ign: {ign}, uuid: {player.uuid}, reason: {reason}, '
-                  f'member.id: {member.id})')
+            print(f'found a smelly ban evader (ign: {ign}, uuid: {player.uuid}, '
+                  f'reason: {reason}, member.id: {member.id})') # type: ignore
             try:
                 await inter.user.send(embed=embed)
             except Exception as e:
-                print(f"couldn't dm ban evading user {member.name} ({member.id}): {e}")
-            return await misc.ban_member(inter.bot, member.id, reason)
+                print(f"couldn't dm ban evading user {member.name} ({member.id}): {e}") # type: ignore
+            return await misc.ban_member(inter.bot, member.id, reason) # type: ignore
 
         with suppress(Forbidden):
             await member.add_roles(disnake.Object(config.VERIFIED_ROLE), reason=f'Verified to {player.name}')
 
-        await usermanager.log_link(member, player)
+        await usermanager.log_link(member, player) # type: ignore
 
-        await update_member(member, session=session)
+        await update_member(member, session=session) # type: ignore
 
         with suppress(disnake.NotFound):
             await inter.send(embed=misc.make_success(title="Successfully Linked!"))
 
-        await log_verification(inter, player, member, session=session)
+        await log_verification(inter, player, member, session=session) # type: ignore
 
 
 async def unverify_command(inter: disnake.AppCmdInter, member: Optional[disnake.Member] = None):
-    if member is None:
-        member = inter.user
-    player = await usermanager.get_linked_player(member)
-    if not player:
-        return await inter.send(embed=misc.make_error(
-            "Not Verified",
-            "You are not verified. Use the /verify command to verify your account."
-        ))
-    await usermanager.log_unlink(player)
-    await remove_verification(member)
-    await inter.send(embed=misc.make_success('successfully unlinked!'))
-
+    member: disnake.Member = member or inter.user # type: ignore
+    async with aiohttp.ClientSession() as session:
+        player = await usermanager.get_linked_player(member, session=session) # type: ignore
+        if not player:
+            return await inter.send(embed=misc.make_error(
+                "Not Verified",
+                "You are not verified. Use the /verify command to verify your account."
+            ))
+        await usermanager.log_unlink(player)
+        await remove_verification(member)
+        await inter.send(embed=misc.make_success('successfully unlinked!'))
+    
 
 async def update_command(inter: disnake.AppCmdInter, member: Optional[disnake.Member] = None):
     before = time.time()
-    if member is None:
-        member = inter.user
+    member: disnake.Member = member or inter.user # type: ignore
     async with aiohttp.ClientSession() as session:
         player = await usermanager.get_linked_player(member, session=session)
         if not player:
