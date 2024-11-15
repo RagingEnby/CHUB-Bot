@@ -20,6 +20,7 @@ from modules import (
     tradereport,
     usermanager,
     verifier,
+    mongodb,
 )
 
 TSKS = []
@@ -52,6 +53,19 @@ bot = commands.InteractionBot(
     # this restricts slash commands to ONLY work in collector's hub:
     test_guilds=[934240413974417439]
 )
+
+
+@bot.event
+async def on_connect():
+    print('on_connect()')
+    await mongodb.message_db.start()
+
+
+@bot.event
+async def on_disconnect():
+    print('on_disconnect()')
+    if mongodb.message_db.running:
+        await mongodb.message_db.close()
 
 
 # noinspection PyAsyncCall
@@ -125,6 +139,7 @@ async def on_guild_channel_create(channel: disnake.abc.GuildChannel):
 
 @bot.event
 async def on_message(message: disnake.Message):
+    asyncio.create_task(mongodb.log_msg(message))
     if message.content.startswith('>exec') and await bot.is_owner(message.author):
         try:
             tmp_dic = {}
