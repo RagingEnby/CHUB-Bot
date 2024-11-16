@@ -68,6 +68,11 @@ async def on_disconnect():
         await mongodb.message_db.close()
 
 
+@bot.event
+async def on_message_edit(before: disnake.Message, after: disnake.Message):
+    await mongodb.log_msg(after)
+
+
 # noinspection PyAsyncCall
 @bot.event
 async def on_ready():
