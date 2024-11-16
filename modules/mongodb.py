@@ -18,12 +18,23 @@ class Database:
         self.queue: list[UpdateOne|InsertOne] = []
         self.running = False
 
-    async def upload(self):
-        queue = self.queue.copy()
-        self.queue = []
-        if queue:
-            await self.collection.bulk_write(queue)
+    async def restart_client(self):
+        self.client = motor.motor_asyncio.AsyncIOMotorClient(config.MONGODB_URI)
 
+    async def upload(self, queue: Optional[list[UpdateOne|InsertOne]] = None):
+        if queue is None:
+            queue = self.queue.copy()
+            self.queue = []
+        if not queue:
+            return
+        try:
+            await self.collection.bulk_write(queue)
+        except Exception as e:
+            if str(e) == "Cannot use MongoClient after close":
+                await self.restart_client()
+                return await self.upload(queue)
+            raise e
+            
     async def upload_task(self):
         while True:
             if not self.running:
