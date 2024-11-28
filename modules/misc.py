@@ -252,7 +252,7 @@ async def make_backgroundcheck_embed(player: datatypes.MinecraftPlayer, member: 
         f"**Linked To:** {member.mention}" if member else "",
         f"**Discord Created:** <t:{int(member.created_at.timestamp())}:R>" if member else "",
         f"**Joined Server:** <t:{int(member.joined_at.timestamp())}:R>",
-        f"**First Hypixel Login:** <t:{round(data['firstLogin'])//1000}:R>",
+        f"**First Hypixel Login:** <t:{round(data['firstLogin'])//1000}:R>" if data['firstLogin'] else "",
         f"**Possible Alts:** `{', '.join([disnake.utils.escape_markdown(player['name']) for player in data['possibleAlts']]) if data['possibleAlts'] else 'None'}`"
     ]
     embed = disnake.Embed(
