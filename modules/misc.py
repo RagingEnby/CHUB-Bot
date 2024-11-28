@@ -259,7 +259,7 @@ async def make_backgroundcheck_embed(player: datatypes.MinecraftPlayer, member: 
         description='\n'.join(description)
     )
     embed.set_author(
-        name=data['rankname'],
+        name=data['rankname'] or player.name,
         icon_url="https://mc-heads.net/avatar/" + player.uuid
     )
     if member:
