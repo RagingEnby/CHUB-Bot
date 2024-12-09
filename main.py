@@ -627,6 +627,15 @@ async def moderation_backgroundcheck_command(inter: disnake.AppCmdInter, member:
         await inter.send(embed=embed)
 
 
+@moderation.sub_command(
+    name="restart",
+    description="Restarts the bot, you may have to use this a lot of times in an emergency"
+)
+async def moderation_restart_command(inter: disnake.AppCmdInter):
+    await inter.response.send_message("Restarting bot...")
+    exit(inter.author.name)
+
+
 @bot.slash_command(
     name="exotic",
     description="Sends the link to Exotic Cafe Discord"
