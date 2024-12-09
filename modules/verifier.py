@@ -26,7 +26,7 @@ async def get_player_data(uuid: str, session: Optional[aiohttp.ClientSession] = 
 async def get_linked_discord(player: datatypes.MinecraftPlayer, session: Optional[aiohttp.ClientSession] = None, player_data: Optional[dict]=None) -> \
         Optional[str]:
     data = player_data or await get_player_data(uuid=player.uuid, session=session)
-    return data.get('player', {}).get('socialMedia', {}).get('links', {}).get('DISCORD', None)
+    return data.get('socialMedia', {}).get('links', {}).get('DISCORD', None)
 
 
 async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[aiohttp.ClientSession] = None, debug: bool=False) -> list[int]:
