@@ -12,14 +12,20 @@ import config
 
 class Database:
     def __init__(self, db: str, collection: str):
+        self.db_name = db
+        self.collection_name = collection
+
         self.client = motor.motor_asyncio.AsyncIOMotorClient(config.MONGODB_URI)
-        self.db = self.client[db]
+        self.db = self.client[self.db_name]
         self.collection = self.db[collection]
+
         self.queue: list[UpdateOne|InsertOne] = []
         self.running = False
 
     async def restart_client(self):
         self.client = motor.motor_asyncio.AsyncIOMotorClient(config.MONGODB_URI)
+        self.db = self.client[self.db_name]
+        self.collection = self.db[self.collection_name]
 
     async def upload(self, queue: Optional[list[UpdateOne|InsertOne]] = None):
         if queue is None:
