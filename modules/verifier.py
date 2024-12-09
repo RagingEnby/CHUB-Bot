@@ -25,6 +25,8 @@ async def get_player_data(uuid: str, session: Optional[aiohttp.ClientSession] = 
 
 async def get_linked_discord(player: datatypes.MinecraftPlayer, session: Optional[aiohttp.ClientSession] = None, player_data: Optional[dict]=None) -> \
         Optional[str]:
+    if player_data and 'player' in player_data:
+        player_data = player_data['player']
     data = player_data or await get_player_data(uuid=player.uuid, session=session)
     return data.get('socialMedia', {}).get('links', {}).get('DISCORD', None)
 
