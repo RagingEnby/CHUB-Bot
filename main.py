@@ -677,7 +677,7 @@ async def update_players_task_single(uuid: str, member: disnake.Member,
 
 @tasks.loop(seconds=120)
 async def update_linked_players_task():
-    #return # temp disabled
+    return # temp disabled
     async with aiohttp.ClientSession() as session:
         member_dict = await misc.get_member_dict(bot)
         linked_users = await misc.randomize_dict_order(usermanager.LinkedUsers.data)
