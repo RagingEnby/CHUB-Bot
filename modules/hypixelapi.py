@@ -11,8 +11,6 @@ from modules import asyncreqs
 PLAYER_RATE_LIMIT_MSG = "You have already looked up this player too recently, please try again shortly"
 API_URL = "https://api.hypixel.net/v2"
 
-LAST_RESPONSE: dict[str, dict] = {}
-
 
 async def get_data(
         endpoint: str,
@@ -39,20 +37,14 @@ async def get_data(
 async def ensure_data(endpoint: str,
                       params: Optional[dict] = None,
                       session: Optional[aiohttp.ClientSession] = None) -> dict:
-    global LAST_RESPONSE
-    id_ = params.get('uuid', params.get('player', params.get('id', params.get('profile')))) if params else None
     response = await get_data(endpoint, params, session=session)
     if response.status == 200 or response.status == 204:
         data = await response.json()
-        if id_:
-            LAST_RESPONSE[id_] = data
         return data
 
     if response.status == 429:
         data = await response.json()
         if data.get('cause') == PLAYER_RATE_LIMIT_MSG:
-            if id_ in LAST_RESPONSE:
-                return LAST_RESPONSE[id_] # type: ignore
             await asyncio.sleep(35)
             return await ensure_data(endpoint, params, session=session)
         important_headers = {k: v for k, v in dict(response.headers).items() if k.startswith('ratelimit-')}
