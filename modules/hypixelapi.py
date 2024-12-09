@@ -39,8 +39,7 @@ async def ensure_data(endpoint: str,
                       session: Optional[aiohttp.ClientSession] = None) -> dict:
     response = await get_data(endpoint, params, session=session)
     if response.status == 200 or response.status == 204:
-        data = await response.json()
-        return data
+        return await response.json()
 
     if response.status == 429:
         data = await response.json()
