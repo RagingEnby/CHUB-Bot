@@ -467,33 +467,27 @@ async def moderation_kick_command(inter: disnake.AppCmdInter, member: disnake.Me
     name="unblacklist",
     description="Unblacklist a Minecraft player from the server"
 )
-async def moderation_unblacklist_command(inter: disnake.AppCmdInter, player: str = commands.Param(
-    autocomplete=autocomplete.banned,
-    description="The Minecraft UUID of the player to unblacklist",
-    min_length=32,
-    max_length=32
-)):
+async def moderation_unblacklist_command(inter: disnake.AppCmdInter, ign: str):
     if not await misc.validate_mod_cmd(inter):
         return
-    player = player.replace('-', '')
-    player_obj = await mojang.get(player)
+    player = await mojang.get(ign)
 
-    if player_obj is None:
+    if player is None:
         return await inter.send(embed=misc.make_error(
             "Invalid Account",
-            f"There is no account with the UUID `{disnake.utils.escape_markdown(player)}`!"
+            f"There is no account with the IGN `{ign}`!"
         ))
 
-    if player_obj.uuid not in usermanager.BannedUsers:
+    if player.uuid not in usermanager.BannedUsers:
         return await inter.send(embed=misc.make_error(
             "Not Banned",
-            f"Account `{disnake.utils.escape_markdown(player)}` is not blacklisted."
+            f"`{player.name}` is not blacklisted."
         ))
-    del usermanager.BannedUsers[player_obj.uuid]
+    del usermanager.BannedUsers[player.uuid]
     await usermanager.BannedUsers.save()
     await inter.send(embed=misc.make_success(
         "success",
-        f"`{disnake.utils.escape_markdown(player)}` is no longer blacklisted!"
+        f"`{player.name}` is no longer blacklisted!"
     ))
 
 
@@ -502,28 +496,23 @@ async def moderation_unblacklist_command(inter: disnake.AppCmdInter, player: str
     name="blacklist",
     description="Blacklist a Minecraft player from the server"
 )
-async def moderation_blacklist_command(inter: disnake.AppCmdInter, player: str = commands.Param(
-    description="The Minecraft UUID of the player to blacklist",
-    min_length=32,
-    max_length=32
-)):
+async def moderation_blacklist_command(inter: disnake.AppCmdInter, ign: str, reason: str):
     if not await misc.validate_mod_cmd(inter):
         return
-    player = player.replace('-', '')
-    player_obj = await mojang.get(player)
+    player = await mojang.get(ign)
 
-    if player_obj is None:
+    if player is None:
         return await inter.send(embed=misc.make_error(
             "Invalid Account",
-            f"There is no account with the UUID `{disnake.utils.escape_markdown(player)}`!"
+            f"There is no account with the IGN `{ign}`!"
         ))
 
-    if player_obj.uuid in usermanager.BannedUsers:
+    if player.uuid in usermanager.BannedUsers:
         return await inter.send(embed=misc.make_error(
-            "Already Bbanned",
-            f"Account `{disnake.utils.escape_markdown(player)}` is already blacklisted."
+            "Already Banned",
+            f"`{player.name}` is already blacklisted."
         ))
-    usermanager.BannedUsers[player_obj.uuid] = f"{player_obj.uuid} | Banned by {inter.author.name} ({inter.author.id})"
+    usermanager.BannedUsers[player.uuid] = f"{reason} | Banned by {inter.author.name} ({inter.author.id})"
     await usermanager.BannedUsers.save()
 
 
