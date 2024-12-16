@@ -100,7 +100,7 @@ async def on_member_ban(guild: disnake.Guild, user: disnake.User):
     ban = await guild.fetch_ban(user)
     await usermanager.log_ban(user.id, reason=ban.reason if ban else None)
 
-    if not ban.reason:
+    if not ban.reason or ban.reason == "No reason provided":
         # im SURE there's a nicer looking way to do this, but according to the disnake support
         # server, the only way to get the moderator responsible is through audit logs
         moderator: Optional[disnake.Member] = None
@@ -129,17 +129,6 @@ async def on_member_remove(member: disnake.Member):
     uuid = await usermanager.get_linked_player(member, return_uuid=True)
     if uuid:
         await usermanager.log_unlink(uuid)
-
-
-@bot.event
-async def on_guild_channel_create(channel: disnake.abc.GuildChannel):
-    if channel.guild.id != config.APPEAL_GUILD_ID:
-        return
-    if not isinstance(channel, disnake.TextChannel):
-        return
-    if not channel.name.startswith('ticket-'):
-        return
-    
 
 
 @bot.event
