@@ -648,6 +648,33 @@ async def tem_command(inter: disnake.AppCmdInter):
     await inter.response.send_message("Download the iTEM mod here!\nhttps://discord.gg/item-932106421338779709")
 
 
+@bot.slash_command(
+    name="is-banned",
+    description="Checks if a player is banned from CHUB, and tells you why if so."
+)
+async def is_banned_command(inter: disnake.AppCmdInter, ign: str):
+    player = await mojang.get(ign)
+    if player is None:
+        return await inter.send(embed=misc.make_error(
+            "Invalid IGN",
+            f"There is no account with the IGN `{ign}`!"
+        ))
+    if player.uuid not in usermanager.BannedUsers:
+        return await inter.send(embed=misc.make_error(
+            "Not Banned",
+            f"No ban found for player `{player.name}`."
+        ))
+    embed = disnake.Embed(
+        title="Banned",
+        description=f"`{player.name}` is banned from CHUB for reason: `{usermanager.BannedUsers[player.uuid].replace('`', '')}`"
+    )
+    embed.set_author(
+        name=player.name,
+        icon_url=player.avatar
+    )
+    return await inter.send(embed=embed)
+
+
 @bot.event
 async def on_slash_command(inter: disnake.AppCmdInter):
     await cmdlogger.on_slash_command(inter)

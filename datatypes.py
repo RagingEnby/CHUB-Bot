@@ -31,6 +31,10 @@ class MinecraftPlayer:
     def id(self) -> str:
         return self.uuid
 
+    @property
+    def avatar(self) -> str:
+        return "https://mc-heads.net/avatar/" + self.uuid
+
     def __str__(self) -> str:
         return self.name
 
