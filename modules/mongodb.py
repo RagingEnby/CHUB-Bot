@@ -1,10 +1,10 @@
-from bson import Timestamp
-import disnake
 import asyncio
-from typing import Optional
 import time
+from typing import Optional
 
+import disnake
 import motor.motor_asyncio
+from bson import Timestamp
 from pymongo import InsertOne, UpdateOne
 
 import config
