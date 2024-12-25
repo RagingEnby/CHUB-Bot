@@ -24,14 +24,15 @@ async def websocket_connector():
                     await asyncio.sleep(0.2)
                     continue
                 await websocket.send(json.dumps(queue.pop(0)))
+                
+    except KeyboardInterrupt:
+        return
+        
     except (ConnectionClosedError, InvalidStatusCode, CancelledError, TimeoutError) as e:
         print('ws disconnected:', e)
         await asyncio.sleep(3)
         await websocket_connector()
 
-    except KeyboardInterrupt:
-        return
-    
     except Exception as e:
         if 'Connect call failed' not in str(e):
            print('unknown ws error:', e)
