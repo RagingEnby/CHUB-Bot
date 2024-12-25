@@ -20,11 +20,10 @@ async def websocket_connector():
             print('ws connected')
             await websocket.send(json.dumps({"method": "login", "content": "ChubBot"}))
             while True:
-                local_queue = queue.copy()
-                queue = []
-                for msg in local_queue:
-                    await websocket.send(json.dumps(msg))
-                await asyncio.sleep(0.2)
+                if not queue:
+                    await asyncio.sleep(0.2)
+                    continue
+                await websocket.send(json.dumps(queue.pop(0)))
     except (ConnectionClosedError, InvalidStatusCode, CancelledError, TimeoutError) as e:
         print('ws disconnected:', e)
         await asyncio.sleep(3)
