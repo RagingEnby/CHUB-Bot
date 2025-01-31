@@ -49,6 +49,9 @@ class DictManager:
         del self.data[key]
         self.save_noasync()
 
+    def __contains__(self, key: str):
+        return key in self.data
+
 
 class ListManager:
     def __init__(self, file_path: str):
