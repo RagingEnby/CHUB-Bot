@@ -648,14 +648,15 @@ async def is_banned_command(inter: disnake.AppCmdInter, ign: str):
             "Invalid IGN",
             f"There is no account with the IGN `{ign}`!"
         ))
-    if player.uuid not in usermanager.BannedUsers:
+    ban_reason = usermanager.BannedUsers.get(player.uuid)
+    if ban_reason:
         return await inter.send(embed=misc.make_error(
             "Not Banned",
             f"No ban found for player `{player.name}`."
         ))
     embed = disnake.Embed(
         title="Banned",
-        description=f"`{player.name}` is banned from CHUB for reason: `{usermanager.BannedUsers[player.uuid].replace('`', '')}`"
+        description=f"`{player.name}` is banned from CHUB for reason: `{ban_reason.replace('`', '')}`"
     )
     embed.set_author(
         name=player.name,
