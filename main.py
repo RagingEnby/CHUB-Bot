@@ -84,9 +84,9 @@ async def on_ready():
             name="Collector's Hub"
         )
     ))
-    for TSK in TSKS:
-        if not TSK.is_running():
-            TSK.start()
+    for tsk in TSKS:
+        if not tsk.is_running():
+            tsk.start()
     verification_channel = bot.get_channel(config.VERIFICATION_CHANNEL)
     async for msg in verification_channel.history(limit=None): # type: ignore
         if not await bot.is_owner(msg.author):
@@ -736,7 +736,8 @@ async def ensure_tasks_working():
     formatted_tasks = '\n'.join([str(tsk) for tsk in broken_tasks])
     await channel.send(f"{config.RAGINGENBY_MENTION} `{len(broken_tasks)}` tasks broke:\n```{formatted_tasks}```") # type: ignore
     for tsk in broken_tasks:
-        tsk.start()
+        if not tsk.is_running():
+            tsk.start()
 
 
 TSKS.append(ensure_tasks_working)
