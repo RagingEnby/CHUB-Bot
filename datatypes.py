@@ -36,7 +36,7 @@ class MinecraftPlayer:
         return "https://mc-heads.net/avatar/" + self.uuid
 
     def __str__(self) -> str:
-        return self.name
+        return f"{self.name} ({self.uuid})"
 
     def to_dict(self) -> MinecraftPlayerDict:
         return {
