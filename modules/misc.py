@@ -23,38 +23,33 @@ async def get_user_from_name(bot: Bot, name: str) -> Optional[disnake.Member]:
     return None
 
 
-async def get_guild(bot: Bot) -> disnake.Guild:
+def get_guild(bot: Bot) -> disnake.Guild:
     return bot.get_guild(config.GUILD_ID) # type: ignore
 
 
 async def get_members(bot: Bot) -> list[disnake.Member]:
-    guild = await get_guild(bot)
-    return guild.members
+    return get_guild(bot).members
 
 
 async def get_member(bot: Bot, user_id: int) -> Optional[disnake.Member]:
-    guild = await get_guild(bot)
-    return guild.get_member(user_id)
+    return get_guild(bot).get_member(user_id)
 
 
 async def get_member_dict(bot: Bot) -> dict[int, disnake.Member]:
-    members = await get_members(bot)
-    return {member.id: member for member in members}
+    return {member.id: member for member in await get_members(bot)}
 
 
 async def get_role(bot: Bot, role_id: int) -> Optional[disnake.Role]:
-    guild = await get_guild(bot)
-    return guild.get_role(role_id)
+    return get_guild(bot).get_role(role_id)
 
 
 async def ban_member(bot: Bot, user_id: int, reason: Optional[str] = None):
-    guild = await get_guild(bot)
-    await guild.ban(disnake.Object(user_id), reason=reason)
+    await get_guild(bot).ban(disnake.Object(user_id), reason=reason)
 
 
-async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] = None, debug: bool=False) -> tuple[dict[str, dict], list[str]]:
+async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] = None) -> tuple[dict[str, dict], list[str]]:
     uuid = uuid.replace('-', '')
-    profiles_data = await hypixelapi.ensure_data('/skyblock/profiles', {"uuid": uuid}, session=session)
+    profiles_data = await hypixelapi.ensure_data('/skyblock/profiles', {"uuid":  uuid}, session=session)
     if not profiles_data.get('profiles'):
         return {}, []
     if not profiles_data:
@@ -64,7 +59,7 @@ async def get_player_items(uuid: str, session: Optional[aiohttp.ClientSession] =
         for profile in profiles_data['profiles']
         if should_scan_museum(profile.get('game_mode', 'normal'), profile['members'].get(uuid, {}))
     ])
-    inventories = await parser.get_inventories(profiles_data, debug=debug)
+    inventories = await parser.get_inventories(profiles_data)
     museum_inventories = await parser.get_museum_inventories(profiles=museum_datas)
     items = {}
     applied_items = []

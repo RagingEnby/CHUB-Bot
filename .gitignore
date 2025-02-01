@@ -11,3 +11,6 @@ data.json
 /storage/inv
 /storage/*.json
 venv/*
+# replit's annoying Ai generates an icon
+# for every repl:
+generated-icon.png

@@ -2,6 +2,7 @@ import json
 import time
 from contextlib import suppress
 from typing import Optional
+import asyncio
 
 import aiohttp
 import disnake
@@ -9,7 +10,7 @@ from disnake.errors import Forbidden
 
 import config
 import datatypes
-from modules import hypixelapi, misc, mojang, roles, usermanager
+from modules import datamanager, hypixelapi, misc, mojang, roles, usermanager
 
 
 async def log_verification(inter: disnake.AppCmdInter, player: datatypes.MinecraftPlayer,
@@ -23,17 +24,19 @@ async def get_player_data(uuid: str, session: Optional[aiohttp.ClientSession] = 
     return await hypixelapi.ensure_data("/player", {"uuid": uuid}, session=session)
 
 
-async def get_linked_discord(player: datatypes.MinecraftPlayer, session: Optional[aiohttp.ClientSession] = None, player_data: Optional[dict]=None) -> \
+async def get_linked_discord(player: datatypes.MinecraftPlayer|str, session: Optional[aiohttp.ClientSession] = None, player_data: Optional[dict]=None) -> \
         Optional[str]:
-    data = player_data or await get_player_data(uuid=player.uuid, session=session)
+    if isinstance(player, datatypes.MinecraftPlayer):
+        player = player.uuid
+    data = player_data or await get_player_data(uuid=player, session=session)
     if 'player' in data:
         data = data['player']
     return data.get('socialMedia', {}).get('links', {}).get('DISCORD', None)
 
 
-async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[aiohttp.ClientSession] = None, debug: bool=False) -> list[int]:
+async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[aiohttp.ClientSession] = None) -> list[int]:
     item_roles = []
-    items, applied_items = await misc.get_player_items(player.uuid, session=session, debug=debug)
+    items, applied_items = await misc.get_player_items(player.uuid, session=session)
     item_ids = [item['ExtraAttributes']['id'] for item in items.values()] + applied_items
     pets = [json.loads(item['ExtraAttributes']['petInfo']) for item in items.values() if item.get('ExtraAttributes', {}).get('id') == 'PET' and 'petInfo' in item['ExtraAttributes']]
     pet_skins = list(set(['PET_SKIN_' + pet['skin'] for pet in pets if pet.get('skin')]))
@@ -49,12 +52,6 @@ async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[ai
         req_item_ids = req_item_ids.split(',')
         if all(req_item_id in item_ids for req_item_id in req_item_ids):
             item_roles.append(role_id)
-        elif debug:
-            for req_item_id in req_item_ids:
-                if req_item_id not in item_ids:
-                    print(role_id, player.name, 'MISSING:', req_item_id)
-                    break
-
             
     item_roles.extend(await roles.get_checker_roles(list(items.values())))
     item_roles = list(set(item_roles)) # remove duplicates
@@ -72,7 +69,7 @@ async def get_misc_roles(player: datatypes.MinecraftPlayer, player_data: dict) -
 
 
 async def update_member(member: disnake.Member, player: Optional[datatypes.MinecraftPlayer] = None,
-                        session: Optional[aiohttp.ClientSession] = None, debug: bool=False):
+                        session: Optional[aiohttp.ClientSession] = None):
     # IDEs get mad if you dont do this:
     if member is None:
         return
@@ -85,34 +82,46 @@ async def update_member(member: disnake.Member, player: Optional[datatypes.Minec
     player_data = await get_player_data(player.uuid, session=session)
     discord = await get_linked_discord(player, player_data=player_data)
     if discord is None or str(discord).lower() != member.name.lower():
-        await usermanager.log_unlink(player)
-        await remove_verification(member)
-        return
+        del usermanager.linked_users[player.uuid]
+        return await remove_verification(member)
         
     with suppress(disnake.NotFound):
         roles = [config.VERIFIED_ROLE]
 
-        roles.extend(await get_item_roles(player, session=session, debug=debug))
-        roles.extend(await get_misc_roles(player, player_data=player_data))
+        item_roles, misc_roles = await asyncio.gather(
+            get_item_roles(player, session=session),
+            get_misc_roles(player, player_data=player_data)
+        )
+        roles.extend(item_roles)
+        roles.extend(misc_roles)
 
         if member.display_name != player.name:
             with suppress(Forbidden):
                 await member.edit(nick=player.name)
+        tasks = []
         if player.name in config.guild_members and config.GUILD_MEMBER_ROLE in [role.id for role in member.roles]:
-            await member.remove_roles(disnake.Object(config.GUILD_MEMBER_ROLE), reason="Not Guild Member")
+            tasks.append(member.remove_roles(
+                disnake.Object(config.GUILD_MEMBER_ROLE),
+                reason="Not Guild Member"
+            ))
 
-        await member.add_roles(*[disnake.Object(role) for role in roles], reason="Auto Roles")
+        tasks.append(member.add_roles(
+            *[disnake.Object(role) for role in roles],
+            reason="Auto Roles")
+        )
+        await asyncio.gather(*tasks)
         
 
 
 async def remove_verification(member: disnake.Member):
     to_remove = [disnake.Object(role) for role in config.REQUIRES_VERIFICATION
                  if member.get_role(role)]
-    with suppress(disnake.NotFound):
-        await member.remove_roles(*to_remove, reason="Unverified")
-    with suppress(Forbidden):
-        await member.edit(nick=None)
-
+    with suppress(disnake.NotFound, disnake.Forbidden):
+        await asyncio.gather(
+            member.remove_roles(*to_remove, reason="Unverified"),
+            member.edit(nick=None)
+        )
+    
 
 async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[disnake.Member] = None):
     member: disnake.Member = member or inter.user # type: ignore
@@ -164,16 +173,16 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
         elif ban_reason:
             await usermanager.log_unban(member.id)
 
-        await member.add_roles(disnake.Object(config.VERIFIED_ROLE), reason=f'Verified to {player.name}')
+        usermanager.linked_users.data[player.uuid] = member.id
 
-        await usermanager.log_link(member, player) # type: ignore
+        await asyncio.gather(
+            member.add_roles(disnake.Object(config.VERIFIED_ROLE), reason=f'Verified to {player.name}')
+            update_member(member, session=session) # type: ignore
+        )
 
-        await update_member(member, session=session) # type: ignore
-
-        with suppress(disnake.NotFound):
+        with suppress(disnake.NotFound, disnake.Forbidden):
             await inter.send(embed=misc.make_success(title="Successfully Linked!"))
-
-        await log_verification(inter, player, member, session=session) # type: ignore
+    asyncio.create_task(log_verification(inter, player, member, session=session))
 
 
 async def unverify_command(inter: disnake.AppCmdInter, member: Optional[disnake.Member] = None):
@@ -185,8 +194,13 @@ async def unverify_command(inter: disnake.AppCmdInter, member: Optional[disnake.
                 "Not Verified",
                 "You are not verified. Use the /verify command to verify your account."
             ))
-        await usermanager.log_unlink(player)
-        await remove_verification(member)
+        asyncio.gather(
+            
+        )
+        await asyncio.gather(
+            usermanager.log_unlink(player),
+            remove_verification(member)
+        )
         await inter.send(embed=misc.make_success('successfully unlinked!'))
     
 
@@ -204,11 +218,11 @@ async def update_command(inter: disnake.AppCmdInter, member: Optional[disnake.Me
         await update_member(
             member=member,
             player=player,
-            session=session,
-            debug=await inter.bot.is_owner(inter.user)
+            session=session
         )
-    after = time.time()
-    await inter.send(embed=misc.make_success(
-        "successfully updated!",
-        f"Took `{round(after - before, 2)}s`!"
-    ))
+        after = time.time()
+        await inter.send(embed=misc.make_success(
+            "successfully updated!",
+            f"Took `{round(after - before, 2)}s`!"
+        ))
+        

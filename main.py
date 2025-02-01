@@ -135,7 +135,8 @@ async def on_member_remove(member: disnake.Member):
 @bot.event
 async def on_message(message: disnake.Message):
     asyncio.create_task(mongodb.log_msg(message))
-    if message.content.startswith('>exec') and await bot.is_owner(message.author):
+    is_owner = await bot.is_owner(message.author)
+    if message.content.startswith('>exec') and is_owner:
         try:
             tmp_dic = {}
             executing_string = "async def temp_func():\n    {}\n".format(message.content.partition("\n")[2].strip("`")
@@ -150,7 +151,7 @@ async def on_message(message: disnake.Message):
             error = traceback.format_exc()
             print(f">exec ERROR:\n{error}")
             await message.reply(f"Error while running code:\n```py\n{error}```")
-    elif message.channel.id == config.VERIFICATION_CHANNEL and not await bot.is_owner(message.author):
+    elif message.channel.id == config.VERIFICATION_CHANNEL and not is_owner :
         await asyncio.sleep(60)
         with suppress(disnake.errors.NotFound):
             await message.delete()
@@ -182,9 +183,8 @@ async def on_message(message: disnake.Message):
             print("non_staff:", [m.id for m in non_staff])
             return await message.channel.send(f"{config.BOT_DEVELOPER_MENTION} Found multiple (or none) non-staff members, see console for details")
         member = non_staff[0]
-        chub = await misc.get_guild(bot)
         ban = None
-        async for ban_ in chub.bans(limit=None):
+        async for ban_ in misc.get_guild(bot).bans(limit=None):
             if ban_.user.id == member.id:
                 ban = ban_
                 break

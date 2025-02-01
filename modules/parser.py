@@ -144,18 +144,14 @@ async def process_inventory(inv_data: dict[str, int|str|dict], parent: Optional[
     return inventories
     
 
-async def get_inventories(sb_data: dict, debug: bool=False) -> list[dict]:
+async def get_inventories(sb_data: dict) -> list[dict]:
     items = []
     for profile in sb_data['profiles']:
         for uuid, member_data in profile['members'].items():
             inventories = await process_inventory(member_data.get('inventory', {}))
             inventories.update(await process_inventory(member_data.get('rift', {}).get('inventory', {}), parent='rift'))
             inventories.update(await process_inventory(member_data.get('shared_inventory', {}), parent='shared_inventory'))
-            if debug:
-                async with aiofiles.open('debug.json', 'w') as file:
-                    await file.write(json.dumps(inventories, indent=2))
             # combine all the inventory dicts:
-            
             parsed = {inv_name: await decode_bytes(inv_contents) for inv_name, inv_contents in inventories.items()}
             items.append({
                 "playerId": uuid,
