@@ -181,7 +181,7 @@ async def on_message(message: disnake.Message):
         ]
         if len(non_staff) != 1:
             print("non_staff:", [m.id for m in non_staff])
-            return await message.channel.send(f"{config.BOT_DEVELOPER_MENTION} Found multiple (or none) non-staff members, see console for details")
+            return await message.channel.send(f"{config.RAGINGENBY_MENTION} Found multiple (or none) non-staff members, see console for details")
         member = non_staff[0]
         ban = None
         async for ban_ in misc.get_guild(bot).bans(limit=None):
@@ -268,13 +268,13 @@ async def update_command(inter: disnake.AppCmdInter):
 )
 async def info_command(inter: disnake.AppCmdInter):
     await inter.response.defer()
-    await inter.send(f"""This bot was made by {config.BOT_DEVELOPER_MENTION} for the Collector's Hub Discord server.
+    await inter.send(f"""This bot was made by {config.RAGINGENBY_MENTION} for the Collector's Hub Discord server.
     
 The bot was made to give out item roles automatically, but is now much more.
 
 The bot is open source: <https://github.com/RagingEnby/CHUB-Bot>
 
-If you have any other questions, feel free to reach out to {config.BOT_DEVELOPER_MENTION}.""")
+If you have any other questions, feel free to reach out to {config.RAGINGENBY_MENTION}.""")
 
 
 @bot.slash_command(
@@ -734,7 +734,7 @@ async def ensure_tasks_working():
         return
     channel = bot.get_channel(config.BOT_DEV_CHANNEL)
     formatted_tasks = '\n'.join([str(tsk) for tsk in broken_tasks])
-    await channel.send(f"{config.BOT_DEVELOPER_MENTION} `{len(broken_tasks)}` tasks broke:\n```{formatted_tasks}```") # type: ignore
+    await channel.send(f"{config.RAGINGENBY_MENTION} `{len(broken_tasks)}` tasks broke:\n```{formatted_tasks}```") # type: ignore
     for tsk in broken_tasks:
         tsk.start()
 
