@@ -10,11 +10,6 @@ linked_users = datamanager.DictManager('storage/linkedusers.json')
 banned_users = datamanager.DictManager('storage/bannedusers.json')
 
 
-async def log_link(member: disnake.Member, player: datatypes.MinecraftPlayer):
-    linked_users.data[player.uuid] = member.id
-    await linked_users.save()
-
-
 async def log_unlink(player: datatypes.MinecraftPlayer|str):
     if isinstance(player, datatypes.MinecraftPlayer):
         player = player.uuid
