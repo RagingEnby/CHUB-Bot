@@ -44,6 +44,7 @@ class DictManager:
 
     def __setitem__(self, key, value):
         self.data[key] = value
+        self.save_noasync()
 
     def __delitem__(self, key):
         del self.data[key]
