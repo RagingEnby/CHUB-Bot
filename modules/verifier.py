@@ -194,9 +194,6 @@ async def unverify_command(inter: disnake.AppCmdInter, member: Optional[disnake.
                 "Not Verified",
                 "You are not verified. Use the /verify command to verify your account."
             ))
-        asyncio.gather(
-            
-        )
         await asyncio.gather(
             usermanager.log_unlink(player),
             remove_verification(member)
