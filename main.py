@@ -651,6 +651,9 @@ async def is_banned_command(inter: disnake.AppCmdInter, ign: str):
         ))
     ban_reason = usermanager.banned_users.get(player.uuid)
     if ban_reason:
+        for i, (uuid, ban_reason_) in enumerate(usermanager.banned_users.items()):
+            if uuid == player.uuid:
+                print(i, uuid, ban_reason_)
         return await inter.send(embed=misc.make_error(
             "Not Banned",
             f"No ban found for player `{player.name}`."
