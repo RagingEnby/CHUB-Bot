@@ -76,6 +76,8 @@ class ListManager:
 
     def __setitem__(self, key, value):
         self.data[key] = value
+        asyncio.create_task(self.save())
 
     def __delitem__(self, key):
         del self.data[key]
+        asyncio.create_task(self.save())
