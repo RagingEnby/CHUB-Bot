@@ -624,10 +624,10 @@ async def crystal_command(inter: disnake.AppCmdInter):
 
 @bot.slash_command(
     name="seymour",
-    description="Sends the link to Tuxedo Cafe Discord"
+    description="Sends the link to Seymour Cafe Discord"
 )
 async def seymour_command(inter: disnake.AppCmdInter):
-    await inter.response.send_message("Sell your Seymour armor here!\nhttps://discord.gg/uSB4XUGh3e")
+    await inter.response.send_message("Sell your Seymour gear here!\nhttps://discord.gg/uSB4XUGh3e")
 
 
 @bot.slash_command(
