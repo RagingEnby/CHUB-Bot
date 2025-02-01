@@ -182,7 +182,7 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
 
         with suppress(disnake.NotFound, disnake.Forbidden):
             await inter.send(embed=misc.make_success(title="Successfully Linked!"))
-    asyncio.create_task(log_verification(inter, player, member, session=session))
+    await log_verification(inter, player, member, session=session)
 
 
 async def unverify_command(inter: disnake.AppCmdInter, member: Optional[disnake.Member] = None):
