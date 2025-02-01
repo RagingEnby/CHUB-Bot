@@ -146,7 +146,7 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
             ))
 
         # bot ONLY gets here if the user has put in THEIR account
-        ban_reason = usermanager.BannedUsers.get(player.uuid)
+        ban_reason = usermanager.banned_users.get(player.uuid)
         if ban_reason and not ban_reason.startswith(str(member.id)):
             embed = misc.make_error(
                 "Ban Evader Detected",

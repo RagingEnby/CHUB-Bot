@@ -221,7 +221,7 @@ def should_scan_museum(game_mode: str, member: dict[str, Any]) -> bool:
 
 
 def uuid_to_user(uuid: str, bot: Bot) -> Optional[disnake.User]:
-    user_id = usermanager.LinkedUsers.get(uuid)
+    user_id = usermanager.linked_users.get(uuid)
     if user_id is None:
         return None
     return bot.get_user(user_id)

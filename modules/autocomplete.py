@@ -54,8 +54,8 @@ async def ign(inter: disnake.AppCmdInter, user_input: str) -> Optional[list[str]
 async def banned(inter: disnake.AppCmdInter, user_input: str) -> list[str]:
     user_input = user_input.lower()
     print(f'Banned Autocomplete > [{inter.user.name}]  {user_input}')
-    best_results = [user for user in usermanager.BannedUsers if user.startswith(user_input)]
-    other_results = [user for user in usermanager.BannedUsers if user_input in user]
+    best_results = [user for user in usermanager.banned_users if user.startswith(user_input)]
+    other_results = [user for user in usermanager.banned_users if user_input in user]
     return (best_results + other_results)[0:25]
 
 
