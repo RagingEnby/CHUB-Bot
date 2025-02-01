@@ -42,7 +42,7 @@ async def log_ban(member: disnake.Member | int, reason: Optional[str] = None):
     player = await get_linked_player(member)
     if player is None:
         return None
-    BannedUsers[player.uuid] = (str(member) + ' | ' + reason) if reason else No reason given.' # type: ignore
+    BannedUsers[str(player.uuid)] = (str(member) + ' | ' + reason) if reason else 'No reason given.' # type: ignore
     await BannedUsers.save()
 
 
