@@ -127,9 +127,9 @@ async def on_member_unban(guild: disnake.Guild, user: disnake.User):
 async def on_member_remove(member: disnake.Member):
     if member.guild.id != config.GUILD_ID:
         return
-    uuid = await usermanager.get_linked_player(member, return_uuid=True)
-    if uuid:
-        await usermanager.log_unlink(uuid)
+    player = await usermanager.get_linked_player(member)
+    if player:
+        await usermanager.log_unlink(player.uuid)
 
 
 @bot.event

@@ -94,7 +94,7 @@ message_db = Database(
 )
 
 
-async def message_to_dict(message: disnake.Message, deleted: bool=False) -> dict:
+def message_to_dict(message: disnake.Message, deleted: bool=False) -> dict:
     return {
         "_id": message.id,
         "type": message.type,
@@ -153,7 +153,7 @@ async def message_to_dict(message: disnake.Message, deleted: bool=False) -> dict
 
 
 async def log_msg(message: disnake.Message, deleted: bool=False):
-    await message_db.add(await message_to_dict(message, deleted=deleted))
+    await message_db.add(message_to_dict(message, deleted=deleted))
 
 
 async def log_msg_delete(message: disnake.Message|int):
