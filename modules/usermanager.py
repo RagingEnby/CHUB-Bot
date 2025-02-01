@@ -36,13 +36,13 @@ async def is_linked(member: disnake.Member | int) -> bool:
     return await get_linked_player(member, return_uuid=True) is not None
     
 
-async def log_ban(member: disnake.Member | int, reason: Optional[str]):
+async def log_ban(member: disnake.Member | int, reason: Optional[str] = None):
     if isinstance(member, disnake.Member):
         member = member.id
     player = await get_linked_player(member)
     if player is None:
         return None
-    BannedUsers[player.uuid] = (str(member) + ' | ' + reason) if reason else str(member) # type: ignore
+    BannedUsers[player.uuid] = (str(member) + ' | ' + reason) if reason else No reason given.' # type: ignore
     await BannedUsers.save()
 
 
