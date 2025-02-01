@@ -1,4 +1,5 @@
 import json
+import asyncio
 
 import aiofiles
 
@@ -15,10 +16,6 @@ class DictManager:
     async def save(self):
         async with aiofiles.open(self.file_path, 'w') as file:
             await file.write(json.dumps(self.data))
-
-    def save_noasync(self):
-        with open(self.file_path, 'w') as file:
-            json.dump(self.data, file)
 
     async def update(self):
         async with aiofiles.open(self.file_path, 'r') as file:
@@ -44,11 +41,11 @@ class DictManager:
 
     def __setitem__(self, key, value):
         self.data[key] = value
-        self.save_noasync()
+        asyncio.create_task(self.save())
 
     def __delitem__(self, key):
         del self.data[key]
-        self.save_noasync()
+        asyncio.create_task(self.save())
 
     def __contains__(self, key: str):
         return key in self.data
