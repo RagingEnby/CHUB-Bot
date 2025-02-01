@@ -56,7 +56,10 @@ async def ensure_all_decoded(data: dict) -> dict:
         if isinstance(v, dict):
             data[k] = await ensure_all_decoded(v)
         elif isinstance(v, list):
-            data[k] = [await ensure_all_decoded(item) for item in v if isinstance(item, dict) or isinstance(item, list)]
+            data[k] = await asyncio.gather(*[
+                ensure_all_decoded(item) for item in v
+                if isinstance(item, (dict, list))
+            ])
         elif isinstance(v, bytearray):
             # TODO: Fix this (this does not work)
             decoded_v = await decode_bytes(gzipped_data=v)
@@ -68,29 +71,18 @@ async def ensure_all_decoded(data: dict) -> dict:
 
 async def decode_item(item_bytes: str) -> dict:
     dict_data = await decode_bytes(item_bytes)
+    print('decode_bytes() ->', type(dict_data))
     if len(dict_data) == 1:
-        data = await ensure_all_decoded(dict_data[0])
-        return data
+        return await ensure_all_decoded(dict_data[0])
     raise ValueError("unexpected item data format: " + str(dict_data))
 
 
 async def decode_items(item_bytes: str) -> list[dict]:
     data: list[dict] = await decode_bytes(item_bytes)
-    for item in data:
-        item = await ensure_all_decoded(item)
-    return data
+    return await asyncio.gather(*[ensure_all_decoded(item) for item in data])
 
 
-async def get_museum_inventories(profiles: Optional[list[dict]]=None, profile: Optional[dict]=None) -> list[dict]:
-    if profiles is None and profile is None:
-        raise ValueError('Must provide either profiles or profile')
-    if profiles is not None and profile is not None:
-        raise ValueError('Must provide only profiles or profile')
-    # before i hear 'just use `profiles = profiles or [profile]`', i would love to,
-    # however if profiles is [] and profile is None, then profiles becomes [None] and that is bad
-    if profiles is None:
-        profiles = [profile]
-        
+async def get_museum_inventories(profiles: list[dict]) -> list[dict]:
     members_data = []
     for profile in profiles:
         # allow for passing just the data, or the entire response:
@@ -129,10 +121,10 @@ async def get_museum_inventories(profiles: Optional[list[dict]]=None, profile: O
     return members_data
 
 
-async def process_inventory(inv_data: dict[str, int|str|dict], parent: Optional[str]=None) -> dict[str, dict]:
+def process_inventory(data: dict[str, int|str|dict], parent: Optional[str]=None) -> dict[str, dict]:
     parent = parent + '_' if parent else ''
     inventories = {}
-    for inv_name, inv_data in inv_data.items():
+    for inv_name, inv_data in data.items():
         if not isinstance(inv_data, dict):
             continue
         if 'data' in inv_data:
@@ -148,11 +140,11 @@ async def get_inventories(sb_data: dict) -> list[dict]:
     items = []
     for profile in sb_data['profiles']:
         for uuid, member_data in profile['members'].items():
-            inventories = await process_inventory(member_data.get('inventory', {}))
-            inventories.update(await process_inventory(member_data.get('rift', {}).get('inventory', {}), parent='rift'))
-            inventories.update(await process_inventory(member_data.get('shared_inventory', {}), parent='shared_inventory'))
+            inventories = process_inventory(member_data.get('inventory', {}))
+            inventories.update(process_inventory(member_data.get('rift', {}).get('inventory', {}), parent='rift'))
+            inventories.update(process_inventory(member_data.get('shared_inventory', {}), parent='shared_inventory'))
             # combine all the inventory dicts:
-            parsed = {inv_name: await decode_bytes(inv_contents) for inv_name, inv_contents in inventories.items()}
+            parsed = {inv_name: await decode_bytes(inv_contents) for inv_name, inv_contents in inventories.items() if isinstance(inv_contents, str)}
             items.append({
                 "playerId": uuid,
                 "profileId": profile['profile_id'],
