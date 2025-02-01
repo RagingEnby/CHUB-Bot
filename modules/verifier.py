@@ -146,22 +146,22 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
             ))
 
         # bot ONLY gets here if the user has put in THEIR account
-        is_banned, reason = usermanager.is_banned(player)
-        reason = reason or ""
-        if is_banned and not reason.startswith(str(member.id)):
+        ban_reason = usermanager.BannedUsers.get(player.uuid)
+        if ban_reason and not ban_reason.startswith(str(member.id)):
             embed = misc.make_error(
                 "Ban Evader Detected",
                 "You've been detected ban evading. Please join the appeals server if this is incorrect."
             )
-            await inter.send(embed=embed)
+            content = "https://discord.gg/6VAAvW7pAm"
+            await inter.send(content, embed=embed)
             print(f'found a smelly ban evader (ign: {ign}, uuid: {player.uuid}, '
                   f'reason: {reason}, member.id: {member.id})') # type: ignore
             try:
-                await inter.user.send("https://discord.gg/6VAAvW7pAm", embed=embed)
+                await inter.user.send(content, embed=embed)
             except Exception as e:
                 print(f"couldn't dm ban evading user {member.name} ({member.id}): {e}") # type: ignore
             return await misc.ban_member(inter.bot, member.id, reason) # type: ignore
-        elif reason.startswith(str(member.id)):
+        elif ban_reason:
             await usermanager.log_unban(member.id)
 
         await member.add_roles(disnake.Object(config.VERIFIED_ROLE), reason=f'Verified to {player.name}')

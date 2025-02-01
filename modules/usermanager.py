@@ -42,7 +42,7 @@ async def log_ban(member: disnake.Member | int, reason: Optional[str] = None):
     player = await get_linked_player(member)
     if player is None:
         return None
-    BannedUsers[str(player.uuid)] = (str(member) + ' | ' + reason) if reason else 'No reason given.' # type: ignore
+    BannedUsers[player.uuid] = (str(member) + ' | ' + reason) if reason else 'No reason given.' # type: ignore
     await BannedUsers.save()
 
 
@@ -51,7 +51,7 @@ async def log_unban(member: disnake.Member | int):
         member = member.id
     uuids = [uuid for uuid, reason in BannedUsers.items() if reason.startswith(f"{member} | ")]
     for uuid in uuids:
-        del BannedUsers.data[uuid]
+        del BannedUsers[uuid]
 
 
 def is_banned(player: datatypes.MinecraftPlayer) -> tuple[bool, Optional[str]]:
