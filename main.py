@@ -30,14 +30,14 @@ bot = commands.InteractionBot(
         automod=False,
         automod_configuration=False,
         automod_execution=False,
-        bans=False,
-        dm_messages=False,
-        dm_reactions=False,
-        dm_typing=False,
-        emojis=False,
+        bans=True,
+        dm_messages=True,
+        dm_reactions=True,
+        dm_typing=True,
+        emojis=True,
         emojis_and_stickers=False,
         guild_messages=True,
-        guild_reactions=False,
+        guild_reactions=True,
         guild_scheduled_events=False,
         guild_typing=False,
         guilds=True,
@@ -50,6 +50,7 @@ bot = commands.InteractionBot(
         voice_states=False,
         webhooks=False
     ),
+    owner_ids=config.BOT_OWNERS,
     # this restricts slash commands to ONLY work in collector's hub:
     test_guilds=[934240413974417439]
 )
@@ -88,7 +89,7 @@ async def on_ready():
             TSK.start()
     verification_channel = bot.get_channel(config.VERIFICATION_CHANNEL)
     async for msg in verification_channel.history(limit=None): # type: ignore
-        if msg.author.id != config.BOT_DEVELOPER_ID:
+        if not await bot.is_owner(msg.author):
             asyncio.create_task(msg.delete())
     print('bot ready')
 
