@@ -267,8 +267,7 @@ async def update_command(inter: disnake.AppCmdInter):
     description="Get information about the bot"
 )
 async def info_command(inter: disnake.AppCmdInter):
-    await inter.response.defer()
-    await inter.send(f"""This bot was made by {config.RAGINGENBY_MENTION} for the Collector's Hub Discord server.
+    await inter.response.send_message(f"""This bot was made by {config.RAGINGENBY_MENTION} for the Collector's Hub Discord server.
     
 The bot was made to give out item roles automatically, but is now much more.
 
@@ -485,7 +484,6 @@ async def moderation_unblacklist_command(inter: disnake.AppCmdInter, ign: str):
             f"`{player.name}` is not blacklisted."
         ))
     del usermanager.banned_users[player.uuid]
-    await usermanager.banned_users.save()
     await inter.send(embed=misc.make_success(
         "success",
         f"`{player.name}` is no longer blacklisted!"
@@ -514,7 +512,6 @@ async def moderation_blacklist_command(inter: disnake.AppCmdInter, ign: str, rea
             f"`{player.name}` is already blacklisted."
         ))
     usermanager.banned_users[player.uuid] = f"{reason} | Banned by {inter.author.name} ({inter.author.id})"
-    await usermanager.banned_users.save()
 
 
 @moderation.sub_command(
@@ -527,30 +524,6 @@ async def moderation_bulk_blacklist_command(inter: disnake.AppCmdInter, file: di
         "This command is broken and I haven't bothered fixing it because afaik, "
         "it's not needed atm. If you have a use case for this command, ping "
         "RagingEnby and I'll fix it."
-    ))
-    if not await misc.validate_mod_cmd(inter):
-        return
-    invalid_format_err = misc.make_error(
-        "Invalid File",
-        "Please ensure your file is a `.txt` file in this format:\n```RagingEnby\nTGWaffles\nFoe\nVinush```"
-    )
-    if not file.filename.endswith('.txt'):
-        return await inter.send(embed=invalid_format_err)
-    data = await file.read()
-    igns = [line.strip() for line in data.decode().split('\n')]
-    players = await mojang.bulk_get(igns)
-    bans = 0
-    for player in players:
-        usermanager.banned_users[player.uuid] = f"{player.uuid} | {reason} | Bulk banned by {inter.author.name} ({inter.author.id})"
-        member = inter.guild.get_member(usermanager.linked_users[player.uuid]) if player.uuid in usermanager.linked_users else None
-        if member:
-            print(f'banning {member.name} from from a bulk blacklist ({player.name} {player.uuid})')
-            await member.ban(f"{reason} | Bulk banned by {inter.author.name} ({inter.author.id})")
-            bans += 1
-    await usermanager.banned_users.save()
-    await inter.send(embed=misc.make_success(
-        "Done!",
-        f"Blacklisted `{len(players)}` from the server and banned `{bans}` server members"
     ))
 
 
@@ -687,7 +660,7 @@ async def update_linked_players_task():
     #return # when uncommented, used to stop the task from running
     async with aiohttp.ClientSession() as session:
         member_dict = await misc.get_member_dict(bot)
-        linked_users = await misc.randomize_dict_order(usermanager.linked_users.data)
+        linked_users = misc.randomize_dict_order(usermanager.linked_users.data)
         for uuid, discord_id in linked_users.items():
             if discord_id not in member_dict:
                 print("UNLINKING:", uuid, discord_id)

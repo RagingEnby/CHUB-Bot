@@ -97,7 +97,7 @@ def add_embed_footer(embed: disnake.Embed) -> disnake.Embed:
     return embed
 
 
-async def randomize_dict_order(input_dict: dict) -> dict:
+def randomize_dict_order(input_dict: dict) -> dict:
     keys = list(input_dict.keys())
     random.shuffle(keys)
     return {key: input_dict[key] for key in keys}
