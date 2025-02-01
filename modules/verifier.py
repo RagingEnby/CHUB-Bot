@@ -114,8 +114,10 @@ async def update_member(member: disnake.Member, player: Optional[datatypes.Minec
 
 
 async def remove_verification(member: disnake.Member):
-    to_remove = [disnake.Object(role) for role in config.REQUIRES_VERIFICATION
-                 if member.get_role(role)]
+    to_remove = [
+        disnake.Object(role) for role in config.REQUIRES_VERIFICATION
+        if member.get_role(role)
+    ]
     with suppress(disnake.NotFound, disnake.Forbidden):
         await asyncio.gather(
             member.remove_roles(*to_remove, reason="Unverified"),
