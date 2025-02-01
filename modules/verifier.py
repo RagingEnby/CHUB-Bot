@@ -176,7 +176,7 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
         usermanager.linked_users.data[player.uuid] = member.id
 
         await asyncio.gather(
-            member.add_roles(disnake.Object(config.VERIFIED_ROLE), reason=f'Verified to {player.name}')
+            member.add_roles(disnake.Object(config.VERIFIED_ROLE), reason=f'Verified to {player.name}'),
             update_member(member, session=session) # type: ignore
         )
 
