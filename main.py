@@ -70,7 +70,7 @@ async def on_disconnect():
 
 
 @bot.event
-async def on_message_edit(before: disnake.Message, after: disnake.Message):
+async def on_message_edit(_, after: disnake.Message):
     await mongodb.log_msg(after)
 
 
