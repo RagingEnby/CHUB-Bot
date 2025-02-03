@@ -21,6 +21,7 @@ async def get(*args, **kwargs) -> aiohttp.ClientResponse:
                 return await get(*args, session=session, **kwargs)
         raise e
 
+
 async def post(*args, **kwargs) -> aiohttp.ClientResponse:
     session = kwargs.pop('session', None)
     if session is None:
