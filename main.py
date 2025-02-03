@@ -52,7 +52,7 @@ bot = commands.InteractionBot(
     ),
     owner_ids=config.BOT_OWNERS,
     # this restricts slash commands to ONLY work in collector's hub:
-    test_guilds=[934240413974417439]
+    test_guilds=[config.GUILD_ID]
 )
 
 
