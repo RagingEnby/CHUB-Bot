@@ -625,6 +625,7 @@ async def tem_command(inter: disnake.AppCmdInter):
     description="Checks if a player is banned from CHUB, and tells you why if so."
 )
 async def is_banned_command(inter: disnake.AppCmdInter, ign: str):
+    await inter.response.defer()
     player = await mojang.get(ign)
     if player is None:
         return await inter.send(embed=misc.make_error(
