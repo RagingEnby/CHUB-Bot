@@ -158,7 +158,7 @@ async def on_message(message: disnake.Message):
         
     elif all([
         message.guild,
-        hasattr(message.channel, 'name'),
+        not isinstance(message.channel, disnake.DMChannel),
         message.guild and message.guild.id == config.APPEAL_GUILD_ID,
         isinstance(message.channel, disnake.TextChannel),
         message.channel.name.startswith('ticket-'), # type: ignore
@@ -183,7 +183,7 @@ async def on_message(message: disnake.Message):
         non_staff = [
             m for m in message.channel.members if\
             not m.get_role(config.APPEAL_STAFF_ROLE) and\
-            not m.bot
+            not m.bot # type: ignore
         ]
         if len(non_staff) != 1:
             print("non_staff:", [m.id for m in non_staff])
