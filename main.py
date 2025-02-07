@@ -255,6 +255,10 @@ async def verify_command(inter: disnake.AppCmdInter,
 )
 async def unverify_command(inter: disnake.AppCmdInter):
     await inter.response.defer()
+    # this is a random inside joke, dw about it
+    if inter.author.id == 689199880337358905:
+        return await inter.send('please dont...')
+        
     if not inter.guild or (inter.guild and inter.guild.id != config.GUILD_ID):
         return await inter.send(embed=misc.NOT_GUILD_ERROR)
     await verifier.unverify_command(inter)
