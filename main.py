@@ -244,8 +244,6 @@ async def on_button_click(inter: disnake.MessageInteraction):
 async def verify_command(inter: disnake.AppCmdInter,
                        ign: str = misc.ign_param('Your IGN')):
     await inter.response.defer()
-    if not inter.guild or (inter.guild and inter.guild.id != config.GUILD_ID):
-        return await inter.send(embed=misc.NOT_GUILD_ERROR)
     await verifier.verify_command(inter, ign)
 
 
@@ -259,8 +257,6 @@ async def unverify_command(inter: disnake.AppCmdInter):
     if inter.author.id == 689199880337358905:
         return await inter.send('please dont...')
         
-    if not inter.guild or (inter.guild and inter.guild.id != config.GUILD_ID):
-        return await inter.send(embed=misc.NOT_GUILD_ERROR)
     await verifier.unverify_command(inter)
 
 
@@ -270,8 +266,6 @@ async def unverify_command(inter: disnake.AppCmdInter):
 )
 async def update_command(inter: disnake.AppCmdInter):
     await inter.response.defer()
-    if not inter.guild or (inter.guild and inter.guild.id != config.GUILD_ID):
-        return await inter.send(embed=misc.NOT_GUILD_ERROR)
     await verifier.update_command(inter)
 
 
