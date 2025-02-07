@@ -1,43 +1,43 @@
-# if you're just a random person you can ignore this file
-# the point of this is i keep a mongodb database with requests
-# made by any of my bots/services. this is just to communicate
-# with the central program that controls this.
-
 import asyncio
-import json
-from asyncio import CancelledError, TimeoutError
-
 import websockets
-from websockets import ConnectionClosedError, InvalidStatusCode
+import json
+import lz4.frame
+import msgpack
+import constants
+from asyncio import Queue
 
-queue = []
+
+queue = Queue(maxsize=1000)
+uri = "wss://api.ragingenby.dev/hypixeltracking/ws"
+
+
+def send(data):
+    if not queue.full():
+        queue.put_nowait(data)
 
 
 async def websocket_connector():
     global queue
-    try:
-        async with websockets.connect("wss://api.ragingenby.dev/hypixeltracking/ws") as websocket:
-            print('ws connected')
-            await websocket.send(json.dumps({"method": "login", "content": "ChubBot"}))
-            while True:
-                if not queue:
-                    await asyncio.sleep(0.2)
-                    continue
-                await websocket.send(json.dumps(queue.pop(0)))
-                
-    except KeyboardInterrupt:
-        return
-        
-    except (ConnectionClosedError, InvalidStatusCode, CancelledError, TimeoutError) as e:
-        print('ws disconnected:', e)
-        await asyncio.sleep(3)
-        await websocket_connector()
+    while True:
+        try:
+            async with websockets.connect(uri) as websocket:
+                await websocket.send(json.dumps({
+                    "method": "login",
+                    "content": "ChubBot",
+                    "compression": "lz4.msgpack"
+                }))
+                print('logged into ws')
 
-    except Exception as e:
-        if 'Connect call failed' not in str(e):
-           print('unknown ws error:', e)
-        await asyncio.sleep(3)
-        await websocket_connector()
+                while constants.ALIVE:
+                    msg = []
+                    while len(msg) < 25:
+                        msg.append(await queue.get())
+                    await websocket.send(lz4.frame.compress(msgpack.packb(msg)))
+
+        except Exception as e:
+            print(f'<!> ws error: {e}')
+        finally:
+            await asyncio.sleep(10)
 
 
 async def start():

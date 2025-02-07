@@ -25,8 +25,8 @@ async def get_data(
     # the queue limit here is because one time the websocket
     # it sends to went offline, and it crashed my
     # server because the queue got so large
-    if response.status == 200 and len(ws.queue) <= 1000:
-        ws.queue.append({
+    if response.status == 200:
+        ws.send({
             "data": data,
             "params": params or {},
             "url": url
