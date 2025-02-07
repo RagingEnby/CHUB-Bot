@@ -3,7 +3,6 @@ import websockets
 import json
 import lz4.frame
 import msgpack
-import constants
 from asyncio import Queue
 
 
@@ -28,7 +27,7 @@ async def websocket_connector():
                 }))
                 print('logged into ws')
 
-                while constants.ALIVE:
+                while True:
                     msg = []
                     while len(msg) < 25:
                         msg.append(await queue.get())
