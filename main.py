@@ -155,13 +155,19 @@ async def on_message(message: disnake.Message):
         await asyncio.sleep(60)
         with suppress(disnake.errors.NotFound):
             await message.delete()
-    elif message.guild and message.guild.id == config.APPEAL_GUILD_ID and\
-    isinstance(message.channel, disnake.TextChannel) and\
-    message.channel.name.startswith('ticket-') and\
-    message.author.id == config.TICKET_TOOL_ID and 'Welcome' in message.content and\
-    len(message.embeds) == 2:
+        
+    elif all([
+        message.guild,
+        hasattr(message.channel, 'name'),
+        message.guild and message.guild.id == config.APPEAL_GUILD_ID,
+        isinstance(message.channel, disnake.TextChannel),
+        message.channel.name.startswith('ticket-'), # type: ignore
+        message.author.id == config.TICKET_TOOL_ID,
+        'Welcome' in message.content,
+        len(message.embeds) == 2
+    ]):
         # this is the welcome message in a ticket, for example:
-        # https://i.ragingenby.dev/u/nQpvHm.png
+        # https://enby.pics/u/nQpvHm.png
         description = message.embeds[1].description.replace('**', '').replace('```', '').split('\n')
         description = [i.strip() for i in description]
         ign = description[1]
