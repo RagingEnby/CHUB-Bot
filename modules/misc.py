@@ -283,6 +283,3 @@ async def make_backgroundcheck_embed(player: datatypes.MinecraftPlayer, member: 
             value="No SkyBlock profiles found"
         )
     return embed
-
-
-async def get_
