@@ -665,12 +665,12 @@ async def is_banned_command(inter: disnake.AppCmdInter, ign: str):
 
 @bot.event
 async def on_slash_command(inter: disnake.AppCmdInter):
-    await cmdlogger.on_slash_command(inter)
+    asyncio.create_task(cmdlogger.on_slash_command(inter))
 
 
 @bot.event
 async def on_slash_command_completion(inter: disnake.AppCmdInter):
-    await cmdlogger.on_slash_command_completion(inter)
+    asyncio.create_task(cmdlogger.on_slash_command_completion(inter))
 
 
 async def update_players_task_single(uuid: str, member: disnake.Member,
