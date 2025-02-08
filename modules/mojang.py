@@ -34,8 +34,9 @@ async def get(
             timeout=15
         )
     except asyncio.TimeoutError as e:
-        if not raging_api:
-            return await get(identifier, session=session, raging_api=True)
+        if raging_api:
+            print('RAGINGENBY API IS DOWN:', url)
+            return await get(identifier, session=session, raging_api=False)
         print(f'asyncio.TimeoutError:\ne: {e}\nurl: {url}\nraging_api: {raging_api}')
         raise e
     response = await asyncreqs.get(
