@@ -136,7 +136,7 @@ async def on_member_remove(member: disnake.Member):
 async def on_message(message: disnake.Message):
     asyncio.create_task(mongodb.log_msg(message))
     is_owner = await bot.is_owner(message.author)
-    if not message.guild and not is_owner:
+    if not message.guild and not is_owner and not message.author.bot:
         embed = disnake.Embed(
             description=message.content,
             timestamp=message.created_at
