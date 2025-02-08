@@ -17,16 +17,19 @@ async def log_unlink(player: datatypes.MinecraftPlayer|str):
         del linked_users[player]
 
 
-async def get_linked_player(member: disnake.Member | int, session: Optional[aiohttp.ClientSession] = None) -> Optional[datatypes.MinecraftPlayer]:
+def get_linked_uuid(member: disnake.Member | int) -> Optional[str]:
     if isinstance(member, disnake.Member):
         member = member.id
-    for uuid, discord_id in linked_users.items():
+    for uuid, discord_id in linked_users.data.items():
         if discord_id == member:
-            return await mojang.get(uuid, session=session)
+            return uuid
 
 
-async def is_linked(member: disnake.Member | int) -> bool:
-    return await get_linked_player(member) is not None
+async def get_linked_player(member: disnake.Member | int, session: Optional[aiohttp.ClientSession] = None) -> Optional[datatypes.MinecraftPlayer]:
+    uuid = get_linked_uuid(member)
+    if not uuid:
+        return None
+    return await mojang.get(uuid, session=session)
     
 
 async def log_ban(member: disnake.Member | int, reason: Optional[str] = None):
