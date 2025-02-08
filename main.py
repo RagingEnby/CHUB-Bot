@@ -136,6 +136,16 @@ async def on_member_remove(member: disnake.Member):
 async def on_message(message: disnake.Message):
     asyncio.create_task(mongodb.log_msg(message))
     is_owner = await bot.is_owner(message.author)
+    if not message.guild:
+        embed = disnake.Embed(
+            description=message.content,
+            timestamp=message.created_at
+        )
+        embed.set_author(
+            name=f"{message.author.display_name} ({message.author.id})",
+            icon_url=message.author.display_avatar.url
+        )
+        return await bot.get_user(config.RAGINGENBY_ID).send(embed=embed) # type: ignore
     if message.content.startswith('>exec') and is_owner:
         try:
             tmp_dic = {}
