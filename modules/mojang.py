@@ -1,28 +1,48 @@
-from typing import Optional
+import json
 import asyncio
+from typing import Optional
 
 import aiohttp
 
 import datatypes
 from modules import asyncreqs
-import config
+
+NAME_TO_UUID_URL = "https://api.minecraftservices.com/minecraft/profile/lookup/name/{}"
+UUID_TO_NAME_URL = "https://api.minecraftservices.com/minecraft/profile/lookup/{}"
+
+
+def get_url(identifier: str, raging_api: bool = True) -> str:
+    if raging_api:
+        return f"https://api.ragingenby.dev/player/{identifier}"
+    if len(identifier) > 16:
+        return UUID_TO_NAME_URL.format(identifier)
+    return NAME_TO_UUID_URL.format(identifier)
 
 
 async def get(
     identifier: str,
     session: Optional[aiohttp.ClientSession] = None,
+    raging_api: bool = True
 ) -> Optional[datatypes.MinecraftPlayer]:
-    url = 'https://api.ragingenby.dev/player/' + identifier\
-            if 'https://' not in identifier\
-            else identifier
-    
+    try:
+        response = await asyncio.wait_for(
+            asyncreqs.get(
+                get_url(identifier),
+                session=session
+            ),
+            timeout=10
+        )
+    except asyncio.TimeoutError as e:
+        if not raging_api:
+            return await get(identifier, session=session, raging_api=True)
+        raise e
     response = await asyncreqs.get(
-        url,
+        get_url(identifier),
         session=session
     )
         
     data = await response.json()
-    if 'id' in data and 'name' in data:
+    if data.get('id') and data.get('name'):
         return datatypes.MinecraftPlayer.from_dict(data)
-    print(f'mojang.get({identifier}) > {data}')
+    print(f'mojang.get({identifier}) > {json.dumps(data)}')
     return None
