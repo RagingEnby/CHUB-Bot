@@ -103,11 +103,19 @@ REQUIRES_VERIFICATION: list[int] = [
     + list(RANK_ROLES.values())
 
 
-response = None
-while response is None or response.status_code != 200:
+while True:
     print('getting guild data...')
-    response = requests.get(f'https://api.hypixel.net/v2/guild?key={HYPIXEL_API_KEY}&id={HYPIXEL_GUILD_ID}')
+    response = requests.get(
+        'https://api.hypixel.net/v2/guild',
+        params={
+            "key": HYPIXEL_API_KEY,
+            "id": HYPIXEL_GUILD_ID
+        },
+        headers={'User-Agent': USER_AGENT}
+    )
     if response.status_code != 200:
         print(response.status_code, json.dumps(response.json(), indent=2))
         time.sleep(2)
+        continue
+    break
 guild_members: list[str] = [member['uuid'] for member in response.json()['guild']['members']]
