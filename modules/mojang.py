@@ -24,17 +24,19 @@ async def get(
     session: Optional[aiohttp.ClientSession] = None,
     raging_api: bool = True
 ) -> Optional[datatypes.MinecraftPlayer]:
+    url = get_url(identifier)
     try:
         response = await asyncio.wait_for(
             asyncreqs.get(
-                get_url(identifier),
+                url,
                 session=session
             ),
-            timeout=10
+            timeout=15
         )
     except asyncio.TimeoutError as e:
         if not raging_api:
             return await get(identifier, session=session, raging_api=True)
+        print(f'asyncio.TimeoutError:\ne: {e}\nurl: {url}\nraging_api: {raging_api}')
         raise e
     response = await asyncreqs.get(
         get_url(identifier),
