@@ -31,7 +31,7 @@ async def get(
                 url,
                 session=session
             ),
-            timeout=15
+            timeout=30
         )
     except asyncio.TimeoutError as e:
         if raging_api:
