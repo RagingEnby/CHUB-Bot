@@ -6,7 +6,7 @@ import requests
 from scrts import BOT_TOKEN, HYPIXEL_API_KEY, MONGODB_URI, RAGINGENBY_API_KEY
 
 ITEMS: list[dict[str, Any]] = requests.get('https://api.ragingenby.dev/skyblock/items').json()['items']
-PET_SKINS: set[str] = [item['id'] for item in ITEMS if item.get('id').starstwith('PET_SKIN_')]
+PET_SKINS: set[str] = [item['id'] for item in ITEMS if item.get('id', '').startswith('PET_SKIN_')]
 
 USER_AGENT: str = "ChubBot"
 TRADE_REPORT_FILE_PATH: str = "storage/tradereports.json"
