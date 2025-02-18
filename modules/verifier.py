@@ -34,7 +34,7 @@ async def get_linked_discord(player: datatypes.MinecraftPlayer|str, session: Opt
     return data.get('socialMedia', {}).get('links', {}).get('DISCORD', None)
 
 
-async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[aiohttp.ClientSession] = None) -> list[int]:
+async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[aiohttp.ClientSession] = None, debug: bool = False) -> list[int]:
     item_roles = []
     items, applied_items = await misc.get_player_items(player.uuid, session=session)
     item_ids = [item['ExtraAttributes']['id'] for item in items.values()] + applied_items
@@ -52,7 +52,10 @@ async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[ai
         req_item_ids = req_item_ids.split(',')
         if all(req_item_id in item_ids for req_item_id in req_item_ids):
             item_roles.append(role_id)
-            
+        elif debug:
+            missing = [req_item_id for req_item_id in req_item_ids if req_item_id not in item_ids]
+            print(f"[{role_id}] {player.name} ({player.uuid}) is missing:", '\n  - '.join(missing))
+    
     item_roles.extend(await roles.get_checker_roles(list(items.values())))
     item_roles = list(set(item_roles)) # remove duplicates
     return item_roles
@@ -69,7 +72,7 @@ async def get_misc_roles(player: datatypes.MinecraftPlayer, player_data: dict) -
 
 
 async def update_member(member: disnake.Member, player: Optional[datatypes.MinecraftPlayer] = None,
-                        session: Optional[aiohttp.ClientSession] = None):
+                        session: Optional[aiohttp.ClientSession] = None, debug: bool = False):
     # IDEs get mad if you dont do this:
     if member is None:
         return
@@ -89,7 +92,7 @@ async def update_member(member: disnake.Member, player: Optional[datatypes.Minec
         roles = [config.VERIFIED_ROLE]
 
         item_roles, misc_roles = await asyncio.gather(
-            get_item_roles(player, session=session),
+            get_item_roles(player, session=session, debug=debug),
             get_misc_roles(player, player_data=player_data)
         )
         roles.extend(item_roles)
@@ -216,7 +219,8 @@ async def update_command(inter: disnake.AppCmdInter, member: Optional[disnake.Me
         await update_member(
             member=member,
             player=player,
-            session=session
+            session=session,
+            debug=await inter.bot.is_owner(member) # makes it easy for admins to find missing items quickly
         )
         after = time.time()
         await inter.send(embed=misc.make_success(
