@@ -146,10 +146,10 @@ async def on_button_click(inter: disnake.MessageInteraction, button_data: str): 
     except asyncio.TimeoutError:
         return await inter.author.send('Your trade report window has timed out and is no longer valid.')
 
-    if not modal_inter.user.get_role(config.RECENT_SALES_JURY_ROLE): # type: ignore
+    if not modal_inter.user.get_role(config.RECENT_SALES_JURY_ROLE) and not modal_inter.user.get_role(config.PRICE_CHECKER_ROLE): # type: ignore
         return await modal_inter.send(embed=misc.make_error(
             "No Permissions",
-            f"You must have the <@&{config.RECENT_SALES_JURY_ROLE}> role to send trade reports"
+            f"You must have the <@&{config.RECENT_SALES_JURY_ROLE}> or <@&P{config.PRICE_CHECKER_ROLE}> role to send trade reports"
         ), ephemeral=True)
 
     raw_overpay_underpay = modal_inter.text_values['overpay_underpay'].lower()
