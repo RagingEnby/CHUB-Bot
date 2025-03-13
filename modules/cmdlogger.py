@@ -23,12 +23,21 @@ async def on_slash_command(inter: disnake.AppCmdInter):
             icon_url=inter.guild.icon if inter.guild else inter.author.avatar,
             text=f"{inter.guild.name} ({inter.guild.id})"
         )
+        
     else:
         embed.set_footer(
             text='DMs'
         )
+    view = disnake.ui.View()
+    message = await inter.original_message()
+    if message:
+        view.add_item(disnake.ui.Button(
+            label="View Message",
+            url=message.jump_url,
+            style=disnake.ButtonStyle.link
+        ))
     channel = inter.bot.get_channel(config.LOG_CHANNEL)
-    log_msgs[inter.id] = await channel.send(embed=embed) # type: ignore
+    log_msgs[inter.id] = await channel.send(embed=embed, view=view) # type: ignore
 
 
 async def on_slash_command_completion(inter: disnake.AppCmdInter):
