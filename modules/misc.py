@@ -289,12 +289,17 @@ async def make_backgroundcheck_embed(player: datatypes.MinecraftPlayer, member: 
             value="No SkyBlock profiles found"
         )
     max_fairy_souls = max([profile['fairySouls'] for profile in data['skyblockProfiles']])
+    banned_coop = any(
+        usermanager.banned_users.get(uuid)
+        for uuid in data['coopMembers']
+    )
     content = ""
     # if inter.author.created_at is less than 6 months ago
     if any([
         member and time.time() - member.created_at.timestamp() < 2592000,
         max_fairy_souls < 100,
-        max_nw < 3_000_000_000 and max_nw_api_enabled
+        max_nw < 3_000_000_000 and max_nw_api_enabled,
+        banned_coop
     ]):
         content = config.SUS_ACCOUNT_PING
     return embed, content
