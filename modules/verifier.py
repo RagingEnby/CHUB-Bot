@@ -15,7 +15,7 @@ from modules import datamanager, hypixelapi, misc, mojang, roles, usermanager
 
 async def log_verification(inter: disnake.AppCmdInter, player: datatypes.MinecraftPlayer,
                            member: disnake.Member, session: aiohttp.ClientSession):
-    embed = await misc.make_backgroundcheck_embed(player, member, session=session)
+    embed, content = await misc.make_backgroundcheck_embed(player, member, session=session)
     channel = inter.bot.get_channel(config.VERIFICATION_LOG_CHANNEL)
     await channel.send(embed=embed)
 

@@ -3,6 +3,7 @@ import json
 import random
 from datetime import datetime
 from typing import Any, Literal, Optional
+import time
 
 import aiofiles
 import aiohttp
@@ -240,7 +241,7 @@ def get_date() -> str:
     return datetime.now().strftime("%m/%d/%Y %I:%M %p")
 
 
-async def make_backgroundcheck_embed(player: datatypes.MinecraftPlayer, member: Optional[disnake.Member]=None, session: Optional[aiohttp.ClientSession]=None) -> disnake.Embed:
+async def make_backgroundcheck_embed(player: datatypes.MinecraftPlayer, member: Optional[disnake.Member]=None, session: Optional[aiohttp.ClientSession]=None) -> tuple[disnake.Embed, str]:
     response = await asyncreqs.get(f'https://api.ragingenby.dev/backgroundcheck/{player.uuid}', session=session)
     data = await response.json()
     description = [
@@ -262,8 +263,13 @@ async def make_backgroundcheck_embed(player: datatypes.MinecraftPlayer, member: 
             text=f"{member.name} ({member.id})",
             icon_url=member.display_avatar.url
         )
+    max_nw = 0
+    max_nw_api_enabled = False
     if data['skyblockProfiles']:
         for profile in data['skyblockProfiles']:
+            if profile['networth'] > max_nw:
+                max_nw = profile['networth']
+                max_nw_api_enabled = not any(profile['disabled'].values())
             value = [
                 f"Selected: {':white_check_mark:' if profile['selected'] else ':x:'}",
                 f"Profile Type: `{profile['game_mode']}`",
@@ -282,4 +288,13 @@ async def make_backgroundcheck_embed(player: datatypes.MinecraftPlayer, member: 
             name="No Profiles",
             value="No SkyBlock profiles found"
         )
-    return embed
+    max_fairy_souls = max([profile['fairySouls'] for profile in data['skyblockProfiles']])
+    content = ""
+    # if inter.author.created_at is less than 6 months ago
+    if any([
+        member and time.time() - member.created_at.timestamp() < 2592000,
+        max_fairy_souls < 100,
+        max_nw < 3_000_000_000 and max_nw_api_enabled
+    ]):
+        content = config.SUS_ACCOUNT_PING
+    return embed, content
