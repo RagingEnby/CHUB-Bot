@@ -166,14 +166,14 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
                 "You've been detected ban evading. Please join the appeals server if this is incorrect."
             )
             content = "https://discord.gg/6VAAvW7pAm"
-            await inter.send(content, embed=embed)
             print(f'found a smelly ban evader (ign: {ign}, uuid: {player.uuid}, '
-                  f'reason: {reason}, member.id: {member.id})') # type: ignore
+                  f'reason: {ban_reason}, member.id: {member.id})') # type: ignore
             try:
                 await inter.user.send(content, embed=embed)
             except Exception as e:
                 print(f"couldn't dm ban evading user {member.name} ({member.id}): {e}") # type: ignore
-            return await misc.ban_member(inter.bot, member.id, reason) # type: ignore
+            await misc.ban_member(inter.bot, member.id, reason) # type: ignore
+            return await inter.send(content, embed=embed)
         elif ban_reason:
             await usermanager.log_unban(member.id)
 
