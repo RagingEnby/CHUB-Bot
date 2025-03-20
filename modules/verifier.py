@@ -172,7 +172,7 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
                 await inter.user.send(content, embed=embed)
             except Exception as e:
                 print(f"couldn't dm ban evading user {member.name} ({member.id}): {e}") # type: ignore
-            await misc.ban_member(inter.bot, member.id, reason) # type: ignore
+            await misc.ban_member(inter.bot, member.id, 'ban evading | ', ban_reason) # type: ignore
             return await inter.send(content, embed=embed)
         elif ban_reason:
             await usermanager.log_unban(member.id)
