@@ -20,7 +20,7 @@ async def log_verification(inter: disnake.AppCmdInter, player: datatypes.Minecra
     await channel.send(content, embed=embed)
 
 
-async def get_player_data(uuid: str, session: Optional[aiohttp.ClientSession] = MNone):
+async def get_player_data(uuid: str, session: Optional[aiohttp.ClientSession] = None):
     return await hypixelapi.ensure_data("/player", {"uuid": uuid}, session=session)
 
 
