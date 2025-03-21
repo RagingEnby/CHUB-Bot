@@ -17,7 +17,7 @@ async def log_verification(inter: disnake.AppCmdInter, player: datatypes.Minecra
                            member: disnake.Member, session: aiohttp.ClientSession):
     embed, content = await misc.make_backgroundcheck_embed(player, member, session=session)
     channel = inter.bot.get_channel(config.VERIFICATION_LOG_CHANNEL)
-    await channel.send(embed=embed)
+    await channel.send(content, embed=embed)
 
 
 async def get_player_data(uuid: str, session: Optional[aiohttp.ClientSession] = None):
