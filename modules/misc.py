@@ -290,7 +290,8 @@ async def make_backgroundcheck_embed(player: datatypes.MinecraftPlayer, member: 
         )
     try:
         max_fairy_souls = max([profile['fairySouls'] for profile in data['skyblockProfiles']] or [0])
-    except TypeError:
+    except TypeError as e:
+        print('error getting max_fairy_souls:', e)
         max_fairy_souls = 0
     banned_coop = any(
         usermanager.banned_users.get(uuid)
