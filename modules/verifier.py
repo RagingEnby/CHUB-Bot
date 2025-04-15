@@ -72,7 +72,7 @@ async def get_misc_roles(player: datatypes.MinecraftPlayer, player_data: dict) -
 
 
 async def update_member(member: disnake.Member, player: Optional[datatypes.MinecraftPlayer] = None,
-                        session: Optional[aiohttp.ClientSession] = None, debug: bool = False):
+                        session: Optional[aiohttp.ClientSession] = None, debug: bool = False, player_data: Optional[dict] = None):
     # IDEs get mad if you dont do this:
     if member is None:
         return
@@ -82,7 +82,7 @@ async def update_member(member: disnake.Member, player: Optional[datatypes.Minec
     if player is None:
         print(member.name, 'might have an invalid account linked')
         return
-    player_data = await get_player_data(player.uuid, session=session)
+    player_data = player_data or await get_player_data(player.uuid, session=session)
     discord = await get_linked_discord(player, player_data=player_data)
     if discord is None or str(discord).lower() != member.name.lower():
         del usermanager.linked_users[player.uuid]
@@ -147,7 +147,8 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
                 f"does not belong to any Minecraft player!."
             ))
 
-        discord = await get_linked_discord(player, session=session)
+        player_data = await get_player_data(player.uuid, session=session)
+        discord = await get_linked_discord(player, player_data=player_data)
         if str(discord).lower() != member.name.lower(): # type: ignore
             return await inter.send(embed=misc.make_error(
                 "Discord Mismatch",
