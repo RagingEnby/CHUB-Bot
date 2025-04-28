@@ -61,10 +61,12 @@ async def get_item_roles(player: datatypes.MinecraftPlayer, session: Optional[ai
     return item_roles
 
 
-async def get_misc_roles(player: datatypes.MinecraftPlayer, player_data: dict) -> list[int]:
+async def get_misc_roles(player: datatypes.MinecraftPlayer, player_data: dict, debug: bool = False) -> list[int]:
     roles = []
     if player.uuid in config.guild_members:
         roles.append(config.GUILD_MEMBER_ROLE)
+    else:
+        print('guild check:', player.uuid, 'not in', json.dumps(config.guild_members))
     rank = player_data.get('player', {}).get('rank')
     if rank in config.RANK_ROLES:
         roles.append(config.RANK_ROLES[rank])
