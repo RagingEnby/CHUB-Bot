@@ -65,7 +65,7 @@ async def get_misc_roles(player: datatypes.MinecraftPlayer, player_data: dict, d
     roles = []
     if player.uuid in config.guild_members:
         roles.append(config.GUILD_MEMBER_ROLE)
-    else:
+    elif debug:
         print('guild check:', player.uuid, 'not in', json.dumps(config.guild_members))
     rank = player_data.get('player', {}).get('rank')
     if rank in config.RANK_ROLES:
@@ -95,7 +95,7 @@ async def update_member(member: disnake.Member, player: Optional[datatypes.Minec
 
         item_roles, misc_roles = await asyncio.gather(
             get_item_roles(player, session=session, debug=debug),
-            get_misc_roles(player, player_data=player_data)
+            get_misc_roles(player, player_data=player_data, debug=debug)
         )
         roles.extend(item_roles)
         roles.extend(misc_roles)
