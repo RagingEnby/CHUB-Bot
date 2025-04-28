@@ -78,6 +78,8 @@ async def update_member(member: disnake.Member, player: Optional[datatypes.Minec
     # IDEs get mad if you dont do this:
     if member is None:
         return
+
+    debug = debug or member.id == config.RAGINGENBY_ID
         
     if player is None:
         player = await usermanager.get_linked_player(member, session=session)
@@ -104,7 +106,7 @@ async def update_member(member: disnake.Member, player: Optional[datatypes.Minec
             with suppress(Forbidden):
                 await member.edit(nick=player.name)
         tasks = []
-        if player.name in config.guild_members and config.GUILD_MEMBER_ROLE in [role.id for role in member.roles]:
+        if player.uuid not in config.guild_members and member.get_role(config.GUILD_MEMBER_ROLE):
             tasks.append(member.remove_roles(
                 disnake.Object(config.GUILD_MEMBER_ROLE),
                 reason="Not Guild Member"
