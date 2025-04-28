@@ -195,8 +195,7 @@ ITEM_ID_ROLES: dict[str, int] = {
 
 RANK_ROLES: dict[str, int] = {
     "YOUTUBER": 935002292791427092, # @Content Creator
-    "ADMIN": 1295140666640171018, # @Hypixel Staff
-    "GAMEMASTER": 1295140666640171018, # @Hypixel Staff
+    "STAFF": 1295140666640171018, # @Hypixel Staff
     "NORMAL": 1341460040128659576, # @Ex Staff/YT Rank (just a role for ragingenby to view a list lol)
 }
 
