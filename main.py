@@ -387,7 +387,7 @@ async def moderation_give_role_command(inter: disnake.AppCmdInter, member: disna
     if role.id == config.STAFF_ROLE:
         return await inter.send(embed=misc.make_error(
             "Staff Role",
-            f"The bot is manually set to not give out the <@{config.STAFF_ROLE}> role."
+            f"The bot is manually set to not give out the <@&{config.STAFF_ROLE}> role."
         ))
     try:
         await member.add_roles(role)
