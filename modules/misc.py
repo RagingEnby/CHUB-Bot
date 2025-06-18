@@ -172,6 +172,7 @@ async def validate_mod_cmd(inter: disnake.AppCmdInter, role: Optional[disnake.Ro
             f"You are not allowed to give away this role as it is above your top role "
             f"({inter.author.top_role.mention})"
         ))
+        return False
     return True
 
 
