@@ -169,8 +169,7 @@ async def validate_mod_cmd(inter: disnake.AppCmdInter, role: Optional[disnake.Ro
     if role and inter.author.top_role <= role: # type: ignore
         await inter.send(embed=make_error(
             "not allowed",
-            f"You are not allowed to give away this role as it is above your top role "
-            f"({inter.author.top_role.mention})"
+            f"Your top role ({inter.author.top_role.mention}) is not high enough to use this command"
         ))
         return False
     return True
