@@ -6,7 +6,6 @@ import config
 async def get(*args, **kwargs) -> aiohttp.ClientResponse:
     session = kwargs.pop('session', None)
     headers = kwargs.pop('headers', {})
-    headers['User-Agent'] = config.USER_AGENT
     if session is None or session.closed:
         async with aiohttp.ClientSession() as session:
             return await get(*args, session=session, **kwargs)

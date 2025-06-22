@@ -10,7 +10,7 @@ from modules import asyncreqs, hypixelapi, mojang, usermanager
 import config
 
 
-ITEMS: dict[str, str] = requests.get('https://api.ragingenby.dev/skyblock/item_ids', headers={"User-Agent": config.USER_AGENT}).json()['items']
+ITEMS: dict[str, str] = requests.get('https://api.ragingenby.dev/skyblock/item_ids').json()['items']
 AUTOCOMPLETE_IGN_CACHE: dict[str, list[str]] = {}
 PROFILE_NAMES_CACHE: dict[str, list[str]] = {}
 

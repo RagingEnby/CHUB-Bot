@@ -11,7 +11,6 @@ PET_SKINS: set[str] = {
     if item.get('id', '').startswith('PET_SKIN_')
 }
 
-USER_AGENT: str = "ChubBot"
 TRADE_REPORT_FILE_PATH: str = "storage/tradereports.json"
 TRADE_REPORT_VERIFICATION_CHANNEL: int = 1297080682517889045
 TRADE_REPORT_CHANNEL: int = 1201283974924861470
@@ -216,8 +215,7 @@ while True:
         params={
             "key": HYPIXEL_API_KEY,
             "id": HYPIXEL_GUILD_ID
-        },
-        headers={'User-Agent': USER_AGENT}
+        }
     )
     if response.status_code != 200:
         print(response.status_code, json.dumps(response.json(), indent=2))
