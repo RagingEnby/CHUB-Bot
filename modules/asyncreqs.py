@@ -10,6 +10,9 @@ async def get(*args, **kwargs) -> aiohttp.ClientResponse:
     if session is None or session.closed:
         async with aiohttp.ClientSession() as session:
             return await get(*args, session=session, **kwargs)
+    if 'api.hypixel.net' in args[0]:
+        kwargs['proxy'] = config.PROXY
+        kwargs['proxy_auth'] = config.PROXY_AUTH
     try:
         async with session.get(*args, headers=headers, **kwargs) as response:
             await response.read() # read the response before we __aexit__ so itll store

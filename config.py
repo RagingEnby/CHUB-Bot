@@ -3,7 +3,7 @@ import json
 import time
 import requests
 
-from scrts import BOT_TOKEN, HYPIXEL_API_KEY, MONGODB_URI, RAGINGENBY_API_KEY
+from scrts import BOT_TOKEN, HYPIXEL_API_KEY, MONGODB_URI, RAGINGENBY_API_KEY, PROXY, PROXY_AUTH
 
 ITEMS: list[dict[str, Any]] = requests.get('https://api.ragingenby.dev/skyblock/items').json()['items']
 PET_SKINS: set[str] = {
