@@ -207,12 +207,6 @@ async def on_message(message: disnake.Message):
         if ban is None:
             return await message.channel.send(f"{member.mention} I was unable to find your ban, please try rejoining Collector's Hub\nhttps://discord.gg/collectors")
         embed, _ = await misc.make_backgroundcheck_embed(player=player, member=member)
-        example_ban_reasons = [
-            "proxy for banned member | Banned by ubz.gabriel (305432997187026944)",
-            "coop with scammer (Dudiee) | Banned by ubz.gabriel (305432997187026944)",
-            "alt | Banned by ubz.gabriel (305432997187026944)",
-            
-        ]
         banned_by = None
         if ban.reason:
             banned_by = ban.reason.replace('(', '').replace(')', '')
