@@ -248,12 +248,12 @@ async def make_backgroundcheck_embed(
     session: Optional[aiohttp.ClientSession]=None
 ) -> tuple[disnake.Embed, str]:
     skyblock_data = await hypixelapi.ensure_data('/skyblock/profiles', {"uuid": player.uuid}, session=session)
-    player_data = player_data or {}
+    player_data = (player_data or {}).get('player') or {}
     description = [
         f"**Linked To:** {member.mention}" if member else "",
         f"**Discord Created:** <t:{int(member.created_at.timestamp())}:R>" if member else "",
         f"**Joined Server:** <t:{int(member.joined_at.timestamp())}:R>",
-        f"**First Hypixel Login:** <t:{round(player_data['firstLogin'])//1000}:R>" if player_data['firstLogin'] else ""
+        f"**First Hypixel Login:** <t:{round(player_data['firstLogin'])//1000}:R>" if player_data.get('lastLogin') else ""
     ]
     embed = disnake.Embed(
         description='\n'.join(description)
