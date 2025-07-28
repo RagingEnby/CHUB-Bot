@@ -276,7 +276,7 @@ async def make_backgroundcheck_embed(
         fairy_souls = profile['members'][player.uuid].get('fairy_soul', {}).get('total_collected', 0)
         if fairy_souls > max_fairy_souls:
             max_fairy_souls = fairy_souls
-        level = profile['members'][player.uuid]['leveling']['experience'] / 100
+        level = profile['members'][player.uuid].get('leveling', {}).get('experience', 0) / 100
         if level > max_level:
             max_level = level
         embed.add_field(
