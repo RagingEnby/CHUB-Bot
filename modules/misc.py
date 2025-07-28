@@ -289,13 +289,16 @@ async def make_backgroundcheck_embed(
             ]),
             inline=True
         )
+
+    banned_coop_members = {uuid for uuid in coop_members if uuid in usermanager.banned_users}
         
     content = ""
     # if inter.author.created_at is less than 6 months ago
     if any([
         member and time.time() - member.created_at.timestamp() < 2592000,
         max_fairy_souls < 100,
-        max_level < 100
+        max_level < 100,
+        banned_coop_members
     ]):
         content = config.SUS_ACCOUNT_PING
     return embed, content
