@@ -134,6 +134,8 @@ async def on_member_remove(member: disnake.Member):
 
 @bot.event
 async def on_message(message: disnake.Message):
+    if not message.guild:
+        return
     asyncio.create_task(mongodb.log_msg(message))
     is_owner = await bot.is_owner(message.author)
     if not message.guild and not is_owner and not message.author.bot:
