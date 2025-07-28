@@ -13,9 +13,18 @@ import datatypes
 from modules import datamanager, hypixelapi, misc, mojang, roles, usermanager
 
 
-async def log_verification(inter: disnake.AppCmdInter, player: datatypes.MinecraftPlayer,
-                           member: disnake.Member, session: aiohttp.ClientSession):
-    embed, content = await misc.make_backgroundcheck_embed(player, member, session=session)
+async def log_verification(
+    inter: disnake.AppCmdInter,
+    player: datatypes.MinecraftPlayer,
+    member: disnake.Member,
+    player_data: dict,
+    session: aiohttp.ClientSession
+):
+    embed, content = await misc.make_backgroundcheck_embed(
+        player=player,
+        member=member,
+        player_data=player_data,
+        session=session)
     channel = inter.bot.get_channel(config.VERIFICATION_LOG_CHANNEL)
     await channel.send(content, embed=embed)
 
@@ -191,7 +200,13 @@ async def verify_command(inter: disnake.AppCmdInter, ign: str, member: Optional[
 
         with suppress(disnake.NotFound, disnake.Forbidden):
             await inter.send(embed=misc.make_success(title="Successfully Linked!"))
-    await log_verification(inter, player, member, session=session)
+    await log_verification(
+        inter=inter,
+        player=player,
+        member=member,
+        player_data=player_data,
+        session=session
+    )
 
 
 async def unverify_command(inter: disnake.AppCmdInter, member: Optional[disnake.Member] = None):

@@ -241,21 +241,25 @@ def get_date() -> str:
     return datetime.now().strftime("%m/%d/%Y %I:%M %p")
 
 
-async def make_backgroundcheck_embed(player: datatypes.MinecraftPlayer, member: Optional[disnake.Member]=None, session: Optional[aiohttp.ClientSession]=None) -> tuple[disnake.Embed, str]:
-    response = await asyncreqs.get(f'https://api.ragingenby.dev/backgroundcheck/{player.uuid}', session=session)
-    data = await response.json()
+async def make_backgroundcheck_embed(
+    player: datatypes.MinecraftPlayer,
+    member: Optional[disnake.Member] = None,
+    player_data: Optional[dict] = None,
+    session: Optional[aiohttp.ClientSession]=None
+) -> tuple[disnake.Embed, str]:
+    skyblock_data = await hypixelapi.ensure_data('/skyblock/profiles', {"uuid": player.uuid}, session=session)
+    player_data = player_data or {}
     description = [
         f"**Linked To:** {member.mention}" if member else "",
         f"**Discord Created:** <t:{int(member.created_at.timestamp())}:R>" if member else "",
         f"**Joined Server:** <t:{int(member.joined_at.timestamp())}:R>",
-        f"**First Hypixel Login:** <t:{round(data['firstLogin'])//1000}:R>" if data['firstLogin'] else "",
-        f"**Possible Alts:** `{', '.join([disnake.utils.escape_markdown(player['name']) for player in data['possibleAlts']]) if data['possibleAlts'] else 'None'}`"
+        f"**First Hypixel Login:** <t:{round(player_data['firstLogin'])//1000}:R>" if player_data['firstLogin'] else ""
     ]
     embed = disnake.Embed(
         description='\n'.join(description)
     )
     embed.set_author(
-        name=data['rankname'] or player.name,
+        name=player.name,
         icon_url=player.avatar
     )
     if member:
@@ -263,47 +267,35 @@ async def make_backgroundcheck_embed(player: datatypes.MinecraftPlayer, member: 
             text=f"{member.name} ({member.id})",
             icon_url=member.display_avatar.url
         )
-    max_nw = 0
-    max_nw_api_enabled = False
-    if data['skyblockProfiles']:
-        for profile in data['skyblockProfiles']:
-            if profile['networth'] > max_nw:
-                max_nw = profile['networth']
-                max_nw_api_enabled = not any(profile['disabled'].values())
-            value = [
-                f"Selected: {':white_check_mark:' if profile['selected'] else ':x:'}",
-                f"Profile Type: `{profile['game_mode']}`",
-                f"Networth: `{numerize(profile['networth'])}`",
-                f"Level: `{profile['sbLevel']}`",
-                f"Fairy Souls: `{profile['fairySouls']}`",
-            ]
-            for weight_name, weight_value in profile['weight'].items():
-                value.append(f"-# {weight_name.title()} Weight: `{round(weight_value, 2)}`")
-            embed.add_field(
-                name=profile['cute_name'],
-                value='\n'.join(value)
-            )
-    else:
+    max_fairy_souls = 0
+    max_level = 0
+    coop_members: set[str] = set()
+    for profile in skyblock_data.get('profiles', []):
+        for coop_member in profile['members']:
+            coop_members.add(coop_member)
+        fairy_souls = profile['members'][player.uuid]['fairy_soul']['total_collected']
+        if fairy_souls > max_fairy_souls:
+            max_fairy_souls = fairy_souls
+        level = profile['members'][player.uuid]['leveling']['experience'] / 100
+        if level > max_level:
+            max_level = level
         embed.add_field(
-            name="No Profiles",
-            value="No SkyBlock profiles found"
+            name=profile['cute_name'],
+            value='\n'.join([
+                f"**Fairy Souls:** `{fairy_souls}`",
+                f"**Level:** `{level}`"
+                f"**Game Mode:** `{profile.get('game_mode', 'normal').title()}`",
+                f"**Created:** <t:{round(profile['created_at'])//1000}:R>",
+            ]),
+            inline=True
         )
-    try:
-        max_fairy_souls = max([profile['fairySouls'] for profile in data['skyblockProfiles']] or [0])
-    except TypeError as e:
-        print('error getting max_fairy_souls:', e)
-        max_fairy_souls = 0
-    banned_coop = any(
-        usermanager.banned_users.get(uuid)
-        for uuid in data['coopMembers']
-    )
+        
     content = ""
     # if inter.author.created_at is less than 6 months ago
     if any([
         member and time.time() - member.created_at.timestamp() < 2592000,
         max_fairy_souls < 100,
-        max_nw < 3_000_000_000 and max_nw_api_enabled,
-        banned_coop
+        max_level < 100
     ]):
         content = config.SUS_ACCOUNT_PING
     return embed, content
