@@ -273,7 +273,7 @@ async def make_backgroundcheck_embed(
     for profile in skyblock_data.get('profiles', []):
         for coop_member in profile['members']:
             coop_members.add(coop_member)
-        fairy_souls = profile['members'][player.uuid]['fairy_soul']['total_collected']
+        fairy_souls = profile['members'][player.uuid].get('fairy_soul', {}).get('total_collected', 0)
         if fairy_souls > max_fairy_souls:
             max_fairy_souls = fairy_souls
         level = profile['members'][player.uuid]['leveling']['experience'] / 100
