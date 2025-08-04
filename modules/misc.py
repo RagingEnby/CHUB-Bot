@@ -282,10 +282,10 @@ async def make_backgroundcheck_embed(
         embed.add_field(
             name=profile['cute_name'],
             value='\n'.join([
-                f"**Fairy Souls:** `{fairy_souls}`",
-                f"**Level:** `{level}`",
-                f"**Game Mode:** `{profile.get('game_mode', 'normal').title()}`",
-                f"**Created:** <t:{round(profile.get('created_at', 0))//1000}:R>",
+                f"Fairy Souls: `{fairy_souls}`",
+                f"Level: `{level}`",
+                f"Game Mode: `{profile.get('game_mode', 'normal').title()}`",
+                f"Created: <t:{round(profile.get('created_at', 0))//1000}:R>",
             ]),
             inline=True
         )
