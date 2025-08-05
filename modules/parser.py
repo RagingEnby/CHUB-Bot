@@ -88,8 +88,7 @@ async def get_museum_inventories(profiles: list[dict]) -> list[dict]:
             for i, item_data in enumerate(formatted_member_data['parsed']):
                 if isinstance(item_data, list):
                     remove.append(i)
-                    for item in item_data:
-                        formatted_member_data['parsed'].extend(item)
+                    formatted_member_data['parsed'].extend(item_data)
             for i in reversed(remove):
                 del formatted_member_data['parsed'][i]
             del formatted_member_data['bytes']
