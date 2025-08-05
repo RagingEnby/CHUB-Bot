@@ -144,7 +144,13 @@ async def get_inventories(sb_data: dict) -> list[dict]:
             inventories.update(process_inventory(member_data.get('rift', {}).get('inventory', {}), parent='rift'))
             inventories.update(process_inventory(member_data.get('shared_inventory', {}), parent='shared_inventory'))
             # combine all the inventory dicts:
-            parsed = {inv_name: await decode_bytes(inv_contents) for inv_name, inv_contents in inventories.items() if isinstance(inv_contents, str)}
+            parsed = {}
+            for inv_name, inv_contents in inventories.items():
+                try:
+                    parsed[inv_name] = await decode_bytes(inv_contents)
+                except UnicodeDecodeError as e:
+                    print('unable to parse inventory data for', uuid, profile['profile_id'], inv_name, inv_contents, e, sep=' - ')
+                    continue
             items.append({
                 "playerId": uuid,
                 "profileId": profile['profile_id'],
