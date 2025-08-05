@@ -149,7 +149,7 @@ async def get_inventories(sb_data: dict) -> list[dict]:
                 try:
                     parsed[inv_name] = await decode_bytes(inv_contents)
                 except UnicodeDecodeError as e:
-                    print('unable to parse inventory data for', uuid, profile['profile_id'], inv_name, inv_contents, e, sep=' - ')
+                    print('unable to parse inventory data for', uuid, profile['profile_id'], inv_name, e, sep=' - ')
                     continue
             items.append({
                 "playerId": uuid,
