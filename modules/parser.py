@@ -80,17 +80,11 @@ async def get_museum_inventories(profiles: list[dict]) -> list[dict]:
                 if item_bytes is None:
                     continue
                 formatted_member_data['bytes'].append(item_bytes)
-            formatted_member_data['parsed'] = [
-                decode(item_bytes)
-                for item_bytes in formatted_member_data['bytes']
-            ]
-            remove = []
-            for i, item_data in enumerate(formatted_member_data['parsed']):
-                if isinstance(item_data, list):
-                    remove.append(i)
-                    formatted_member_data['parsed'].extend(item_data)
-            for i in reversed(remove):
-                del formatted_member_data['parsed'][i]
+            formatted_member_data['parsed'] = []
+            for item_bytes in formatted_member_data['bytes']:
+                decoded_items = decode(item_bytes)
+                formatted_member_data['parsed'].extend(decoded_items)
+
             del formatted_member_data['bytes']
             members_data.append(formatted_member_data)
     return members_data
@@ -122,7 +116,7 @@ async def get_inventories(sb_data: dict) -> list[dict]:
             parsed = {}
             for inv_name, inv_contents in inventories.items():
                 try:
-                    parsed[inv_name] = await decode_bytes(inv_contents)
+                    parsed[inv_name] = decode(inv_contents)
                 except UnicodeDecodeError as e:
                     print('unable to parse inventory data for', uuid, profile['profile_id'], inv_name, e, sep=' - ')
                     continue
