@@ -9,9 +9,9 @@ from nbt import nbt
 
 def nbt_to_dict_(nbt_data: nbt.NBTFile|nbt.TAG_Compound|nbt.TAG_List|Any) -> dict|list|Any:
     if isinstance(nbt_data, (nbt.NBTFile, nbt.TAG_Compound)):
-        return {tag.name: nbt_to_dict(tag) for tag in nbt_data.tags}
+        return {tag.name: nbt_to_dict_(tag) for tag in nbt_data.tags}
     elif isinstance(nbt_data, nbt.TAG_List):
-        return [nbt_to_dict(item) for item in nbt_data.tags]
+        return [nbt_to_dict_(item) for item in nbt_data.tags]
     return nbt_data.value
 
 
