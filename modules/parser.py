@@ -21,13 +21,9 @@ async def nbt_to_dict(nbt_data) -> dict:
         return nbt_data.value
 
 
-async def un_gzip(gzipped_data: bytes) -> Optional[dict]:
+async def un_gzip(gzipped_data: bytes) -> dict:
     loop = asyncio.get_event_loop()
-    try:
-        data = await loop.run_in_executor(None, lambda: nbt.NBTFile(fileobj=io.BytesIO(gzipped_data)))
-    except UnicodeDecodeError as e:
-        print('unable to ungzip data:', e)
-        return None
+    data = await loop.run_in_executor(None, lambda: nbt.NBTFile(fileobj=io.BytesIO(gzipped_data)))
     return await nbt_to_dict(data)
 
 
@@ -38,8 +34,6 @@ async def decode_bytes(item_bytes: str = None, gzipped_data=None) -> list[dict]:
     if not gzipped_data:
         gzipped_data = base64.b64decode(item_bytes)
     dict_data = await un_gzip(gzipped_data)
-    if not dict_data:
-        return []
     data = await ensure_all_decoded(dict_data)
     formatted_data = []
     if 'i' in data and len(data) == 1:
