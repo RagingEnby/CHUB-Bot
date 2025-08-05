@@ -1,85 +1,61 @@
-import asyncio
-import base64
 import io
 import json
-from typing import Optional
+from base64 import b64decode
+from contextlib import suppress
+from typing import Any, Optional
 
-import aiofiles
 from nbt import nbt
 
 
-async def nbt_to_dict(nbt_data) -> dict:
-    if isinstance(nbt_data, nbt.NBTFile) or isinstance(nbt_data, nbt.TAG_Compound):
-        return {tag.name: await nbt_to_dict(tag) for tag in nbt_data.tags}
+def nbt_to_dict_(nbt_data: nbt.NBTFile|nbt.TAG_Compound|nbt.TAG_List|Any) -> dict|list|Any:
+    if isinstance(nbt_data, (nbt.NBTFile, nbt.TAG_Compound)):
+        return {tag.name: nbt_to_dict(tag) for tag in nbt_data.tags}
     elif isinstance(nbt_data, nbt.TAG_List):
-        return [await nbt_to_dict(item) for item in nbt_data.tags]
-    elif isinstance(nbt_data, nbt.TAG_Byte_Array) or isinstance(nbt_data, nbt.TAG_Int_Array):
-        return nbt_data.value
-    elif isinstance(nbt_data, nbt.TAG_String):
-        return nbt_data.value
-    else:
-        return nbt_data.value
+        return [nbt_to_dict(item) for item in nbt_data.tags]
+    return nbt_data.value
 
 
-async def un_gzip(gzipped_data: bytes) -> dict:
-    loop = asyncio.get_event_loop()
-    data = await loop.run_in_executor(None, lambda: nbt.NBTFile(fileobj=io.BytesIO(gzipped_data)))
-    return await nbt_to_dict(data)
+def nbt_to_dict(nbt_data: nbt.NBTFile) -> list[dict]:
+    # The ONLY point of this function is to make sure IDEs know the
+    # proper datatype returned when passing a single object
+    return nbt_to_dict_(nbt_data)  # type: ignore [assignment]
 
 
-async def decode_bytes(item_bytes: str = None, gzipped_data=None) -> list[dict]:
-    if item_bytes is None and gzipped_data is None:
-        raise ValueError("Either item_bytes or gzipped_data must be provided")
-
-    if not gzipped_data:
-        gzipped_data = base64.b64decode(item_bytes)
-    dict_data = await un_gzip(gzipped_data)
-    data = await ensure_all_decoded(dict_data)
-    formatted_data = []
-    if 'i' in data and len(data) == 1:
-        data = data['i']
-        for item in data:
-            if 'tag' not in item:
-                continue
-            tag = item['tag']
-            tag['Damage'] = item['Damage']
-            formatted_data.append(tag)
-
-    elif len(data) > 1:
-        print('len(data) > 1')
-        print(json.dumps(data, indent=2))
-    return formatted_data
+def raw_decode(data: bytes) -> list[dict[str, Any]]:
+    with io.BytesIO(data) as fileobj:
+        parsed_data: dict[str, list[dict[str, Any]]] = nbt_to_dict(nbt.NBTFile(fileobj=fileobj)) # type: ignore [assignment]
+        if len(parsed_data) == 1 and 'i' in parsed_data:
+            return parsed_data['i']
+        else:
+            raise ValueError('Invalid item data', data)
 
 
-async def ensure_all_decoded(data: dict) -> dict:
+def ensure_all_decoded(data: dict[str, Any]|Any) -> dict[str, Any]:
     for k, v in data.items():
+        if k == 'petInfo' and isinstance(v, str):
+            with suppress(json.JSONDecodeError):
+                data[k] = json.loads(v)
         if isinstance(v, dict):
-            data[k] = await ensure_all_decoded(v)
+            data[k] = ensure_all_decoded(v)
         elif isinstance(v, list):
-            data[k] = await asyncio.gather(*[
-                ensure_all_decoded(item) for item in v
+            data[k] = [
+                ensure_all_decoded(item)
                 if isinstance(item, (dict, list))
-            ])
+                else item for item in v
+            ]
         elif isinstance(v, bytearray):
-            # TODO: Fix this (this does not work)
-            decoded_v = await decode_bytes(gzipped_data=v)
-            if len(decoded_v) == 1 and 'i' in decoded_v[0]:
-                decoded_v = decoded_v[0]['i']
-            data[k] = decoded_v
+            data[k] = str(v)
+            #data[k] = raw_decode(v)
     return data
 
 
-async def decode_item(item_bytes: str) -> dict:
-    dict_data = await decode_bytes(item_bytes)
-    print('decode_bytes() ->', type(dict_data))
-    if len(dict_data) == 1:
-        return await ensure_all_decoded(dict_data[0])
-    raise ValueError("unexpected item data format: " + str(dict_data))
+
+def decode(item_bytes: str) -> list[dict[str, Any]]:
+    return [ensure_all_decoded(i) for i in raw_decode(b64decode(item_bytes))]
 
 
-async def decode_items(item_bytes: str) -> list[dict]:
-    data: list[dict] = await decode_bytes(item_bytes)
-    return await asyncio.gather(*[ensure_all_decoded(item) for item in data])
+def decode_single(item_bytes: str) -> dict[str, Any]:
+    return decode(item_bytes)[0]
 
 
 async def get_museum_inventories(profiles: list[dict]) -> list[dict]:
@@ -104,16 +80,16 @@ async def get_museum_inventories(profiles: list[dict]) -> list[dict]:
                 if item_bytes is None:
                     continue
                 formatted_member_data['bytes'].append(item_bytes)
-            formatted_member_data['parsed'] = await asyncio.gather(*[
-                decode_items(item_bytes)
+            formatted_member_data['parsed'] = [
+                decode(item_bytes)
                 for item_bytes in formatted_member_data['bytes']
-            ])
+            ]
             remove = []
             for i, item_data in enumerate(formatted_member_data['parsed']):
                 if isinstance(item_data, list):
                     remove.append(i)
                     for item in item_data:
-                        formatted_member_data['parsed'].append(item)
+                        formatted_member_data['parsed'].extend(item)
             for i in reversed(remove):
                 del formatted_member_data['parsed'][i]
             del formatted_member_data['bytes']
