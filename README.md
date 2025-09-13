@@ -1,4 +1,4 @@
-This is the official github repository for the Collector's Hub Bot used in the [Collector's Hub](https://discord.gg/collectors) Discord server.
+This is the official github repository for the Collector's Hub Bot used in the [Collector's Hub](https://discord.gg/HqyfTBe6Dj) Discord server.
 
 **THIS BOT IS NOT WELL MADE** this is 'discontinued' because I left the chub staff team. The bot is coded very bad please do not use this
 

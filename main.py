@@ -207,7 +207,7 @@ async def on_message(message: disnake.Message):
                 ban = ban_
                 break
         if ban is None:
-            return await message.channel.send(f"{member.mention} I was unable to find your ban, please try rejoining Collector's Hub\nhttps://discord.gg/collectors")
+            return await message.channel.send(f"{member.mention} I was unable to find your ban, please try rejoining Collector's Hub\nhttps://discord.gg/HqyfTBe6Dj")
         embed, _ = await misc.make_backgroundcheck_embed(player=player, member=member)
         banned_by = None
         if ban.reason:
