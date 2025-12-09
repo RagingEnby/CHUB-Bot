@@ -16,3 +16,8 @@ venv/*
 generated-icon.png
 # i edit this file nearly constantly doing various random tests:
 test.py
+
+debug.json
+vouches.json.*
+callgrind.*
+
