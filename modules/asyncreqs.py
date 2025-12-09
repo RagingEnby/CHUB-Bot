@@ -19,7 +19,7 @@ async def get(*args, **kwargs) -> aiohttp.ClientResponse:
                 print(
                     response.status,
                     response.method,
-                    str(response.url).split(".net/")[-1],
+                    str(response.url).split(".net")[-1],
                 )
             return response
     except RuntimeError as e:
